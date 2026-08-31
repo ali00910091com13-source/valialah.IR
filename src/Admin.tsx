@@ -12,7 +12,13 @@ import {
   disconnectCloud,
   isDefaultList,
 } from "./doctorStore";
-import { testCloud, saveCloudCfg, SETUP_SQL, getCloudCfg } from "./cloud";
+import {
+  testCloud,
+  saveCloudCfg,
+  SETUP_SQL,
+  getCloudCfg,
+  normalizeProjectUrl,
+} from "./cloud";
 import {
   IconGear,
   IconKey,
@@ -723,6 +729,7 @@ function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") =
   const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
   const meta = SYNC_META[sync] ?? SYNC_META.off;
+  const preview = normalizeProjectUrl(url);
 
   const copySql = async () => {
     try {
@@ -736,7 +743,7 @@ function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") =
 
   const handleConnect = async () => {
     if (!url.trim() || !key.trim()) {
-      setMsg({ kind: "err", text: "هم آدرس پروژه و هم کلید anon را وارد کنید." });
+      setMsg({ kind: "err", text: "هم آدرس پروژه و هم کلید را وارد کنید." });
       return;
     }
     setBusy(true);
@@ -750,6 +757,11 @@ function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") =
       setUrl("");
       setKey("");
       onToast("اتصال برقرار شد ✅ فهرست برای همه همگام‌سازی می‌شود");
+    } else if (r.badUrl) {
+      setMsg({
+        kind: "err",
+        text: "آدرس شناخته نشد — چیزی شبیه https://abcdefgh.supabase.co بچسبانید (یا آدرس داشبورد Supabase را کپی کنید تا خودکار پروژه را پیدا کنیم).",
+      });
     } else if (r.missingTable) {
       setMsg({
         kind: "err",
@@ -758,7 +770,7 @@ function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") =
     } else {
       setMsg({
         kind: "err",
-        text: "اتصال برقرار نشد — Project URL و anon public key را از تنظیمات پروژه‌ی Supabase کپی کنید.",
+        text: "کلید اشتباه است یا دسترسی ندارد — کلید «Publishable» (همان anon public) را از API Keys کپی کنید.",
       });
     }
   };
@@ -858,21 +870,37 @@ function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") =
             <li className="flex gap-3.5">
               <span className="font-display grid h-8 w-8 shrink-0 place-items-center rounded-full bg-sea/25 text-lg text-[#7fd6cb]">۳</span>
               <div className="min-w-0 flex-1 text-[0.8rem] leading-7 text-foam/80">
-                در <b className="text-foam">Project Settings ← API</b>، مقدار <b className="text-foam">Project URL</b> و
-                کلید <b className="text-foam">anon&nbsp;public</b> را کپی و این‌جا وارد کنید:
+                از منوی کناری <b className="text-foam">Project Settings ← API&nbsp;Keys</b> را باز کنید؛
+                در بالای همان صفحه، آدرس پروژه نوشته شده (چیزی شبیه{" "}
+                <span dir="ltr" className="rounded bg-foam/10 px-1.5 py-0.5 text-[0.68rem] text-[#9fdcd3]">
+                  https://abcdefgh.supabase.co
+                </span>
+                ). آن را به‌همراه کلید <b className="text-foam">Publishable</b> (همان anon&nbsp;public) کپی کنید.
+                <span className="mt-1.5 block rounded-[10px] border border-gold/40 bg-gold/10 px-3 py-2 text-[0.72rem] leading-6 text-gold">
+                  راحت‌تر: آدرس مرورگر وقتی داخل داشبورد پروژه هستید را هم بچسبانید؛ ما خودکار
+                  پروژه را پیدا می‌کنیم.
+                </span>
                 <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2">
-                  <input
-                    dir="ltr"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    placeholder="https://xxxxx.supabase.co"
-                    className={inputCls}
-                  />
+                  <div>
+                    <input
+                      dir="ltr"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      placeholder="https://xxxxx.supabase.co یا آدرس داشبورد"
+                      className={inputCls}
+                    />
+                    {preview && (
+                      <p className="mt-1.5 flex items-center gap-1.5 text-[0.66rem] font-bold text-[#7fd6cb]">
+                        <IconCheck className="h-3.5 w-3.5" strokeWidth={2.4} />
+                        پروژه شناسایی شد: <span dir="ltr">{preview}</span>
+                      </p>
+                    )}
+                  </div>
                   <input
                     dir="ltr"
                     value={key}
                     onChange={(e) => setKey(e.target.value)}
-                    placeholder="eyJhbGciOi… (anon public key)"
+                    placeholder="eyJhbGciOi… (Publishable / anon key)"
                     className={inputCls}
                   />
                 </div>
