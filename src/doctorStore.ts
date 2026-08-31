@@ -1,9 +1,15 @@
 import { useSyncExternalStore } from "react";
 import { DOCTORS, type Doctor } from "./data";
+import {
+  fetchCloudDoctors,
+  pushCloudDoctors,
+  getCloudCfg,
+  clearCloudCfg,
+} from "./cloud";
 
 const KEY = "aavm-doctors-v1";
 
-function load(): Doctor[] {
+function loadLocal(): Doctor[] {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return DOCTORS;
@@ -15,8 +21,61 @@ function load(): Doctor[] {
   }
 }
 
-let cache: Doctor[] = load();
+function saveLocal(list: Doctor[]) {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(list));
+  } catch {
+    /* حافظه مرورگر در دسترس نیست */
+  }
+}
+
+export type SyncState = "off" | "loading" | "cloud" | "error" | "pushfail";
+
+let cache: Doctor[] = loadLocal();
+let sync: SyncState = getCloudCfg() ? "loading" : "off";
 const listeners = new Set<() => void>();
+const notify = () => listeners.forEach((l) => l());
+
+let initStarted = false;
+
+/** دریافت فهرست مشترک از فضای ابری (برای همه‌ی بازدیدکنندگان) */
+export function initCloud(force = false) {
+  if (initStarted && !force) return;
+  initStarted = true;
+  if (!getCloudCfg()) {
+    sync = "off";
+    notify();
+    return;
+  }
+  sync = "loading";
+  notify();
+  void fetchCloudDoctors().then((remote) => {
+    if (remote === null) {
+      sync = "error";
+      notify();
+      return;
+    }
+    if (remote.length > 0) {
+      cache = remote;
+      saveLocal(cache);
+    } else {
+      // جدول خالی است → فهرست فعلی به‌عنوان نسخه‌ی اولیه منتشر می‌شود
+      void pushCloudDoctors(cache);
+    }
+    sync = "cloud";
+    notify();
+  });
+}
+
+export const reconnectCloud = () => initCloud(true);
+
+export function disconnectCloud() {
+  clearCloudCfg();
+  initStarted = false;
+  sync = "off";
+  cache = loadLocal();
+  notify();
+}
 
 const subscribe = (l: () => void) => {
   listeners.add(l);
@@ -24,19 +83,24 @@ const subscribe = (l: () => void) => {
     listeners.delete(l);
   };
 };
-const getSnapshot = () => cache;
+
+export const useDoctors = () => useSyncExternalStore(subscribe, () => cache);
+export const useSyncState = () => useSyncExternalStore(subscribe, () => sync);
 
 function commit(next: Doctor[]) {
   cache = next;
-  try {
-    localStorage.setItem(KEY, JSON.stringify(next));
-  } catch {
-    /* حافظه مرورگر در دسترس نیست */
+  saveLocal(cache);
+  notify();
+  if (getCloudCfg()) {
+    void pushCloudDoctors(cache).then((ok) => {
+      const nextSync: SyncState = ok ? "cloud" : "pushfail";
+      if (sync !== nextSync) {
+        sync = nextSync;
+        notify();
+      }
+    });
   }
-  listeners.forEach((l) => l());
 }
-
-export const useDoctors = () => useSyncExternalStore(subscribe, getSnapshot);
 
 export const addDoctor = (d: Doctor) => commit([d, ...cache]);
 
@@ -48,6 +112,11 @@ export const removeDoctor = (index: number) =>
 
 export const resetDoctors = () => commit([...DOCTORS]);
 
+export const publishNow = () => pushCloudDoctors(cache);
+
 export const isDefaultList = () =>
   cache.length === DOCTORS.length &&
   cache.every((d, i) => d.name === DOCTORS[i].name);
+
+/* به‌محض باز شدن سایت، فهرست مشترک دریافت می‌شود */
+initCloud();

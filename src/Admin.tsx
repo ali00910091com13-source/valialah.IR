@@ -2,12 +2,17 @@ import { useMemo, useRef, useState, type FormEvent } from "react";
 import { DOCTOR_SPECS, faNum, type Doctor } from "./data";
 import {
   useDoctors,
+  useSyncState,
   addDoctor,
   updateDoctor,
   removeDoctor,
   resetDoctors,
+  publishNow,
+  reconnectCloud,
+  disconnectCloud,
   isDefaultList,
 } from "./doctorStore";
+import { testCloud, saveCloudCfg, SETUP_SQL, getCloudCfg } from "./cloud";
 import {
   IconGear,
   IconKey,
@@ -197,7 +202,7 @@ function Console({ onLogout }: { onLogout: () => void }) {
             <div>
               <span className="font-display block text-lg leading-6">کنسول مدیریت پزشکان</span>
               <span className="block text-[0.68rem] text-foam/50">
-                درمانگاه خیریه آوای مهر ولی‌الله — تغییرات فقط در مرورگر شما ذخیره می‌شود
+                درمانگاه خیریه آوای مهر ولی‌الله — مدیریت فهرست پزشکان و انتشار عمومی
               </span>
             </div>
           </div>
@@ -220,6 +225,8 @@ function Console({ onLogout }: { onLogout: () => void }) {
       </header>
 
       <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-8 sm:px-6">
+        <CloudPanel onToast={notify} />
+
         {/* ── آمار ── */}
         <div className="grid grid-cols-3 gap-3">
           {[
@@ -439,6 +446,7 @@ function DoctorForm({
   const [errs, setErrs] = useState<{ name?: boolean; title?: boolean }>({});
   const [photoErr, setPhotoErr] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const sync = useSyncState();
   const [loadedFor, setLoadedFor] = useState<number | null>(null);
 
   /* هنگام شروع ویرایش، فرم را پر کن */
@@ -665,9 +673,238 @@ function DoctorForm({
 
       <p className="mt-3 flex items-start gap-2 text-[0.7rem] leading-6 text-foam/45">
         <IconGear className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-        پزشک جدید بلافاصله در تب «پزشکان» سایت نمایش داده می‌شود؛ تغییرات در
-        حافظه‌ی همین مرورگر ذخیره می‌ماند.
+        {sync === "cloud"
+          ? "فضای ابری متصل است؛ تغییرات بلافاصله برای همه‌ی بازدیدکنندگان سایت منتشر می‌شود."
+          : "پزشک جدید بلافاصله در تب «پزشکان» نمایش داده می‌شود؛ برای دیده‌شدن توسط همه، فضای ابری را از نوار بالای صفحه متصل کنید."}
       </p>
     </form>
+  );
+}
+
+/* ─────────────── پنل فضای ابری (انتشار برای عموم) ─────────────── */
+
+const SYNC_META: Record<string, { text: string; cls: string; dot: string }> = {
+  off: {
+    text: "ذخیره‌سازی محلی — تغییرات فقط در مرورگر شما دیده می‌شود",
+    cls: "border-gold/40 bg-gold/10 text-gold",
+    dot: "bg-gold",
+  },
+  loading: {
+    text: "در حال دریافت فهرست مشترک از فضای ابری…",
+    cls: "border-foam/20 bg-foam/5 text-foam/80",
+    dot: "bg-foam/70 pulse-ring",
+  },
+  cloud: {
+    text: "متصل به فضای ابری — هر تغییر، همان لحظه برای همه منتشر می‌شود",
+    cls: "border-sea/50 bg-sea/15 text-[#7fd6cb]",
+    dot: "bg-[#5fc9bc] pulse-ring",
+  },
+  error: {
+    text: "ارتباط با فضای ابری برقرار نشد — حالت محلی فعال است",
+    cls: "border-clay/50 bg-clay/10 text-[#f0b3a3]",
+    dot: "bg-clay",
+  },
+  pushfail: {
+    text: "آخرین انتشار ناموفق بود — با دکمه‌ی «انتشار فوری» دوباره تلاش کنید",
+    cls: "border-clay/50 bg-clay/10 text-[#f0b3a3]",
+    dot: "bg-clay pulse-ring",
+  },
+};
+
+function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") => void }) {
+  const sync = useSyncState();
+  const configured = getCloudCfg() !== null;
+  const [openForm, setOpenForm] = useState(false);
+  const [url, setUrl] = useState("");
+  const [key, setKey] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+
+  const meta = SYNC_META[sync] ?? SYNC_META.off;
+
+  const copySql = async () => {
+    try {
+      await navigator.clipboard.writeText(SETUP_SQL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  const handleConnect = async () => {
+    if (!url.trim() || !key.trim()) {
+      setMsg({ kind: "err", text: "هم آدرس پروژه و هم کلید anon را وارد کنید." });
+      return;
+    }
+    setBusy(true);
+    setMsg(null);
+    const r = await testCloud(url, key);
+    setBusy(false);
+    if (r.ok) {
+      saveCloudCfg(url, key);
+      reconnectCloud();
+      setOpenForm(false);
+      setUrl("");
+      setKey("");
+      onToast("اتصال برقرار شد ✅ فهرست برای همه همگام‌سازی می‌شود");
+    } else if (r.missingTable) {
+      setMsg({
+        kind: "err",
+        text: "اتصال درست است، اما جدول doctors ساخته نشده — ابتدا SQL مرحله‌ی ۲ را در SQL Editor اجرا کنید.",
+      });
+    } else {
+      setMsg({
+        kind: "err",
+        text: "اتصال برقرار نشد — Project URL و anon public key را از تنظیمات پروژه‌ی Supabase کپی کنید.",
+      });
+    }
+  };
+
+  const handlePublish = async () => {
+    setPublishing(true);
+    const ok = await publishNow();
+    setPublishing(false);
+    onToast(ok ? "فهرست فعلی برای همه‌ی بازدیدکنندگان منتشر شد ✅" : "انتشار ناموفق بود — اتصال را بررسی کنید ❌", ok ? "ok" : "err");
+  };
+
+  const handleDisconnect = () => {
+    if (!window.confirm("اتصال فضای ابری قطع شود؟ سایت دوباره فهرست محلی را نشان می‌دهد.")) return;
+    disconnectCloud();
+    onToast("اتصال قطع شد — حالت محلی فعال است");
+  };
+
+  return (
+    <section className="overflow-hidden rounded-[18px] border border-foam/10 bg-pine2/70">
+      {/* نوار وضعیت */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 sm:px-5">
+        <span className={`flex items-center gap-2.5 rounded-full border px-3.5 py-1.5 text-[0.74rem] font-extrabold ${meta.cls}`}>
+          <span className={`h-2 w-2 shrink-0 rounded-full ${meta.dot}`} />
+          {meta.text}
+        </span>
+        <div className="flex items-center gap-2">
+          {configured ? (
+            <>
+              <button
+                onClick={handlePublish}
+                disabled={publishing}
+                className="flex items-center gap-1.5 rounded-[10px] bg-gold px-3.5 py-2 text-[0.76rem] font-extrabold text-pine transition-all hover:bg-golddeep hover:text-goldsoft active:scale-95 disabled:opacity-60"
+              >
+                <IconRefresh className={`h-4 w-4 ${publishing ? "animate-spin" : ""}`} />
+                {publishing ? "در حال انتشار…" : "انتشار فوری"}
+              </button>
+              <button
+                onClick={handleDisconnect}
+                className="rounded-[10px] border border-foam/15 px-3 py-2 text-[0.72rem] font-bold text-foam/60 transition-colors hover:bg-foam/10 hover:text-foam"
+              >
+                قطع اتصال
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => setOpenForm((o) => !o)}
+              className="flex items-center gap-1.5 rounded-[10px] bg-gold px-3.5 py-2 text-[0.76rem] font-extrabold text-pine transition-all hover:bg-golddeep hover:text-goldsoft active:scale-95"
+            >
+              <IconKey className="h-4 w-4" />
+              اتصال فضای ابری (نمایش برای عموم)
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* راهنمای اتصال */}
+      {openForm && !configured && (
+        <div className="border-t border-foam/10 px-4 py-5 sm:px-5">
+          <h3 className="font-display text-xl text-gold">راه‌اندازی نمایش عمومی — فقط یک‌بار، حدود ۵ دقیقه</h3>
+          <p className="mt-2 text-[0.8rem] leading-7 text-foam/70">
+            سایت روی گیت‌هاب «استاتیک» است و حافظه‌ی مشترک ندارد؛ با یک دیتابیس رایگان
+            Supabase، هر تغییری که این‌جا ذخیره کنید <b className="text-foam">همان لحظه برای همه‌ی بازدیدکنندگان</b> نمایش داده می‌شود.
+          </p>
+
+          <ol className="mt-5 space-y-5">
+            <li className="flex gap-3.5">
+              <span className="font-display grid h-8 w-8 shrink-0 place-items-center rounded-full bg-sea/25 text-lg text-[#7fd6cb]">۱</span>
+              <div className="text-[0.8rem] leading-7 text-foam/80">
+                در <a href="https://supabase.com" target="_blank" rel="noreferrer" className="font-extrabold text-gold underline underline-offset-4">supabase.com</a> با
+                اکانت گوگل وارد شوید (رایگان) و یک <b className="text-foam">New Project</b> بسازید
+                (رمز قوی بگذارید؛ منطقه‌ی دلخواه).
+              </div>
+            </li>
+
+            <li className="flex gap-3.5">
+              <span className="font-display grid h-8 w-8 shrink-0 place-items-center rounded-full bg-sea/25 text-lg text-[#7fd6cb]">۲</span>
+              <div className="min-w-0 flex-1 text-[0.8rem] leading-7 text-foam/80">
+                از منوی سمت چپ، <b className="text-foam">SQL Editor</b> را باز کنید، این کد را
+                Paste کنید و دکمه‌ی <b className="text-foam">Run</b> را بزنید:
+                <div className="relative mt-2.5">
+                  <pre dir="ltr" className="no-scrollbar overflow-x-auto rounded-[12px] border border-foam/10 bg-[#082a2c] p-4 text-left text-[0.7rem] leading-6 text-[#9fdcd3]">
+                    {SETUP_SQL}
+                  </pre>
+                  <button
+                    onClick={copySql}
+                    className={`absolute end-2.5 top-2.5 flex items-center gap-1.5 rounded-[8px] px-2.5 py-1.5 text-[0.66rem] font-extrabold transition-all active:scale-95 ${
+                      copied ? "bg-sea text-foam" : "bg-foam/10 text-foam/80 hover:bg-foam/20"
+                    }`}
+                  >
+                    {copied ? <IconCheck className="h-3.5 w-3.5" strokeWidth={2.4} /> : <IconEdit className="h-3.5 w-3.5" />}
+                    {copied ? "کپی شد" : "کپی کد"}
+                  </button>
+                </div>
+              </div>
+            </li>
+
+            <li className="flex gap-3.5">
+              <span className="font-display grid h-8 w-8 shrink-0 place-items-center rounded-full bg-sea/25 text-lg text-[#7fd6cb]">۳</span>
+              <div className="min-w-0 flex-1 text-[0.8rem] leading-7 text-foam/80">
+                در <b className="text-foam">Project Settings ← API</b>، مقدار <b className="text-foam">Project URL</b> و
+                کلید <b className="text-foam">anon&nbsp;public</b> را کپی و این‌جا وارد کنید:
+                <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2">
+                  <input
+                    dir="ltr"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://xxxxx.supabase.co"
+                    className={inputCls}
+                  />
+                  <input
+                    dir="ltr"
+                    value={key}
+                    onChange={(e) => setKey(e.target.value)}
+                    placeholder="eyJhbGciOi… (anon public key)"
+                    className={inputCls}
+                  />
+                </div>
+                <button
+                  onClick={handleConnect}
+                  disabled={busy}
+                  className="mt-3 flex items-center gap-2 rounded-[10px] bg-sea px-4 py-2.5 text-[0.78rem] font-extrabold text-foam transition-all hover:bg-seadeep active:scale-95 disabled:opacity-60"
+                >
+                  <IconKey className="h-4 w-4" />
+                  {busy ? "در حال آزمایش اتصال…" : "اتصال و آزمایش"}
+                </button>
+                {msg && (
+                  <p className={`mt-2.5 rounded-[10px] border px-3 py-2 text-[0.72rem] font-bold leading-6 ${
+                    msg.kind === "ok"
+                      ? "border-sea/50 bg-sea/15 text-[#7fd6cb]"
+                      : "border-clay/50 bg-clay/10 text-[#f0b3a3]"
+                  }`}>
+                    {msg.text}
+                  </p>
+                )}
+              </div>
+            </li>
+          </ol>
+
+          <p className="mt-4 flex items-start gap-2 border-t border-foam/10 pt-3.5 text-[0.68rem] leading-6 text-foam/45">
+            <IconGear className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            کلید anon برای استفاده‌ی عمومی طراحی شده و قرار گرفتن آن در سایت بی‌خطر است.
+            تنظیمات فقط در همین مرورگر ذخیره می‌شود؛ پس از اتصال، همه‌ی تغییرات (افزودن،
+            ویرایش، حذف و عکس پزشکان) برای تمام بازدیدکنندگان منتشر می‌شود.
+          </p>
+        </div>
+      )}
+    </section>
   );
 }
