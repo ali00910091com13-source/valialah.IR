@@ -84,7 +84,7 @@ export function StatsBand() {
 }
 
 /* ---------------- departments with sticky tabs ---------------- */
-export function Departments() {
+export function Departments({ onNavigate }: { onNavigate?: (id: "doctors") => void }) {
   const [idx, setIdx] = useState(0);
   const d = DEPARTMENTS[idx];
 
@@ -192,13 +192,13 @@ export function Departments() {
                       <IconPhone className="h-4 w-4" />
                       رزرو نوبت {d.title}
                     </a>
-                    <a
-                      href="#contact"
+                    <button
+                      onClick={() => onNavigate?.("doctors")}
                       className="group flex items-center gap-2 text-sm font-bold text-seadeep transition-colors hover:text-gold"
                     >
-                      فرم درخواست نوبت
+                      پزشکان این حوزه
                       <IconArrow className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>

@@ -146,6 +146,73 @@ body {
   background: var(--color-gold);
 }
 
+/* ---------- tab navigation ---------- */
+.tab-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  border: 1.5px solid transparent;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-inksoft);
+  background: transparent;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.25s,
+    color 0.25s,
+    border-color 0.25s,
+    transform 0.2s;
+}
+.tab-pill:hover {
+  background: rgba(14, 124, 116, 0.08);
+  color: var(--color-seadeep);
+}
+.tab-pill:active {
+  transform: scale(0.96);
+}
+.tab-pill.active {
+  background: var(--color-sea);
+  color: var(--color-mist);
+  border-color: var(--color-seadeep);
+  box-shadow: 0 8px 20px -8px rgba(10, 90, 84, 0.65);
+}
+
+/* ---------- view (tab) transition ---------- */
+.view-enter {
+  animation: view-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- horizontal scroll helpers ---------- */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.fade-x {
+  mask-image: linear-gradient(
+    to left,
+    transparent 0,
+    #000 24px,
+    #000 calc(100% - 24px),
+    transparent 100%
+  );
+}
+
 /* ---------- shapes ---------- */
 .arch {
   border-radius: 11rem 11rem 1rem 1rem;

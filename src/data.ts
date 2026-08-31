@@ -33,16 +33,16 @@ export const CONTACT = {
   ],
 };
 
-export const NAV = [
-  { id: "home", label: "خانه" },
-  { id: "facilities", label: "امکانات" },
-  { id: "departments", label: "بخش‌های تخصصی" },
-  { id: "units", label: "سایر بخش‌ها" },
-  { id: "insurance", label: "بیمه‌ها" },
-  { id: "team", label: "تیم پزشکی" },
-  { id: "charity", label: "نیکوکاری" },
-  { id: "contact", label: "تماس و نوبت" },
-];
+export const TABS = [
+  { id: "home", label: "خانه", icon: "home" },
+  { id: "services", label: "خدمات تخصصی", icon: "stetho" },
+  { id: "doctors", label: "پزشکان", icon: "doctor" },
+  { id: "facilities", label: "امکانات", icon: "building" },
+  { id: "insurance", label: "بیمه‌ها", icon: "shield" },
+  { id: "contact", label: "تماس با ما", icon: "phone" },
+] as const;
+
+export type TabId = (typeof TABS)[number]["id"];
 
 export type Stat = {
   value: number;
@@ -208,3 +208,99 @@ export const TEAM_SPECIALTIES = [
 
 export const faNum = (n: number | string): string =>
   String(n).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+
+/* ─────────────── پزشکان ─────────────── */
+
+export type Doctor = {
+  name: string;
+  spec: string; // کلید تخصص برای فیلتر
+  title: string; // عنوان دقیق
+  focus?: string; // حوزه تمرکز / علل شایع مراجعه
+};
+
+export const DOCTOR_SPECS: { id: string; label: string }[] = [
+  { id: "uro", label: "اورولوژی" },
+  { id: "ent", label: "گوش، حلق و بینی" },
+  { id: "ortho", label: "ارتوپدی" },
+  { id: "cardio", label: "قلب و عروق" },
+  { id: "eye", label: "چشم‌پزشکی" },
+  { id: "int", label: "داخلی و پوست" },
+  { id: "psy", label: "روان‌شناسی" },
+  { id: "dent", label: "دندانپزشکی" },
+  { id: "coun", label: "مشاوره" },
+];
+
+export const DOCTORS: Doctor[] = [
+  {
+    name: "دکتر سید محمدعلی مدینه‌ای",
+    spec: "uro",
+    title: "فلوشیپ اندویورولوژی، متخصص اورولوژی",
+    focus: "جراحی درون‌بین کلیه، مجاری ادراری و تناسلی",
+  },
+  {
+    name: "دکتر عبدالرضا جهانگیری",
+    spec: "ent",
+    title: "متخصص گوش، حلق و بینی",
+    focus: "کاهش شنوایی، گرفتگی گوش و بیماری‌های حلق و بینی",
+  },
+  {
+    name: "دکتر وحید مجریان",
+    spec: "ortho",
+    title: "متخصص ارتوپدی",
+    focus: "درد مفاصل، آسیب‌های استخوانی و ارتوپدی عمومی",
+  },
+  {
+    name: "دکتر غلامرضا خرمی",
+    spec: "ortho",
+    title: "متخصص ارتوپدی",
+    focus: "بیماری‌های استخوان و مفاصل",
+  },
+  {
+    name: "دکتر ناهید فضلی بنفشه‌ورق",
+    spec: "cardio",
+    title: "متخصص قلب و عروق",
+    focus: "تنگی نفس، فشار خون و بیماری‌های قلبی",
+  },
+  {
+    name: "دکتر مرتضی میرعرب",
+    spec: "eye",
+    title: "متخصص چشم‌پزشکی",
+    focus: "بیماری‌های چشم و بینایی",
+  },
+  {
+    name: "دکتر وحید احیایی قدرتی",
+    spec: "eye",
+    title: "متخصص چشم و کارشناس بینایی‌سنجی",
+    focus: "خشکی چشم، اپتومتری و سنجش بینایی",
+  },
+  {
+    name: "دکتر محبوبه ثابت",
+    spec: "int",
+    title: "پزشک عمومی، داخلی و پوست و مو",
+    focus: "ویزیت عمومی، بیماری‌های داخلی و مشکلات پوستی",
+  },
+  {
+    name: "دکتر سید بهنام نورحسینی",
+    spec: "psy",
+    title: "روان‌شناس و درمانگر خانواده",
+    focus: "مشاوره فردی و خانواده",
+  },
+  {
+    name: "دکتر علی امیری",
+    spec: "dent",
+    title: "متخصص جراحی دهان، فک و صورت",
+    focus: "جراحی‌های تخصصی دهان و فک",
+  },
+  {
+    name: "دکتر سپیده علی‌نژاد",
+    spec: "dent",
+    title: "دندانپزشک و جراح",
+    focus: "ترمیم، جراحی و درمان‌های دندانی",
+  },
+  {
+    name: "زهرا خدادادی",
+    spec: "coun",
+    title: "مشاور",
+    focus: "مشاوره و راهنمایی",
+  },
+];
