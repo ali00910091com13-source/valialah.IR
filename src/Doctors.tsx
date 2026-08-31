@@ -142,9 +142,17 @@ export default function Doctors() {
                 <article className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-sea/15 bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-sea/40 hover:shadow-xl hover:shadow-sea/10">
                   <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-l from-sea to-teal opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   <div className="flex items-start gap-4">
-                    <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-sea/10 text-sea transition-colors duration-300 group-hover:bg-sea group-hover:text-white">
-                      <IconStetho className="h-7 w-7" />
-                    </span>
+                    {d.photo ? (
+                      <img
+                        src={d.photo}
+                        alt={d.name}
+                        className="h-14 w-14 shrink-0 rounded-2xl border-2 border-sea/20 object-cover transition-all duration-300 group-hover:border-sea"
+                      />
+                    ) : (
+                      <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-sea/10 text-sea transition-colors duration-300 group-hover:bg-sea group-hover:text-white">
+                        <IconStetho className="h-7 w-7" />
+                      </span>
+                    )}
                     <div className="min-w-0">
                       <span className="inline-block rounded-full bg-goldsoft px-2.5 py-0.5 text-[11px] font-bold text-golddeep">
                         {SPEC_LABEL[d.spec]}
