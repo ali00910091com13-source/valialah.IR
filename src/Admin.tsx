@@ -354,12 +354,20 @@ function Console({ onLogout }: { onLogout: () => void }) {
                     </div>
                   ) : (
                     <div className="flex items-center gap-3.5">
-                      <span
-                        className="font-display grid h-12 w-12 shrink-0 place-items-center rounded-[13px] text-xl"
-                        style={{ background: `${tintOf(d.spec)}22`, color: tintOf(d.spec) }}
-                      >
-                        {monoOf(d.name)}
-                      </span>
+                      {d.photo ? (
+                        <img
+                          src={d.photo}
+                          alt={d.name}
+                          className="h-12 w-12 shrink-0 rounded-[13px] border border-foam/15 object-cover"
+                        />
+                      ) : (
+                        <span
+                          className="font-display grid h-12 w-12 shrink-0 place-items-center rounded-[13px] text-xl"
+                          style={{ background: `${tintOf(d.spec)}22`, color: tintOf(d.spec) }}
+                        >
+                          {monoOf(d.name)}
+                        </span>
+                      )}
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-display text-lg leading-6">{d.name}</span>
@@ -426,9 +434,11 @@ function DoctorForm({
   onDone: (msg: string) => void;
   onCancel: () => void;
 }) {
-  const empty = { name: "", spec: DOCTOR_SPECS[0].id, title: "", focus: "" };
+  const empty = { name: "", spec: DOCTOR_SPECS[0].id, title: "", focus: "", photo: "" };
   const [form, setForm] = useState(empty);
   const [errs, setErrs] = useState<{ name?: boolean; title?: boolean }>({});
+  const [photoErr, setPhotoErr] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
   const [loadedFor, setLoadedFor] = useState<number | null>(null);
 
   /* هنگام شروع ویرایش، فرم را پر کن */
@@ -436,7 +446,7 @@ function DoctorForm({
     const d = doctors[editing];
     if (d) {
       setLoadedFor(editing);
-      setForm({ name: d.name, spec: d.spec, title: d.title, focus: d.focus ?? "" });
+      setForm({ name: d.name, spec: d.spec, title: d.title, focus: d.focus ?? "", photo: d.photo ?? "" });
       setErrs({});
     }
   }
@@ -458,7 +468,13 @@ function DoctorForm({
     setErrs(next);
     if (next.name || next.title) return;
 
-    const doc: Doctor = { name, spec: form.spec, title, focus: form.focus.trim() || undefined };
+    const doc: Doctor = {
+      name,
+      spec: form.spec,
+      title,
+      focus: form.focus.trim() || undefined,
+      photo: form.photo.trim() || undefined,
+    };
     if (isEdit) {
       updateDoctor(editing, doc);
       onDone(`تغییرات «${name}» ذخیره شد`);
@@ -472,6 +488,33 @@ function DoctorForm({
   const label = "mb-1.5 block text-[0.72rem] font-extrabold text-foam/60";
   const field = (bad?: boolean) =>
     `${inputCls} ${bad ? "border-clay! shadow-[0_0_0_3px_rgba(182,90,69,0.18)]" : ""}`;
+
+  /* آپلود عکس از دستگاه و کوچک‌سازی خودکار برای ذخیره در مرورگر */
+  const onPickFile = (file: File | undefined) => {
+    if (!file) return;
+    setPhotoErr("");
+    if (!file.type.startsWith("image/")) {
+      setPhotoErr("فقط فایل تصویری مجاز است");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onerror = () => setPhotoErr("خواندن فایل ناموفق بود");
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 360;
+        const scale = Math.min(1, max / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d")?.drawImage(img, 0, 0, canvas.width, canvas.height);
+        setForm((f) => ({ ...f, photo: canvas.toDataURL("image/jpeg", 0.85) }));
+      };
+      img.onerror = () => setPhotoErr("تصویر قابل پردازش نیست");
+      img.src = String(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <form onSubmit={submit}>
@@ -544,6 +587,62 @@ function DoctorForm({
             placeholder="مثلاً: بیماری‌های گوارشی"
             className={inputCls}
           />
+        </div>
+
+        <div>
+          <label className={label}>عکس پزشک (اختیاری)</label>
+          <div className="flex items-center gap-3">
+            <span
+              className={`grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border-2 ${
+                form.photo ? "border-gold" : "border-foam/15"
+              } bg-pine2`}
+            >
+              {form.photo ? (
+                <img src={form.photo} alt="پیش‌نمایش عکس پزشک" className="h-full w-full object-cover" />
+              ) : (
+                <IconDoctor className="h-6 w-6 text-foam/30" />
+              )}
+            </span>
+            <div className="min-w-0 flex-1 space-y-2">
+              <input
+                value={form.photo.startsWith("data:") ? "" : form.photo}
+                onChange={(e) => { setForm({ ...form, photo: e.target.value }); setPhotoErr(""); }}
+                placeholder="آدرس اینترنتی عکس (URL)…"
+                className={inputCls}
+              />
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  className="flex items-center gap-1.5 rounded-[9px] border border-gold/50 bg-gold/10 px-3 py-1.5 text-[0.72rem] font-extrabold text-gold transition-colors hover:bg-gold/20"
+                >
+                  <IconPlus className="h-3.5 w-3.5" strokeWidth={2.2} />
+                  بارگذاری از دستگاه
+                </button>
+                {form.photo && (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, photo: "" })}
+                    className="flex items-center gap-1.5 rounded-[9px] border border-clay/50 bg-clay/10 px-3 py-1.5 text-[0.72rem] font-extrabold text-[#f0b3a3] transition-colors hover:bg-clay/20"
+                  >
+                    <IconTrash className="h-3.5 w-3.5" />
+                    حذف عکس
+                  </button>
+                )}
+                {form.photo.startsWith("data:") && (
+                  <span className="text-[0.64rem] font-bold text-foam/40">عکس از دستگاه بارگذاری شده</span>
+                )}
+              </div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => { onPickFile(e.target.files?.[0]); e.target.value = ""; }}
+              />
+            </div>
+          </div>
+          {photoErr && <p className="mt-1.5 text-[0.68rem] font-bold text-[#f0b3a3]">{photoErr}</p>}
         </div>
       </div>
 

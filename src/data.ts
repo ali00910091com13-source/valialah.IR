@@ -228,6 +228,7 @@ export type Doctor = {
   spec: string; // کلید تخصص برای فیلتر
   title: string; // عنوان دقیق
   focus?: string; // حوزه تمرکز / علل شایع مراجعه
+  photo?: string; // آدرس عکس یا data-URL
 };
 
 export const DOCTOR_SPECS: { id: string; label: string }[] = [
