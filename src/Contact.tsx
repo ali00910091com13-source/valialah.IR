@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CONTACT, IMG, faNum, TABS, type TabId } from "./data";
+import { CONTACT, IMG, faNum, TABS, BOOKING_LINKS, type TabId } from "./data";
 import { Reveal, useOpenStatus } from "./fx";
 import {
   IconPhone,
@@ -9,8 +9,8 @@ import {
   IconStar8,
   IconArrow,
   IconHeart,
-  IconHeartPulse,
   IconCalendar,
+  LogoMark,
 } from "./Icons";
 
 function MapCard() {
@@ -89,9 +89,72 @@ export function ContactSection() {
               سلامتی را به <span className="text-sea">فردا</span> نیندازید
             </h1>
             <p className="mt-4 leading-8 text-inksoft">
-              برای نوبت‌دهی کافی است تماس بگیرید؛ همکاران ما هر روز از ساعت ۷
-              صبح تا ۲۳ پاسخگوی شما هستند.
+              هم آنلاین، هم تلفنی؛ همکاران ما هر روز از ساعت ۷ صبح تا ۲۳
+              پاسخگوی شما هستند.
             </p>
+          </div>
+        </Reveal>
+
+        {/* ── نوبت‌دهی آنلاین ── */}
+        <Reveal delay={40}>
+          <div className="relative mt-10 overflow-hidden rounded-[20px] bg-pine p-6 sm:p-8">
+            <div className="girih-light absolute inset-0" aria-hidden="true" />
+            <div className="relative">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="font-display flex items-center gap-3 text-2xl text-gold sm:text-3xl">
+                  <IconCalendar className="h-7 w-7" />
+                  نوبت‌دهی آنلاین
+                </h2>
+                <span className="rounded-full bg-sea/25 px-3 py-1 text-[0.72rem] font-bold text-[#7fd6cb]">
+                  بدون معطلی، از خانه نوبت بگیرید
+                </span>
+              </div>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-foam/75">
+                درمانگاه آوای مهر ولی‌الله در سامانه‌های معتبر نوبت‌دهی کشور حضور
+                دارد؛ روی هر سامانه بزنید تا مستقیم وارد صفحه نوبت‌دهی شوید:
+              </p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                {BOOKING_LINKS.map((b, i) => (
+                  <a
+                    key={b.name}
+                    href={b.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`group flex items-center justify-between gap-3 rounded-[14px] border px-4 py-3.5 transition-all duration-300 hover:-translate-y-0.5 ${
+                      i === 0
+                        ? "border-gold bg-gold text-pine hover:bg-golddeep hover:text-goldsoft"
+                        : "border-foam/15 bg-foam/[0.06] text-foam hover:border-gold/60 hover:bg-foam/10"
+                    }`}
+                  >
+                    <span>
+                      <span className="block text-base font-extrabold">{b.name}</span>
+                      <span className={`block text-[0.72rem] font-semibold ${i === 0 ? "text-pine/70" : "text-foam/55"}`}>
+                        {b.note}
+                      </span>
+                    </span>
+                    <span
+                      className={`grid h-9 w-9 shrink-0 place-items-center rounded-[10px] transition-transform group-hover:-translate-x-0.5 ${
+                        i === 0 ? "bg-pine/10 text-pine" : "bg-foam/10 text-gold"
+                      }`}
+                    >
+                      <IconArrow className="h-4.5 w-4.5 -rotate-45" />
+                    </span>
+                  </a>
+                ))}
+              </div>
+              <a
+                href={`tel:${CONTACT.bookingPhone}`}
+                className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-dashed border-gold/50 px-4 py-3 text-sm font-bold text-foam/85 transition-colors hover:border-gold hover:text-gold"
+              >
+                <span className="flex items-center gap-2">
+                  <IconPhone className="h-4.5 w-4.5 text-gold" />
+                  ترجیح می‌دهید تلفنی نوبت بگیرید؟
+                </span>
+                <span dir="ltr" className="font-display text-lg text-gold">
+                  {CONTACT.bookingPhoneDisplay}
+                </span>
+              </a>
+            </div>
           </div>
         </Reveal>
 
@@ -229,9 +292,9 @@ export function Footer({ onNavigate }: { onNavigate?: (id: TabId) => void }) {
       <div className="girih-light absolute inset-0" aria-hidden="true" />
       <div className="wrap relative grid gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div>
-          <button onClick={() => go("home")} className="flex items-center gap-3 text-start">
-            <span className="arch-ring grid h-11 w-11 place-items-center bg-gold text-pine">
-              <IconHeartPulse className="heartbeat h-6 w-6" strokeWidth={2} />
+          <button onClick={() => go("home")} className="group flex items-center gap-3 text-start">
+            <span className="arch-ring grid h-12 w-12 place-items-center bg-gold text-pine transition-transform duration-300 group-hover:rotate-3">
+              <LogoMark className="h-8 w-8" />
             </span>
             <span className="font-display text-xl text-card">آوای مهر ولی‌الله</span>
           </button>

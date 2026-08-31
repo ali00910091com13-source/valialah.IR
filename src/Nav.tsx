@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { TABS, CONTACT, faNum, type TabId } from "./data";
+import { TABS, CONTACT, type TabId } from "./data";
 import { useOpenStatus } from "./fx";
+import BookingMenu from "./Booking";
 import {
   IconPhone,
   IconPin,
   IconClock,
-  IconHeartPulse,
   IconInstagram,
   ICONS,
+  LogoMark,
 } from "./Icons";
 
 function Logo({ onClick }: { onClick?: () => void }) {
@@ -17,8 +18,8 @@ function Logo({ onClick }: { onClick?: () => void }) {
       className="group flex items-center gap-3 text-start"
       aria-label="بازگشت به خانه"
     >
-      <span className="arch-ring grid h-11 w-11 shrink-0 place-items-center bg-sea text-foam transition-transform duration-300 group-hover:-translate-y-0.5">
-        <IconHeartPulse className="heartbeat h-6 w-6" strokeWidth={2} />
+      <span className="arch-ring grid h-12 w-12 shrink-0 place-items-center bg-pine text-gold shadow-[0_8px_20px_-8px_rgba(7,39,42,0.6)] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:rotate-3">
+        <LogoMark className="h-8 w-8" />
       </span>
       <span className="leading-none">
         <span className="font-display block text-[1.25rem] leading-[1.15] text-pine sm:text-[1.35rem]">
@@ -132,14 +133,8 @@ export default function Nav({
             })}
           </nav>
 
-          {/* دکمه تماس دسکتاپ */}
-          <a
-            href={`tel:${CONTACT.bookingPhone}`}
-            className="btn btn-gold hidden py-2.5! text-sm sm:inline-flex"
-          >
-            <IconPhone className="h-4 w-4" />
-            نوبت‌دهی <span dir="ltr">{faNum("33559068")}</span>
-          </a>
+          {/* رزرو نوبت دسکتاپ */}
+          <BookingMenu label="رزرو نوبت" className="hidden sm:block" />
         </div>
 
         {/* ── نوار تب‌های موبایل (قابل اسکرول) ── */}

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Nav from "./Nav";
 import Hero from "./Hero";
 import { StatsBand, Departments, OtherUnits } from "./Sections";
-import { Insurance, Team, Charity } from "./Sections2";
+import { Insurance, Team } from "./Sections2";
 import Doctors from "./Doctors";
 import { ContactSection, Footer } from "./Contact";
 import type { TabId } from "./data";
@@ -24,7 +24,7 @@ export default function App() {
           <>
             <Hero onNavigate={setTab} />
             <Team onNavigate={setTab} />
-            <Charity />
+            <Insurance />
           </>
         )}
         {tab === "services" && (
