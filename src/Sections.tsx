@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { STATS, DEPARTMENTS, UNITS, CONTACT, faNum } from "./data";
 import { Reveal, CountUp } from "./fx";
-import BookingMenu from "./Booking";
 import { ICONS, IconStar8, IconCheck, IconArrow, IconSpark } from "./Icons";
 
 /* ---------------- facilities / stats band ---------------- */
@@ -189,10 +188,9 @@ export function Departments({ onNavigate }: { onNavigate?: (id: "doctors") => vo
                     ))}
                   </ul>
                   <div className="mt-7 flex flex-wrap items-center gap-4 border-t border-sea/10 pt-6">
-                    <BookingMenu label={`رزرو نوبت ${d.title}`} variant="sea" />
                     <button
                       onClick={() => onNavigate?.("doctors")}
-                      className="group flex items-center gap-2 text-sm font-bold text-seadeep transition-colors hover:text-gold"
+                      className="group inline-flex items-center gap-2 rounded-[10px] bg-sea px-5 py-2.5 text-sm font-bold text-foam transition-all hover:-translate-y-0.5 hover:bg-seadeep"
                     >
                       پزشکان این حوزه
                       <IconArrow className="h-4 w-4 transition-transform group-hover:-translate-x-1" />

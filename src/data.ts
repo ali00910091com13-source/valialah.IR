@@ -325,14 +325,4 @@ export const BOOKING_LINKS = [
     note: "همراه با نظرات بیماران",
     url: "https://doctoreto.com/center/avaye-mehr-valiollah/YJpggL",
   },
-  {
-    name: "ایران‌نوبت",
-    note: "نوبت‌دهی اینترنتی",
-    url: "https://irannobat.ir/ClinicProfile/avayemehr-tehran-clinic",
-  },
-  {
-    name: "اسکن‌طب",
-    note: "پذیرش فوری بدون معطلی",
-    url: "https://scanteb.com/listing/%D8%AF%D8%B1%D9%85%D8%A7%D9%86%DA%AF%D8%A7%D9%87-%D8%AE%DB%8C%D8%B1%DB%8C%D9%87-%D8%A2%D9%88%D8%A7%DB%8C-%D9%85%D9%87%D8%B1-%D9%88%D9%84%DB%8C-%D8%A7%D9%84%D9%84%D9%87-%D8%AA%D9%87%D8%B1%D8%A7%D9%86",
-  },
 ];
