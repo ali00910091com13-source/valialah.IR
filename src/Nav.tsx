@@ -1,37 +1,8 @@
-import { useEffect, useState } from "react";
-import { TABS, CONTACT, type TabId } from "./data";
+import { useEffect, useRef, useState } from "react";
+import { CONTACT, TABS, faNum, type TabId } from "./data";
+import { ICONS, IconClose, LogoMark } from "./Icons";
 import { useOpenStatus } from "./fx";
 import BookingMenu from "./Booking";
-import {
-  IconPhone,
-  IconPin,
-  IconClock,
-  IconInstagram,
-  ICONS,
-  LogoMark,
-} from "./Icons";
-
-function Logo({ onClick }: { onClick?: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="group flex items-center gap-3 text-start"
-      aria-label="بازگشت به خانه"
-    >
-      <span className="arch-ring grid h-12 w-12 shrink-0 place-items-center bg-pine text-gold shadow-[0_8px_20px_-8px_rgba(7,39,42,0.6)] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:rotate-3">
-        <LogoMark className="h-8 w-8" />
-      </span>
-      <span className="leading-none">
-        <span className="font-display block text-[1.25rem] leading-[1.15] text-pine sm:text-[1.35rem]">
-          آوای مهر ولی‌الله
-        </span>
-        <span className="mt-0.5 block text-[0.66rem] font-semibold tracking-wide text-inksoft sm:text-[0.68rem]">
-          درمانگاه خیریه • بیش از ۲۷ سال خدمت
-        </span>
-      </span>
-    </button>
-  );
-}
 
 export default function Nav({
   active,
@@ -40,134 +11,209 @@ export default function Nav({
   active: TabId;
   onNavigate: (id: TabId) => void;
 }) {
-  const open = useOpenStatus();
   const [scrolled, setScrolled] = useState(false);
+  const [menu, setMenu] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const topRef = useRef<HTMLDivElement>(null);
+  const open = useOpenStatus();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 14);
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(max > 0 ? window.scrollY / max : 0);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = menu ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menu]);
+
   const go = (id: TabId) => {
     onNavigate(id);
-    window.scrollTo({ top: 0 });
+    setMenu(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <>
-      {/* ── نوار وضعیت بالایی ── */}
-      <div className="relative z-40 bg-pine text-foam/90">
-        <div className="wrap flex items-center justify-between gap-3 px-4 py-2 text-[0.74rem] sm:px-6 sm:text-[0.78rem]">
-          <div className="flex min-w-0 items-center gap-4">
-            <a
-              href={`tel:${CONTACT.phone}`}
-              className="flex items-center gap-1.5 font-semibold transition-colors hover:text-gold"
-            >
-              <IconPhone className="h-3.5 w-3.5 shrink-0" />
-              <span dir="ltr">{CONTACT.phoneDisplay}</span>
-            </a>
-            <span className="hidden items-center gap-1.5 truncate text-foam/70 md:flex">
-              <IconPin className="h-3.5 w-3.5 shrink-0" />
-              {CONTACT.addressShort}
-            </span>
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <span className="hidden items-center gap-1.5 text-foam/70 sm:flex">
-              <IconClock className="h-3.5 w-3.5" />
-              همه‌روزه ۷ تا ۲۳
-            </span>
-            <a
-              href={CONTACT.instagram}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="اینستاگرام"
-              className="hidden items-center gap-1.5 text-foam/70 transition-colors hover:text-gold sm:flex"
-            >
-              <IconInstagram className="h-3.5 w-3.5" />
-            </a>
+      {/* ── نوار وضعیت بالای صفحه ── */}
+      <div ref={topRef} className="relative z-40 bg-pine text-foam">
+        <div className="girih-light absolute inset-0" aria-hidden="true" />
+        <div className="wrap relative flex h-10 items-center justify-between gap-3 text-[0.72rem] font-bold sm:text-[0.78rem]">
+          <span className="flex items-center gap-2">
             <span
-              className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.7rem] font-bold ${
-                open ? "bg-sea/25 text-[#7fd6cb]" : "bg-clay/25 text-[#f0b3a3]"
-              }`}
-            >
-              <span
-                className={`pulse-ring h-1.5 w-1.5 rounded-full ${
-                  open ? "bg-[#5fc9bc]" : "bg-clay"
-                }`}
-              />
-              {open ? "باز" : "بسته"}
+              className={`h-2 w-2 rounded-full ${open ? "bg-teal pulse-ring" : "bg-clay"}`}
+            />
+            {open ? "اکنون باز هستیم — تا ساعت ۲۳" : "اکنون بسته‌ایم — از ساعت ۷ صبح باز می‌شویم"}
+          </span>
+          <span className="hidden items-center gap-4 sm:flex">
+            <span className="flex items-center gap-1.5 text-foam/75">
+              هر روز: ۷ صبح تا ۲۳
             </span>
-          </div>
+            <a dir="ltr" href={`tel:${CONTACT.phone}`} className="flex items-center gap-1.5 text-gold transition-colors hover:text-goldsoft">
+              {CONTACT.phoneDisplay}
+            </a>
+          </span>
+          <a dir="ltr" href={`tel:${CONTACT.phone}`} className="text-gold sm:hidden">
+            {CONTACT.phoneDisplay}
+          </a>
         </div>
       </div>
 
-      {/* ── هدر اصلی با تب‌ها ── */}
+      {/* ── نوار اصلی چسبان ── */}
       <header
         className={`sticky top-0 z-50 border-b transition-all duration-300 ${
           scrolled
-            ? "border-sea/15 bg-card/95 shadow-[0_10px_36px_-18px_rgba(7,39,42,0.35)] backdrop-blur-sm"
-            : "border-sea/10 bg-paper"
+            ? "border-sea/15 bg-card/95 shadow-[0_10px_30px_-18px_rgba(11,59,56,0.4)] backdrop-blur"
+            : "border-transparent bg-card/80 backdrop-blur"
         }`}
       >
-        <div className="wrap flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <Logo onClick={() => go("home")} />
+        {/* نوار پیشرفت اسکرول */}
+        <div
+          className="absolute inset-x-0 top-0 h-[3px] origin-right bg-gradient-to-l from-gold to-teal transition-transform duration-150"
+          style={{ transform: `scaleX(${progress})` }}
+          aria-hidden="true"
+        />
+        <div className="wrap flex h-16 items-center justify-between gap-3 sm:h-[4.5rem]">
+          <button onClick={() => go("home")} className="group flex items-center gap-3 text-start">
+            <span className="arch-ring grid h-11 w-11 shrink-0 place-items-center bg-pine text-gold transition-transform duration-300 group-hover:rotate-3 sm:h-12 sm:w-12">
+              <LogoMark className="h-7 w-7 sm:h-8 sm:w-8" />
+            </span>
+            <span>
+              <span className="font-display block text-lg leading-5 text-pine sm:text-xl">
+                آوای مهر ولی‌الله
+              </span>
+              <span className="block text-[0.62rem] font-bold text-inksoft sm:text-[0.68rem]">
+                درمانگاه خیریه • {faNum(27)} سال خدمت
+              </span>
+            </span>
+          </button>
 
           {/* تب‌های دسکتاپ */}
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="منوی اصلی">
+          <nav className="hidden items-center gap-1 lg:flex" aria-label="تب‌های اصلی">
             {TABS.map((t) => {
-              const Icon = ICONS[t.icon];
+              const Ic = ICONS[t.icon];
               const isActive = active === t.id;
               return (
                 <button
                   key={t.id}
                   onClick={() => go(t.id)}
-                  aria-current={isActive ? "page" : undefined}
-                  className={`tab-pill ${isActive ? "active" : ""}`}
+                  className={`relative rounded-[11px] px-3.5 py-2.5 text-sm font-extrabold transition-all duration-200 ${
+                    isActive
+                      ? "bg-pine text-gold shadow-[0_10px_24px_-12px_rgba(11,59,56,0.6)]"
+                      : "text-ink hover:bg-mist hover:text-seadeep"
+                  }`}
                 >
-                  {Icon && <Icon className="h-4 w-4" />}
-                  {t.label}
+                  <span className="flex items-center gap-1.5">
+                    <Ic className="h-4 w-4" />
+                    {t.label}
+                  </span>
                 </button>
               );
             })}
           </nav>
 
-          {/* رزرو نوبت دسکتاپ */}
-          <BookingMenu label="رزرو نوبت" className="hidden sm:block" />
+          <div className="flex items-center gap-2">
+            <BookingMenu label="رزرو نوبت" className="hidden sm:block" />
+            {/* همبرگری */}
+            <button
+              onClick={() => setMenu(true)}
+              aria-label="باز کردن منو"
+              className="grid h-11 w-11 place-items-center rounded-[12px] border border-sea/25 bg-card text-pine transition-colors hover:bg-mist lg:hidden"
+            >
+              <svg viewBox="0 0 24 24" className="h-5.5 w-5.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <path d="M4 7h16M4 12h11M4 17h16" />
+              </svg>
+            </button>
+          </div>
         </div>
 
-        {/* ── نوار تب‌های موبایل (قابل اسکرول) ── */}
-        <nav
-          className="no-scrollbar fade-x flex items-center gap-1.5 overflow-x-auto border-t border-sea/10 px-3 py-2 lg:hidden"
-          aria-label="منوی موبایل"
-        >
+        {/* تب‌های افقی موبایل و تبلت */}
+        <div className="no-scrollbar fade-x flex gap-1.5 overflow-x-auto border-t border-sea/10 px-3 py-2 lg:hidden">
           {TABS.map((t) => {
-            const Icon = ICONS[t.icon];
+            const Ic = ICONS[t.icon];
             const isActive = active === t.id;
             return (
               <button
                 key={t.id}
                 onClick={() => go(t.id)}
-                aria-current={isActive ? "page" : undefined}
-                className={`tab-pill shrink-0 ${isActive ? "active" : ""}`}
+                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-[0.78rem] font-extrabold transition-all ${
+                  isActive
+                    ? "border-pine bg-pine text-gold"
+                    : "border-sea/20 bg-card text-ink hover:border-sea/50"
+                }`}
               >
-                {Icon && <Icon className="h-4 w-4" />}
+                <Ic className="h-3.5 w-3.5" />
                 {t.label}
               </button>
             );
           })}
-        </nav>
+        </div>
       </header>
 
-      {/* ── دکمه شناور تماس (موبایل) ── */}
-      <a
-        href={`tel:${CONTACT.phone}`}
-        aria-label="تماس فوری با درمانگاه"
-        className="fixed bottom-5 start-5 z-[60] grid h-14 w-14 place-items-center rounded-full bg-gold text-pine shadow-xl shadow-gold/40 transition-all duration-300 hover:scale-110 active:scale-95 sm:bottom-6 sm:start-6 lg:hidden"
-      >
-        <IconPhone className="h-6 w-6" strokeWidth={2} />
-      </a>
+      {/* ── منوی تمام‌صفحه موبایل ── */}
+      {menu && (
+        <div className="fixed inset-0 z-[80] lg:hidden">
+          <div className="absolute inset-0 bg-pine/60 backdrop-blur-sm" onClick={() => setMenu(false)} />
+          <div className="view-enter absolute inset-y-0 start-0 flex w-[19rem] max-w-[88vw] flex-col overflow-y-auto bg-pine text-foam shadow-2xl">
+            <div className="girih-light pointer-events-none absolute inset-0" aria-hidden="true" />
+            <div className="relative flex items-center justify-between border-b border-foam/10 p-5">
+              <span className="flex items-center gap-3">
+                <span className="arch-ring grid h-11 w-11 place-items-center bg-gold text-pine">
+                  <LogoMark className="h-7 w-7" />
+                </span>
+                <span className="font-display text-lg">آوای مهر ولی‌الله</span>
+              </span>
+              <button
+                onClick={() => setMenu(false)}
+                aria-label="بستن منو"
+                className="grid h-10 w-10 place-items-center rounded-full border border-foam/20 text-foam/80 transition-colors hover:bg-foam/10"
+              >
+                <IconClose className="h-5 w-5" />
+              </button>
+            </div>
+            <nav className="relative flex flex-col gap-1 p-4" aria-label="منوی موبایل">
+              {TABS.map((t, i) => {
+                const Ic = ICONS[t.icon];
+                const isActive = active === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => go(t.id)}
+                    className={`fadeup flex items-center gap-3.5 rounded-[13px] px-4 py-3.5 text-start text-base font-extrabold transition-colors ${
+                      isActive ? "bg-gold text-pine" : "text-foam/85 hover:bg-foam/10"
+                    }`}
+                    style={{ animationDelay: `${i * 55}ms` }}
+                  >
+                    <Ic className="h-5 w-5" />
+                    {t.label}
+                  </button>
+                );
+              })}
+            </nav>
+            <div className="relative mt-auto space-y-3 border-t border-foam/10 p-5">
+              <div className="flex items-center gap-2 text-[0.78rem] font-bold">
+                <span className={`h-2 w-2 rounded-full ${open ? "bg-teal pulse-ring" : "bg-clay"}`} />
+                {open ? "اکنون باز هستیم" : "اکنون بسته‌ایم"}
+                <span className="text-foam/50">• هر روز ۷ تا ۲۳</span>
+              </div>
+              <a dir="ltr" href={`tel:${CONTACT.phone}`} className="btn btn-gold w-full">
+                {CONTACT.phoneDisplay}
+              </a>
+              <a dir="ltr" href={`tel:${CONTACT.bookingPhone}`} className="btn w-full border border-foam/25 text-foam hover:bg-foam/10">
+                نوبت‌دهی: {CONTACT.bookingPhoneDisplay}
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

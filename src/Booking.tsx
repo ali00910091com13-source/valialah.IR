@@ -10,7 +10,7 @@ type Props = {
 
 /**
  * دکمه «رزرو نوبت» — با کلیک، فهرست سامانه‌های نوبت‌دهی آنلاین
- * (پذیرش۲۴، دکترتو، ایران‌نوبت، اسکن‌طب) و تماس تلفنی باز می‌شود.
+ * (پذیرش۲۴ و دکترتو) و تماس تلفنی باز می‌شود.
  */
 export default function BookingMenu({
   label = "رزرو نوبت آنلاین",
@@ -62,12 +62,10 @@ export default function BookingMenu({
       </button>
 
       {open && (
-        <div className="menu-pop absolute start-0 top-full z-[70] mt-3 w-[19.5rem] max-w-[calc(100vw-2rem)] sm:start-auto sm:end-0">
+        <div className="menu-pop fixed inset-x-3 bottom-4 z-[70] sm:absolute sm:inset-x-auto sm:bottom-auto sm:end-0 sm:top-full sm:mt-3 sm:w-[19.5rem]">
           <div className="overflow-hidden rounded-[16px] border border-sea/25 bg-card shadow-[0_24px_60px_-18px_rgba(7,39,42,0.45)]">
             <div className="flex items-center justify-between bg-pine px-4 py-3">
-              <span className="font-display text-base text-gold">
-                انتخاب سامانه نوبت‌دهی
-              </span>
+              <span className="font-display text-base text-gold">انتخاب سامانه نوبت‌دهی</span>
               <button
                 onClick={() => setOpen(false)}
                 aria-label="بستن"
@@ -89,9 +87,7 @@ export default function BookingMenu({
                     <span className="block text-sm font-extrabold text-pine transition-colors group-hover:text-seadeep">
                       {b.name}
                     </span>
-                    <span className="block text-[0.72rem] font-semibold text-inksoft">
-                      {b.note}
-                    </span>
+                    <span className="block text-[0.72rem] font-semibold text-inksoft">{b.note}</span>
                   </span>
                   <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-mist text-sea transition-all group-hover:bg-sea group-hover:text-foam">
                     <IconArrow className="h-4 w-4 -rotate-45" />

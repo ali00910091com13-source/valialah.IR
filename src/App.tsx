@@ -6,7 +6,9 @@ import { Insurance, Team } from "./Sections2";
 import Doctors from "./Doctors";
 import Admin from "./Admin";
 import { ContactSection, Footer } from "./Contact";
-import type { TabId } from "./data";
+import { IMG, faNum, type TabId } from "./data";
+import { Reveal } from "./fx";
+import { IconBuilding } from "./Icons";
 
 export default function App() {
   const [tab, setTab] = useState<TabId>("home");
@@ -67,30 +69,32 @@ function FacilitiesIntro() {
     <section className="relative overflow-hidden bg-paper px-4 pt-14 sm:px-6 sm:pt-20">
       <div className="girih absolute inset-0 opacity-40" aria-hidden="true" />
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
-        <span className="eyebrow justify-center text-seadeep!">
-          <svg
-            viewBox="0 0 24 24"
-            className="h-4.5 w-4.5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M4 21V5.5L12 3v18" />
-            <path d="M12 21V8l8 2.5V21" />
-            <path d="M2.5 21h19" />
-          </svg>
-          امکانات مجموعه
-        </span>
-        <h1 className="font-display mt-4 text-4xl leading-[1.3] text-pine sm:text-5xl">
-          فضایی در شأن <span className="text-sea">سلامت</span> شما
-        </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-inksoft sm:text-lg">
-          ساختمان ۴ طبقه به‌همراه زیرزمین، با ۳۵ اتاق مراجعه و تجهیزات تخصصی؛
-          محیطی که در آن کیفیت خدمات و آرامش مراجعین در اولویت است.
-        </p>
+        <Reveal>
+          <span className="eyebrow justify-center text-seadeep!">
+            <IconBuilding className="h-4.5 w-4.5" />
+            امکانات مجموعه
+          </span>
+          <h1 className="font-display mt-4 text-4xl leading-[1.25] text-pine sm:text-5xl">
+            یک مجموعه‌ی کامل، <span className="text-sea">در چهار طبقه</span>
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-inksoft sm:text-lg">
+            {faNum(4)} طبقه‌ی مجزا به‌همراه زیرزمین، {faNum(35)} اتاق مراجعه و{" "}
+            {faNum(50)} نفر پرسنل اداری و اجرایی؛ همه برای اینکه مراجعت شما
+            راحت، سریع و در شأن شما باشد.
+          </p>
+        </Reveal>
+        <Reveal delay={150}>
+          <div className="arch-ring relative mx-auto mt-10 max-w-3xl bg-gradient-to-b from-sea/25 to-transparent p-2.5">
+            <div className="arch relative aspect-[16/8] overflow-hidden">
+              <img
+                src={IMG.exterior}
+                alt="ساختمان درمانگاه خیریه آوای مهر ولی‌الله"
+                className="kenburns h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-pine/50 via-transparent to-transparent" />
+            </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

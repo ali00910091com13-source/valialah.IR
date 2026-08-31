@@ -2,205 +2,199 @@ import {
   useEffect,
   useRef,
   useState,
-  type ReactNode,
   type CSSProperties,
+  type ReactNode,
 } from "react";
 import { faNum } from "./data";
 
-/* reveal-on-scroll wrapper */
+export function useReducedMotion() {
+  const [reduced, setReduced] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const on = () => setReduced(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return reduced;
+}
+
+/* ─────────────── scroll reveal ─────────────── */
 export function Reveal({
   children,
   delay = 0,
   className = "",
-  style,
+  as: Tag = "div",
 }: {
   children: ReactNode;
   delay?: number;
   className?: string;
-  style?: CSSProperties;
+  as?: "div" | "section" | "article" | "li" | "span";
 }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLElement | null>(null);
+  const reduced = useReducedMotion();
+  const [inView, setInView] = useState(reduced);
+
   useEffect(() => {
+    if (reduced) {
+      setInView(true);
+      return;
+    }
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          el.classList.add("on");
-          io.disconnect();
-        }
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setInView(true);
+            io.disconnect();
+          }
+        });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
     );
     io.observe(el);
     return () => io.disconnect();
-  }, []);
+  }, [reduced]);
+
   return (
-    <div
-      ref={ref}
-      className={`reveal ${className}`}
-      style={{ transitionDelay: `${delay}ms`, ...style }}
+    <Tag
+      ref={ref as never}
+      className={`reveal ${inView ? "in" : ""} ${className}`}
+      style={{ transitionDelay: `${delay}ms` } as CSSProperties}
     >
       {children}
-    </div>
+    </Tag>
   );
 }
 
-/* animated counter in Persian digits */
-export function CountUp({
-  to,
-  duration = 1500,
-  prefix = "",
-  suffix = "",
-}: {
-  to: number;
-  duration?: number;
-  prefix?: string;
-  suffix?: string;
-}) {
+/* ─────────────── count-up ─────────────── */
+export function CountUp({ to, duration = 1400 }: { to: number; duration?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const [val, setVal] = useState(0);
+  const reduced = useReducedMotion();
+  const [val, setVal] = useState(reduced ? to : 0);
+  const started = useRef(false);
+
   useEffect(() => {
+    if (reduced) {
+      setVal(to);
+      return;
+    }
     const el = ref.current;
     if (!el) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let raf = 0;
     const io = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting) return;
-        io.disconnect();
-        if (reduced) {
-          setVal(to);
-          return;
-        }
-        const t0 = performance.now();
-        const tick = (t: number) => {
-          const p = Math.min(1, (t - t0) / duration);
-          setVal(Math.round(to * (1 - Math.pow(1 - p, 3))));
-          if (p < 1) raf = requestAnimationFrame(tick);
-        };
-        raf = requestAnimationFrame(tick);
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting && !started.current) {
+            started.current = true;
+            const t0 = performance.now();
+            const tick = (t: number) => {
+              const p = Math.min(1, (t - t0) / duration);
+              const eased = 1 - Math.pow(1 - p, 3);
+              setVal(Math.round(eased * to));
+              if (p < 1) requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+            io.disconnect();
+          }
+        });
       },
       { threshold: 0.4 },
     );
     io.observe(el);
-    return () => {
-      io.disconnect();
-      cancelAnimationFrame(raf);
-    };
-  }, [to, duration]);
+    return () => io.disconnect();
+  }, [to, duration, reduced]);
+
+  return <span ref={ref}>{faNum(val)}</span>;
+}
+
+/* ─────────────── ECG heartbeat line ─────────────── */
+export function EcgLine({ className = "" }: { className?: string }) {
+  const reduced = useReducedMotion();
+  const d =
+    "M0 30 H70 l10-14 10 28 8-20 6 6 H150 l10-14 10 28 8-20 6 6 H240 l10-14 10 28 8-20 6 6 H340 l10-14 10 28 8-20 6 6 H440 l10-14 10 28 8-20 6 6 H600";
   return (
-    <span ref={ref}>
-      {prefix}
-      {faNum(val)}
-      {suffix}
-    </span>
+    <svg
+      viewBox="0 0 600 60"
+      preserveAspectRatio="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d={d} fill="none" stroke="currentColor" strokeWidth="2" opacity="0.25" />
+      {!reduced && (
+        <path
+          d={d}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          className="ecg-path"
+        />
+      )}
+    </svg>
   );
 }
 
-/* live open/closed status based on Tehran time (07:00–23:00 daily) */
-export function useOpenStatus(): boolean {
-  const calc = () => {
+/* ─────────────── rotating stamp ─────────────── */
+export function Stamp({ className = "" }: { className?: string }) {
+  const reduced = useReducedMotion();
+  return (
+    <svg viewBox="0 0 120 120" className={`${reduced ? "" : "stamp-spin"} ${className}`} aria-hidden="true">
+      <defs>
+        <path id="stampcircle" d="M60 12a48 48 0 1 1 0 96 48 48 0 1 1 0-96" fill="none" />
+      </defs>
+      <circle cx="60" cy="60" r="57" fill="var(--color-pine)" />
+      <circle cx="60" cy="60" r="53" fill="none" stroke="var(--color-gold)" strokeWidth="1.4" strokeDasharray="3 4" />
+      <circle cx="60" cy="60" r="34" fill="none" stroke="var(--color-gold)" strokeWidth="1" opacity="0.55" />
+      <text fill="var(--color-goldsoft)" fontSize="10.6" fontWeight="700" letterSpacing="2.6">
+        <textPath href="#stampcircle">
+          آوای مهر ولی‌الله • ۲۷ سال خدمت • صدای سلامت •
+        </textPath>
+      </text>
+      <path
+        d="M60 76c-8.6-7-13.4-11.4-13.4-17 0-3.7 2.8-6.4 6.2-6.4 2.6 0 5 1.5 6.2 3.8.2.4.8.4 1 0 1.2-2.3 3.6-3.8 6.2-3.8 3.4 0 6.2 2.7 6.2 6.4 0 5.6-4.8 10-13.4 17z"
+        fill="var(--color-gold)"
+      />
+    </svg>
+  );
+}
+
+/* ─────────────── hand-drawn squiggle ─────────────── */
+export function Squiggle({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 220 14" className={className} preserveAspectRatio="none" aria-hidden="true">
+      <path
+        d="M3 10 C 30 2, 55 13, 85 8 S 140 2, 165 9 S 205 12, 217 5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="4.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/* ─────────────── live open/closed status (Tehran time) ─────────────── */
+export function useOpenStatus() {
+  const compute = () => {
     try {
-      const parts = new Intl.DateTimeFormat("en-GB", {
-        timeZone: "Asia/Tehran",
-        hour: "2-digit",
-        hour12: false,
-      }).formatToParts(new Date());
-      const h = Number(parts.find((p) => p.type === "hour")?.value ?? "12");
+      const now = new Date(
+        new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" }),
+      );
+      const h = now.getHours() + now.getMinutes() / 60;
       return h >= 7 && h < 23;
     } catch {
-      const h = new Date().getHours();
+      const h = new Date().getHours() + new Date().getMinutes() / 60;
       return h >= 7 && h < 23;
     }
   };
-  const [open, setOpen] = useState(calc);
+  const [open, setOpen] = useState(compute);
   useEffect(() => {
-    const id = setInterval(() => setOpen(calc()), 60_000);
-    return () => clearInterval(id);
+    const id = window.setInterval(() => setOpen(compute()), 60_000);
+    return () => window.clearInterval(id);
   }, []);
   return open;
-}
-
-/* animated electrocardiogram strip */
-export function EcgLine({
-  className = "",
-  stroke = "#0e7c74",
-}: {
-  className?: string;
-  stroke?: string;
-}) {
-  const d =
-    "M0 60 H110 l10 0 7-14 9 26 10-46 12 68 10-48 8 20 5-6 H360 " +
-    "l10 0 7-14 9 26 10-46 12 68 10-48 8 20 5-6 H720 " +
-    "l10 0 7-14 9 26 10-46 12 68 10-48 8 20 5-6 H1080 l10 0 7-14 9 26 10-46 12 68 10-48 8 20 5-6 H1200";
-  return (
-    <svg
-      viewBox="0 0 1200 120"
-      preserveAspectRatio="none"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d={d} fill="none" stroke={stroke} strokeOpacity="0.18" strokeWidth="2" />
-      <path
-        d={d}
-        fill="none"
-        stroke={stroke}
-        strokeWidth="2.6"
-        strokeLinecap="round"
-        pathLength={1000}
-        className="ecg-run"
-      />
-    </svg>
-  );
-}
-
-/* rotating circular stamp with the clinic name */
-export function Stamp({ className = "" }: { className?: string }) {
-  return (
-    <div className={`pointer-events-none select-none ${className}`} aria-hidden="true">
-      <svg viewBox="0 0 130 130" className="spin-slow h-full w-full">
-        <defs>
-          <path
-            id="stamp-circ"
-            d="M65 65 m-46 0 a46 46 0 1 1 92 0 a46 46 0 1 1 -92 0"
-            fill="none"
-          />
-        </defs>
-        <circle cx="65" cy="65" r="63" fill="rgba(247,232,198,0.92)" />
-        <circle cx="65" cy="65" r="63" fill="none" stroke="#d69a25" strokeWidth="1.6" strokeDasharray="3 5" />
-        <circle cx="65" cy="65" r="30" fill="#0e7c74" />
-        <path
-          d="M65 80c-6.5-4.6-11.5-8.9-11.5-14.3 0-3.8 3-6.7 6.7-6.7 2 0 3.8 1 4.8 2.5 1-1.5 2.8-2.5 4.8-2.5 3.7 0 6.7 2.9 6.7 6.7 0 5.4-5 9.7-11.5 14.3z"
-          fill="#f7e8c6"
-        />
-        <text fontSize="10" fontWeight="700" fill="#0a5a54" fontFamily="Vazirmatn, sans-serif">
-          <textPath href="#stamp-circ" startOffset="0">
-            درمانگاه خیریه آوای مهر ولی‌الله • ۲۷ سال خدمت • سلامت شما اولویت ماست •
-          </textPath>
-        </text>
-      </svg>
-    </div>
-  );
-}
-
-/* hand-drawn saffron underline */
-export function Squiggle({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 220 16"
-      className={className}
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M4 11 C 42 3, 84 13, 124 8 S 196 4, 216 10"
-        fill="none"
-        stroke="#d69a25"
-        strokeWidth="5.5"
-        strokeLinecap="round"
-        className="draw-line"
-      />
-    </svg>
-  );
 }

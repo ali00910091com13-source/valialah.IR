@@ -19,24 +19,31 @@ export function getCloudCfg(): CloudCfg | null {
 
 /**
  * آدرس پروژه را از هر شکلی که کاربر بچسباند استخراج و یکدست می‌کند:
- * - https://supabase.com/dashboard/project/xyzcompany/database/... → https://xyzcompany.supabase.co
- * - xyzcompany.supabase.co → https://xyzcompany.supabase.co
- * - https://xyzcompany.supabase.co/ → https://xyzcompany.supabase.co
+ * - https://supabase.com/dashboard/project/xyz/...  → https://xyz.supabase.co
+ * - supabase.com/project/xyz                        → https://xyz.supabase.co
+ * - xyz.supabase.co                                 → https://xyz.supabase.co
  */
 export function normalizeProjectUrl(raw: string): string | null {
   const t = raw.trim().replace(/\/+$/, "");
   if (!t) return null;
-  const dash = t.match(/dashboard\/project\/([a-zA-Z0-9-]+)/);
+  const dash = t.match(/(?:dashboard\/)?project\/([a-zA-Z0-9-]+)/);
   if (dash) return `https://${dash[1]}.supabase.co`;
   const plain = t.match(/^(?:https?:\/\/)?([a-zA-Z0-9-]+\.supabase\.(?:co|in|net))/);
   if (plain) return `https://${plain[1]}`;
   return null;
 }
 
+/** کلید را یکدست می‌کند (حذف پیشوند Bearer و فاصله‌ها) */
+export const normalizeKey = (raw: string) =>
+  raw.trim().replace(/^Bearer\s+/i, "");
+
 export const saveCloudCfg = (url: string, key: string) =>
   localStorage.setItem(
     CFG_KEY,
-    JSON.stringify({ url: normalizeProjectUrl(url) ?? url.trim(), key: key.trim() }),
+    JSON.stringify({
+      url: normalizeProjectUrl(url) ?? url.trim(),
+      key: normalizeKey(key),
+    }),
   );
 
 export const clearCloudCfg = () => localStorage.removeItem(CFG_KEY);
@@ -51,8 +58,8 @@ const endpoint = (cfg: CloudCfg) => `${cfg.url}/rest/v1/doctors`;
 
 /**
  * دریافت فهرست پزشک‌ها از فضای ابری.
- * - `null`  → خطا در ارتباط (قطع/تنظیمات اشتباه)
- * - `[]`    → اتصال برقرار است ولی هنوز فهرستی منتشر نشده
+ * - `null` → خطا در ارتباط (قطع/تنظیمات اشتباه)
+ * - `[]`   → اتصال برقرار است ولی هنوز فهرستی منتشر نشده
  */
 export async function fetchCloudDoctors(): Promise<Doctor[] | null> {
   const cfg = getCloudCfg();
@@ -62,15 +69,15 @@ export async function fetchCloudDoctors(): Promise<Doctor[] | null> {
       headers: authHeaders(cfg.key),
     });
     if (!res.ok) return null;
-    const rows = (await res.json()) as { data?: unknown }[];
-    const data = rows?.[0]?.data;
-    return Array.isArray(data) ? (data as Doctor[]) : [];
+    const rows = (await res.json()) as { data?: Doctor[] }[];
+    const list = rows[0]?.data;
+    return Array.isArray(list) ? list : [];
   } catch {
     return null;
   }
 }
 
-/** انتشار فهرست پزشک‌ها برای همه‌ی بازدیدکنندگان */
+/** انتشار فهرست برای همه‌ی بازدیدکنندگان */
 export async function pushCloudDoctors(list: Doctor[]): Promise<boolean> {
   const cfg = getCloudCfg();
   if (!cfg) return false;
@@ -89,27 +96,39 @@ export async function pushCloudDoctors(list: Doctor[]): Promise<boolean> {
   }
 }
 
-/** آزمایش اتصال قبل از ذخیره‌ی تنظیمات */
-export async function testCloud(
-  urlRaw: string,
-  key: string,
-): Promise<{ ok: boolean; missingTable: boolean; badUrl?: boolean }> {
+/* ─────────────── آزمایش اتصال با تشخیص دقیق ─────────────── */
+
+export type TestResult =
+  | { status: "ok" }
+  | { status: "bad-url" }
+  | { status: "bad-key-format" }
+  | { status: "network"; detail: string }
+  | { status: "unauthorized"; detail: string }
+  | { status: "no-table"; detail: string }
+  | { status: "other"; code: number; detail: string };
+
+export async function testCloud(urlRaw: string, keyRaw: string): Promise<TestResult> {
   const url = normalizeProjectUrl(urlRaw);
-  if (!url) return { ok: false, missingTable: false, badUrl: true };
+  const key = normalizeKey(keyRaw);
+  if (!url) return { status: "bad-url" };
+  if (key.length < 20) return { status: "bad-key-format" };
   try {
     const res = await fetch(`${url}/rest/v1/doctors?id=eq.1&select=data`, {
-      headers: authHeaders(key.trim()),
+      headers: authHeaders(key),
     });
-    if (res.ok) return { ok: true, missingTable: false };
-    const text = await res.text().catch(() => "");
-    const missingTable = /PGRST205|schema cache|could not find the table/i.test(text);
-    return { ok: false, missingTable };
-  } catch {
-    return { ok: false, missingTable: false };
+    if (res.ok) return { status: "ok" };
+    const detail = (await res.text().catch(() => "")).slice(0, 220) || `HTTP ${res.status}`;
+    if (res.status === 401 || res.status === 403 || /invalid api key|jwt|signature/i.test(detail))
+      return { status: "unauthorized", detail };
+    if (res.status === 404 || /PGRST205|could not find the table|schema cache/i.test(detail))
+      return { status: "no-table", detail };
+    return { status: "other", code: res.status, detail };
+  } catch (e) {
+    return { status: "network", detail: e instanceof Error ? e.message : String(e) };
   }
 }
 
-/** کدی که یک‌بار در SQL Editor پروژه‌ی Supabase اجرا می‌شود */
+/** کدی که یک‌بار در SQL Editor پروژه‌ی Supabase اجرا می‌شود (قابل تکرار) */
 export const SETUP_SQL = `create table if not exists doctors (
   id int primary key,
   data jsonb not null,
@@ -118,5 +137,6 @@ export const SETUP_SQL = `create table if not exists doctors (
 
 alter table doctors enable row level security;
 
+drop policy if exists "public access" on doctors;
 create policy "public access" on doctors
   for all using (true) with check (true);`;

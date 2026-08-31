@@ -41,13 +41,13 @@ export default function Doctors() {
             <IconDoctor className="h-4.5 w-4.5" />
             تیم پزشکی ما
           </span>
-          <h1 className="font-display text-4xl leading-[1.25] text-pine sm:text-5xl">
+          <h1 className="font-display mt-4 text-4xl leading-[1.25] text-pine sm:text-5xl">
             پزشکان درمانگاه آوای مهر
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-inksoft sm:text-lg">
-            مجموعه‌ای از پزشکان متخصص و عمومی در کنار دندانپزشکان مجرب؛ با
-            بیش از {faNum(27)} سال تجربه در خدمت سلامت شما. پزشک موردنظر خود را
-            جستجو یا بر اساس تخصص فیلتر کنید.
+            مجموعه‌ای از پزشکان متخصص و عمومی در کنار دندانپزشکان مجرب؛ با بیش از{" "}
+            {faNum(27)} سال تجربه در خدمت سلامت شما. پزشک موردنظر خود را جستجو یا بر
+            اساس تخصص فیلتر کنید.
           </p>
         </div>
       </Reveal>
@@ -68,21 +68,15 @@ export default function Doctors() {
               <button
                 onClick={() => setQuery("")}
                 aria-label="پاک کردن جستجو"
-                className="absolute left-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-sea/10 text-sea transition-colors hover:bg-sea hover:text-white"
+                className="absolute left-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-sea/10 text-sea transition-colors hover:bg-sea hover:text-foam"
               >
                 <IconClose className="h-4 w-4" />
               </button>
             )}
           </div>
 
-          {/* چیپ‌های تخصص — قابل اسکرول در موبایل */}
           <div className="fade-x no-scrollbar mt-5 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:overflow-visible">
-            <FilterChip
-              active={spec === "all"}
-              onClick={() => setSpec("all")}
-              label="همه تخصص‌ها"
-              count={doctors.length}
-            />
+            <FilterChip active={spec === "all"} onClick={() => setSpec("all")} label="همه تخصص‌ها" count={doctors.length} />
             {DOCTOR_SPECS.map((s) => (
               <FilterChip
                 key={s.id}
@@ -98,10 +92,9 @@ export default function Doctors() {
 
       {/* ── نتایج ── */}
       <div className="mt-8">
-        <div className="mb-4 flex items-center justify-between text-sm text-inksoft">
-          <span>
-            <b className="font-display text-lg text-seadeep">{faNum(list.length)}</b>{" "}
-            پزشک یافت شد
+        <div className="mb-4 flex items-center justify-between">
+          <span className="text-sm font-bold text-inksoft">
+            <b className="font-display text-lg text-seadeep">{faNum(list.length)}</b> پزشک یافت شد
           </span>
           {(spec !== "all" || query) && (
             <button
@@ -120,17 +113,12 @@ export default function Doctors() {
         {list.length === 0 ? (
           <div className="rounded-3xl border-2 border-dashed border-sea/25 bg-card/60 px-6 py-16 text-center">
             <IconSearch className="mx-auto h-12 w-12 text-sea/30" />
-            <p className="mt-4 font-display text-xl text-pine">
-              پزشکی با این مشخصات یافت نشد
-            </p>
+            <p className="font-display mt-4 text-xl text-pine">پزشکی با این مشخصات یافت نشد</p>
             <p className="mt-2 text-sm leading-7 text-inksoft">
               عبارت دیگری جستجو کنید یا برای اطلاع از برنامه کامل حضور پزشکان با
               پذیرش تماس بگیرید.
             </p>
-            <a
-              href={`tel:${CONTACT.phone}`}
-              className="btn btn-sea mx-auto mt-6 inline-flex"
-            >
+            <a href={`tel:${CONTACT.phone}`} className="btn btn-sea mx-auto mt-6 inline-flex">
               <IconPhone className="h-5 w-5" />
               تماس با پذیرش
             </a>
@@ -146,25 +134,21 @@ export default function Doctors() {
                       <img
                         src={d.photo}
                         alt={d.name}
-                        className="h-14 w-14 shrink-0 rounded-2xl border-2 border-sea/20 object-cover transition-all duration-300 group-hover:border-sea"
+                        className="h-14 w-14 shrink-0 rounded-2xl border-2 border-sea/30 object-cover transition-colors duration-300 group-hover:border-sea"
                       />
                     ) : (
-                      <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-sea/10 text-sea transition-colors duration-300 group-hover:bg-sea group-hover:text-white">
+                      <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-sea/10 text-sea transition-colors duration-300 group-hover:bg-sea group-hover:text-foam">
                         <IconStetho className="h-7 w-7" />
                       </span>
                     )}
                     <div className="min-w-0">
                       <span className="inline-block rounded-full bg-goldsoft px-2.5 py-0.5 text-[11px] font-bold text-golddeep">
-                        {SPEC_LABEL[d.spec]}
+                        {SPEC_LABEL[d.spec] ?? d.spec}
                       </span>
-                      <h3 className="mt-1.5 font-display text-lg leading-7 text-pine">
-                        {d.name}
-                      </h3>
+                      <h3 className="font-display mt-1.5 text-lg leading-7 text-pine">{d.name}</h3>
                     </div>
                   </div>
-                  <p className="mt-3.5 text-sm font-semibold leading-7 text-ink">
-                    {d.title}
-                  </p>
+                  <p className="mt-3.5 text-sm font-semibold leading-7 text-ink">{d.title}</p>
                   {d.focus && (
                     <p className="mt-2 flex items-start gap-2 text-[13px] leading-6 text-inksoft">
                       <IconCheck className="mt-1 h-3.5 w-3.5 shrink-0 text-sea" />
@@ -196,27 +180,25 @@ export default function Doctors() {
         )}
       </div>
 
-      {/* ── یادداشت ── */}
+      {/* ── یادداشت و رزرو ── */}
       <Reveal delay={120}>
-        <div className="mt-10 rounded-3xl bg-seadeep p-6 text-center text-white sm:p-8">
+        <div className="mt-10 rounded-3xl bg-seadeep p-6 text-center text-foam sm:p-8">
           <p className="font-display text-xl leading-9 sm:text-2xl">
             برنامه حضور پزشکان در روزهای مختلف هفته متفاوت است.
           </p>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-8 text-white/80">
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-8 text-foam/80">
             برای رزرو نوبت می‌توانید از سامانه‌های آنلاین استفاده کنید یا با
             شماره‌های پذیرش تماس بگیرید.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            {BOOKING_LINKS.slice(0, 2).map((b, i) => (
+            {BOOKING_LINKS.map((b, i) => (
               <a
                 key={b.name}
                 href={b.url}
                 target="_blank"
                 rel="noreferrer"
                 className={`btn w-full sm:w-auto ${
-                  i === 0
-                    ? "btn-gold"
-                    : "border-2 border-white/30 text-white hover:bg-white/10"
+                  i === 0 ? "btn-gold" : "border-2 border-foam/30 text-foam hover:bg-foam/10"
                 }`}
               >
                 <IconArrow className="h-4.5 w-4.5 -rotate-45" />
@@ -225,7 +207,7 @@ export default function Doctors() {
             ))}
             <a
               href={`tel:${CONTACT.bookingPhone}`}
-              className="btn w-full border-2 border-white/30 text-white hover:bg-white/10 sm:w-auto"
+              className="btn w-full border-2 border-foam/30 text-foam hover:bg-foam/10 sm:w-auto"
             >
               <IconPhone className="h-4.5 w-4.5" />
               نوبت‌دهی: <span dir="ltr">{CONTACT.bookingPhoneDisplay}</span>
@@ -254,14 +236,14 @@ function FilterChip({
       aria-pressed={active}
       className={`flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2.5 text-sm font-bold transition-all duration-200 active:scale-95 ${
         active
-          ? "border-sea bg-sea text-white shadow-md shadow-sea/25"
+          ? "border-sea bg-sea text-foam shadow-md shadow-sea/25"
           : "border-sea/25 bg-card text-ink hover:border-sea/50 hover:bg-sea/5"
       }`}
     >
       {label}
       <span
         className={`rounded-full px-1.5 py-0.5 text-[11px] ${
-          active ? "bg-white/20" : "bg-sea/10 text-seadeep"
+          active ? "bg-foam/20" : "bg-sea/10 text-seadeep"
         }`}
       >
         {faNum(count)}

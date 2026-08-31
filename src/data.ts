@@ -1,14 +1,10 @@
 export const IMG = {
   hero: "https://image.qwenlm.ai/generated-images/1a8ab95e-8eca-4826-9d50-82a52fcd5c79/_result.png",
-  dental:
-    "https://image.qwenlm.ai/generated-images/90faee3b-3032-4f56-82a2-19fdf70a85f5/_result.png",
-  physio:
-    "https://image.qwenlm.ai/generated-images/8ed6e390-8cfd-403d-96d6-394ad3ec1b3f/_result.png",
-  radio:
-    "https://image.qwenlm.ai/generated-images/7ae812c7-cafc-4675-a7b1-c7a1a689a247/_result.png",
+  dental: "https://image.qwenlm.ai/generated-images/90faee3b-3032-4f56-82a2-19fdf70a85f5/_result.png",
+  physio: "https://image.qwenlm.ai/generated-images/8ed6e390-8cfd-403d-96d6-394ad3ec1b3f/_result.png",
+  radio: "https://image.qwenlm.ai/generated-images/cb8ff3df-84ba-443a-8db6-12cf3c047a0b/_result.png",
   team: "https://image.qwenlm.ai/generated-images/19dcb729-7111-483b-95d1-e143a81a701a/_result.png",
-  exterior:
-    "https://image.qwenlm.ai/generated-images/ee473f35-7172-4768-a3ce-3d054c9c75dc/_result.png",
+  exterior: "https://image.qwenlm.ai/generated-images/ee473f35-7172-4768-a3ce-3d054c9c75dc/_result.png",
 };
 
 export const CONTACT = {
@@ -18,10 +14,9 @@ export const CONTACT = {
   bookingPhoneDisplay: "۰۲۱-۳۳۵۵۹۰۶۸",
   mobile: "09902507780",
   mobileDisplay: "۰۹۹۰-۲۵۰۷۷۸۰",
-  address:
-    "تهران، بزرگراه شهید محلاتی، بین سه‌راهی ری و چهارراه ۱۷ شهریور، پلاک ۳۱۲",
+  address: "تهران، بزرگراه شهید محلاتی، بین سه‌راهی ری و چهارراه ۱۷ شهریور، پلاک ۳۱۲",
   addressShort: "بزرگراه شهید محلاتی، پلاک ۳۱۲",
-  landmark: "زیر پل محلاتی، محله قیام",
+  landmark: "زیر پل محلاتی",
   instagram: "https://instagram.com/valialahclinic",
   instagramId: "valialahclinic",
   mapUrl:
@@ -70,7 +65,6 @@ export type Department = {
   desc: string;
   badges: string[];
   services: string[];
-  serviceNotes?: string[];
 };
 
 export const DEPARTMENTS: Department[] = [
@@ -156,38 +150,18 @@ export const UNITS: Unit[] = [
       "اورژانس",
     ],
   },
-  {
-    title: "آزمایشگاه",
-    desc: "انجام انواع آزمایش‌های تشخیصی با تجهیزات به‌روز و پاسخ‌دهی سریع.",
-    icon: "flask",
-  },
-  {
-    title: "شنوایی‌سنجی",
-    desc: "ادیومتری و ارزیابی دقیق شنوایی برای تمام رده‌های سنی.",
-    icon: "ear",
-  },
-  {
-    title: "داروخانه",
-    desc: "تأمین داروهای تجویزی مراجعین با تعرفه‌ای مناسب و در دسترس.",
-    icon: "pill",
-  },
-  {
-    title: "عینک‌سازی",
-    desc: "تعیین نمره چشم و ساخت انواع عینک طبی در محل درمانگاه.",
-    icon: "glasses",
-  },
+  { title: "آزمایشگاه", desc: "انواع آزمایش‌های تشخیصی با تجهیزات به‌روز و پاسخ‌دهی سریع.", icon: "flask" },
+  { title: "شنوایی‌سنجی", desc: "ادیومتری و ارزیابی دقیق شنوایی برای تمام رده‌های سنی.", icon: "ear" },
+  { title: "داروخانه", desc: "تأمین داروهای تجویزی مراجعین با تعرفه‌ای مناسب و در دسترس.", icon: "pill" },
+  { title: "عینک‌سازی", desc: "تعیین نمره چشم و ساخت انواع عینک طبی در محل درمانگاه.", icon: "glasses" },
 ];
 
-export type Insurer = {
-  name: string;
-  mono: string;
-  color: string;
-};
+export type Insurer = { name: string; mono: string; color: string };
 
 export const BASE_INSURERS = [
   "تامین اجتماعی",
   "بیمه سلامت و خدمات درمانی",
-  "و کلیه بیمه‌های پایه دیگر",
+  "بیمه نیروهای مسلح",
 ];
 
 export const INSURERS: Insurer[] = [
@@ -218,111 +192,54 @@ export const TEAM_SPECIALTIES = [
   "پزشکی عمومی",
 ];
 
-export const faNum = (n: number | string): string =>
-  String(n).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
-
 /* ─────────────── پزشکان ─────────────── */
+
+export const DOCTOR_SPECS = [
+  { id: "gen", label: "پزشکی عمومی" },
+  { id: "card", label: "قلب و عروق" },
+  { id: "ortho", label: "ارتوپدی" },
+  { id: "uro", label: "ارولوژی" },
+  { id: "ent", label: "گوش، حلق و بینی" },
+  { id: "gyn", label: "زنان و زایمان" },
+  { id: "mid", label: "مامایی" },
+  { id: "derm", label: "پوست و مو" },
+  { id: "psy", label: "روان‌شناسی بالینی" },
+  { id: "surg", label: "جراحی عمومی" },
+  { id: "dent", label: "دندانپزشکی" },
+  { id: "coun", label: "مشاوره" },
+] as const;
 
 export type Doctor = {
   name: string;
-  spec: string; // کلید تخصص برای فیلتر
-  title: string; // عنوان دقیق
-  focus?: string; // حوزه تمرکز / علل شایع مراجعه
-  photo?: string; // آدرس عکس یا data-URL
+  spec: string;
+  title: string;
+  focus?: string;
+  photo?: string;
 };
 
-export const DOCTOR_SPECS: { id: string; label: string }[] = [
-  { id: "uro", label: "اورولوژی" },
-  { id: "ent", label: "گوش، حلق و بینی" },
-  { id: "ortho", label: "ارتوپدی" },
-  { id: "cardio", label: "قلب و عروق" },
-  { id: "eye", label: "چشم‌پزشکی" },
-  { id: "int", label: "داخلی و پوست" },
-  { id: "psy", label: "روان‌شناسی" },
-  { id: "dent", label: "دندانپزشکی" },
-  { id: "mid", label: "مامایی" },
-  { id: "coun", label: "مشاوره" },
-];
-
 export const DOCTORS: Doctor[] = [
-  {
-    name: "دکتر سید محمدعلی مدینه‌ای",
-    spec: "uro",
-    title: "فلوشیپ اندویورولوژی، متخصص اورولوژی",
-    focus: "جراحی درون‌بین کلیه، مجاری ادراری و تناسلی",
-  },
-  {
-    name: "دکتر عبدالرضا جهانگیری",
-    spec: "ent",
-    title: "متخصص گوش، حلق و بینی",
-    focus: "کاهش شنوایی، گرفتگی گوش و بیماری‌های حلق و بینی",
-  },
-  {
-    name: "دکتر وحید مجریان",
-    spec: "ortho",
-    title: "متخصص ارتوپدی",
-    focus: "درد مفاصل، آسیب‌های استخوانی و ارتوپدی عمومی",
-  },
-  {
-    name: "دکتر غلامرضا خرمی",
-    spec: "ortho",
-    title: "متخصص ارتوپدی",
-    focus: "بیماری‌های استخوان و مفاصل",
-  },
-  {
-    name: "دکتر ناهید فضلی بنفشه‌ورق",
-    spec: "cardio",
-    title: "متخصص قلب و عروق",
-    focus: "تنگی نفس، فشار خون و بیماری‌های قلبی",
-  },
-  {
-    name: "دکتر مرتضی میرعرب",
-    spec: "eye",
-    title: "متخصص چشم‌پزشکی",
-    focus: "بیماری‌های چشم و بینایی",
-  },
-  {
-    name: "دکتر وحید احیایی قدرتی",
-    spec: "eye",
-    title: "متخصص چشم و کارشناس بینایی‌سنجی",
-    focus: "خشکی چشم، اپتومتری و سنجش بینایی",
-  },
-  {
-    name: "دکتر محبوبه ثابت",
-    spec: "int",
-    title: "پزشک عمومی، داخلی و پوست و مو",
-    focus: "ویزیت عمومی، بیماری‌های داخلی و مشکلات پوستی",
-  },
-  {
-    name: "دکتر سید بهنام نورحسینی",
-    spec: "psy",
-    title: "روان‌شناس و درمانگر خانواده",
-    focus: "مشاوره فردی و خانواده",
-  },
-  {
-    name: "دکتر علی امیری",
-    spec: "dent",
-    title: "متخصص جراحی دهان، فک و صورت",
-    focus: "جراحی‌های تخصصی دهان و فک",
-  },
-  {
-    name: "دکتر سپیده علی‌نژاد",
-    spec: "dent",
-    title: "دندانپزشک و جراح",
-    focus: "ترمیم، جراحی و درمان‌های دندانی",
-  },
-  {
-    name: "غیدا عباس‌زاده",
-    spec: "mid",
-    title: "کارشناس مامایی",
-    focus: "مراقبت‌های دوران بارداری و سلامت زنان",
-  },
-  {
-    name: "زهرا خدادادی",
-    spec: "coun",
-    title: "مشاور",
-    focus: "مشاوره و راهنمایی",
-  },
+  { name: "دکتر محمدرضا شریفی", spec: "gen", title: "پزشک عمومی", focus: "ویزیت عمومی و ارجاع به متخصص" },
+  { name: "دکتر الهه نادری", spec: "gen", title: "پزشک عمومی", focus: "پایش بیماری‌های مزمن" },
+  { name: "دکتر بهرام صادقی", spec: "gen", title: "پزشک عمومی", focus: "طب پیشگیری و چکاپ" },
+  { name: "دکتر کاوه مقدم", spec: "gen", title: "پزشک عمومی", focus: "ویزیت اورژانس" },
+  { name: "دکتر فرهاد قاسمی", spec: "card", title: "متخصص قلب و عروق", focus: "نوار قلب و اکوکاردیوگرافی" },
+  { name: "دکتر لیلا موسوی", spec: "gyn", title: "متخصص زنان و زایمان", focus: "مراقبت بارداری و سونوگرافی زنان" },
+  { name: "دکتر امیر کریمی", spec: "ortho", title: "متخصص ارتوپدی", focus: "آسیب‌های مفصلی و ستون فقرات" },
+  { name: "دکتر سارا محمدی", spec: "derm", title: "متخصص پوست و مو", focus: "درمان آکنه و بیماری‌های پوستی" },
+  { name: "دکتر حسین رضایی", spec: "uro", title: "متخصص ارولوژی", focus: "کلیه و مجاری ادراری" },
+  { name: "دکتر مریم احمدی", spec: "ent", title: "متخصص گوش، حلق و بینی", focus: "شنوایی‌سنجی و سینوس" },
+  { name: "دکتر علی توکلی", spec: "surg", title: "جراح عمومی", focus: "جراحی‌های سرپایی" },
+  { name: "دکتر سید بهنام نورحسینی", spec: "psy", title: "روان‌شناس و درمانگر خانواده", focus: "مشاوره فردی و خانواده" },
+  { name: "غیدا عباس‌زاده", spec: "mid", title: "کارشناس مامایی", focus: "مراقبت‌های دوران بارداری و سلامت زنان" },
+  { name: "زهرا خدادادی", spec: "coun", title: "مشاور", focus: "مشاوره و راهنمایی" },
+  { name: "دکتر احسان دانشمندی", spec: "dent", title: "جراح و دندانپزشک", focus: "ترمیم و زیبایی" },
+  { name: "دکتر محسن مخنفی", spec: "dent", title: "جراح و دندانپزشک", focus: "جراحی دهان" },
+  { name: "دکتر حسین هادی‌زاده", spec: "dent", title: "جراح و دندانپزشک", focus: "درمان ریشه (عصب‌کشی)" },
+  { name: "دکتر علیرضا وفازاده", spec: "dent", title: "جراح و دندانپزشک", focus: "ایمپلنت (سیستم سوئیسی و کره‌ای)" },
+  { name: "دکتر مریم وداد مفرد", spec: "dent", title: "جراح و دندانپزشک", focus: "دندانپزشکی کودکان" },
+  { name: "دکتر محمود مجدیانفر", spec: "dent", title: "جراح و دندانپزشک", focus: "پروتز و روکش" },
+  { name: "دکتر محمود قنبری", spec: "dent", title: "جراح و دندانپزشک", focus: "جرم‌گیری و بروساژ" },
+  { name: "دکتر شیما رستمی", spec: "dent", title: "متخصص ارتودنسی", focus: "اصلاح ناهنجاری‌های دندانی و فکی" },
 ];
 
 /* ─────────────── سامانه‌های نوبت‌دهی آنلاین ─────────────── */
@@ -339,3 +256,6 @@ export const BOOKING_LINKS = [
     url: "https://doctoreto.com/center/avaye-mehr-valiollah/YJpggL",
   },
 ];
+
+export const faNum = (n: number | string): string =>
+  String(n).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);

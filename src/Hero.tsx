@@ -1,86 +1,62 @@
-import { IMG, faNum } from "./data";
+import { IMG, faNum, type TabId } from "./data";
 import { Reveal, EcgLine, Stamp, Squiggle, useOpenStatus } from "./fx";
 import BookingMenu from "./Booking";
 import {
-  IconArrow,
   IconStar8,
-  IconClock,
+  IconArrow,
+  IconDoctor,
   IconHeartPulse,
   IconUsers,
   IconCalendar,
-  IconDoctor,
 } from "./Icons";
 
-export default function Hero({
-  onNavigate,
-}: {
-  onNavigate?: (id: "services" | "doctors") => void;
-}) {
+export default function Hero({ onNavigate }: { onNavigate?: (id: TabId) => void }) {
   const open = useOpenStatus();
+
   return (
-    <section id="home" className="relative overflow-hidden scroll-mt-24">
-      {/* layered ambient background */}
-      <div className="girih absolute inset-0 opacity-70" aria-hidden="true" />
+    <section className="relative overflow-hidden bg-paper">
+      <div className="girih absolute inset-0 opacity-60" aria-hidden="true" />
       <div
         className="absolute inset-0"
         aria-hidden="true"
         style={{
           background:
-            "radial-gradient(58rem 34rem at 88% -8%, rgba(14,124,116,0.13), transparent 62%), radial-gradient(44rem 30rem at -6% 96%, rgba(214,154,37,0.14), transparent 60%)",
+            "radial-gradient(52rem 30rem at 85% 8%, rgba(14,124,116,0.14), transparent 60%), radial-gradient(40rem 26rem at 10% 95%, rgba(214,154,37,0.13), transparent 60%)",
         }}
       />
-      <svg
-        className="absolute -start-24 top-24 h-[26rem] w-[26rem] text-sea/10"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="0.5"
-        aria-hidden="true"
-      >
-        <rect x="7" y="7" width="10" height="10" />
-        <rect x="7" y="7" width="10" height="10" transform="rotate(45 12 12)" />
-      </svg>
 
-      <div className="wrap relative grid items-center gap-12 pb-16 pt-12 lg:grid-cols-12 lg:gap-8 lg:pt-16">
-        {/* text column */}
-        <div className="lg:col-span-7">
+      <div className="wrap relative grid items-center gap-12 pb-16 pt-10 sm:pt-14 lg:grid-cols-12 lg:gap-8 lg:pb-24 lg:pt-16">
+        {/* ── متن ── */}
+        <div className="relative z-10 lg:col-span-6">
           <Reveal>
             <span className="eyebrow">
               <IconStar8 className="h-4 w-4 text-gold" />
               درمانگاه خیریه • همراه شما در مسیر سلامتی
             </span>
           </Reveal>
-
-          <Reveal delay={90}>
-            <h1 className="font-display mt-5 text-[2.9rem] leading-[1.18] text-pine sm:text-6xl lg:text-[4.4rem]">
-              آوای مِهر؛
-              <span className="relative mt-1 block">
-                صدای{" "}
-                <span className="relative inline-block text-sea">
-                  سلامت
-                  <Squiggle className="absolute -bottom-2 start-0 h-3.5 w-full" />
-                </span>{" "}
-                و خدمت
+          <Reveal delay={100}>
+            <h1 className="font-display mt-5 text-[2.6rem] leading-[1.22] text-pine sm:text-6xl sm:leading-[1.18] lg:text-[4.1rem]">
+              صدای <span className="text-sea">مهر</span>،
+              <br />
+              نوای{" "}
+              <span className="relative inline-block text-golddeep">
+                سلامتی
+                <Squiggle className="absolute -bottom-2 right-0 h-3 w-full text-gold" />
               </span>
             </h1>
           </Reveal>
-
-          <Reveal delay={180}>
-            <p className="mt-6 max-w-xl text-[1.02rem] leading-8 text-inksoft">
-              بیش از <b className="text-seadeep">{faNum(27)} سال</b> است که درمانگاه خیریه
-              آوای مهر ولی‌الله با تکیه بر کادر پزشکی مجرب، امکانات تخصصی و محیطی
-              شایسته، در کنار مردم ایستاده است؛ تا سلامتی، سهمِ همه باشد — با
-              تعرفه‌ای که هیچ کس را پشت در نمی‌گذارد.
+          <Reveal delay={200}>
+            <p className="mt-6 max-w-xl text-[0.95rem] leading-8 text-inksoft sm:text-lg sm:leading-9">
+              با افتخار، درمانگاه خیریه آوای مهر ولی‌الله با بیش از{" "}
+              <b className="text-seadeep">{faNum(27)} سال سابقه‌ی فعالیت مستمر</b>، با تکیه بر
+              کادر پزشکی مجرب، امکانات تخصصی و محیطی مناسب، خدماتی شایسته و
+              باکیفیت به مراجعین محترم ارائه می‌نماید.
             </p>
           </Reveal>
-
-          <Reveal delay={260}>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+          <Reveal delay={300}>
+            <div className="mt-8 flex flex-wrap items-center gap-3.5">
               <BookingMenu label="رزرو نوبت آنلاین" />
-              <button
-                onClick={() => onNavigate?.("services")}
-                className="btn btn-line"
-              >
+              <button onClick={() => onNavigate?.("services")} className="btn btn-line">
                 آشنایی با بخش‌ها
                 <IconArrow className="h-4 w-4" />
               </button>
@@ -93,71 +69,69 @@ export default function Hero({
               </button>
             </div>
           </Reveal>
-
-          <Reveal delay={340}>
-            <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-3 text-sm font-semibold text-inksoft">
-              <span className="flex items-center gap-2">
-                <IconCalendar className="h-4.5 w-4.5 text-gold" />
-                همه‌روزه ۷ صبح تا ۲۳
-              </span>
-              <span className="hidden h-4 w-px bg-sea/25 sm:block" />
-              <span className="flex items-center gap-2">
-                <IconUsers className="h-4.5 w-4.5 text-gold" />
-                روزانه حدود {faNum(500)} مراجعه‌کننده
-              </span>
-              <span className="hidden h-4 w-px bg-sea/25 sm:block" />
-              <span className="flex items-center gap-2">
-                <span
-                  className={`pulse-ring h-2 w-2 rounded-full ${open ? "bg-sea" : "bg-clay"}`}
-                />
-                {open ? "هم‌اکنون پذیرش فعال است" : "پذیرش از ساعت ۷ صبح"}
-              </span>
-            </div>
+          <Reveal delay={420}>
+            <dl className="mt-10 grid max-w-md grid-cols-3 gap-3">
+              {[
+                { icon: IconCalendar, n: 27, t: "سال تجربه" },
+                { icon: IconUsers, n: 42, t: "پزشک و دندانپزشک" },
+                { icon: IconHeartPulse, n: 500, t: "بیمار در روز", approx: true },
+              ].map((s) => (
+                <div
+                  key={s.t}
+                  className="lift rounded-[14px] border border-sea/15 bg-card/80 px-3 py-3.5 text-center"
+                >
+                  <s.icon className="mx-auto h-5 w-5 text-sea" />
+                  <dt className="sr-only">{s.t}</dt>
+                  <dd className="font-display mt-1.5 text-2xl leading-none text-pine">
+                    {s.approx && "≈"}
+                    {faNum(s.n)}
+                  </dd>
+                  <dd className="mt-1 text-[0.66rem] font-bold text-inksoft sm:text-[0.72rem]">{s.t}</dd>
+                </div>
+              ))}
+            </dl>
           </Reveal>
         </div>
 
-        {/* visual column */}
-        <div className="relative lg:col-span-5">
-          <Reveal delay={200} className="relative">
-            <div className="arch-ring relative p-3">
-              <div className="arch-ring absolute inset-0 border-2 border-dashed border-sea/35" />
-              <div className="arch relative aspect-[4/5] overflow-hidden">
-                <img
-                  src={IMG.hero}
-                  alt="فضای داخلی درمانگاه خیریه آوای مهر ولی‌الله"
-                  className="kenburns h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-pine/45 via-transparent to-transparent" />
-                <div className="absolute bottom-4 start-4 end-4 flex items-center justify-between rounded-[12px] bg-pine/80 px-4 py-3 text-foam backdrop-blur-[2px]">
-                  <span className="flex items-center gap-2 text-sm font-bold">
-                    <IconHeartPulse className="heartbeat h-5 w-5 text-gold" />
-                    نیکوکاری، بنیان ماست
-                  </span>
-                  <span className="text-[0.7rem] text-foam/70">وقف خدمت به مردم</span>
+        {/* ── تصویر قوسی ── */}
+        <div className="relative lg:col-span-6">
+          <Reveal delay={180}>
+            <div className="relative mx-auto max-w-[30rem]">
+              <div className="arch-ring bg-gradient-to-b from-gold/60 via-sea/30 to-sea/10 p-2.5 shadow-[0_40px_90px_-40px_rgba(11,59,56,0.55)]">
+                <div className="arch relative aspect-[4/4.6]">
+                  <img
+                    src={IMG.hero}
+                    alt="محیط درمانگاه خیریه آوای مهر ولی‌الله"
+                    className="kenburns h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-pine/55 via-transparent to-transparent" />
+                  {/* کارت وضعیت زنده */}
+                  <div className="absolute bottom-4 start-4 end-4 flex items-center justify-between gap-3 rounded-[13px] bg-card/95 px-4 py-3 shadow-lg sm:end-auto">
+                    <span className="flex items-center gap-2.5">
+                      <span
+                        className={`h-2.5 w-2.5 rounded-full ${open ? "bg-teal pulse-ring" : "bg-clay"}`}
+                      />
+                      <span>
+                        <span className="block text-[0.8rem] font-extrabold text-pine">
+                          {open ? "همین حالا باز هستیم" : "فعلاً بسته‌ایم"}
+                        </span>
+                        <span className="block text-[0.66rem] font-bold text-inksoft">
+                          هر روز • ۷ صبح تا ۲۳
+                        </span>
+                      </span>
+                    </span>
+                    <IconHeartPulse className={`h-6 w-6 text-sea ${open ? "heartbeat" : ""}`} />
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {/* rotating stamp */}
-            <Stamp className="absolute -top-7 -start-7 h-28 w-28 drop-shadow-lg sm:-start-10 sm:h-32 sm:w-32" />
-
-            {/* floating live status card */}
-            <div className="floaty absolute -bottom-6 -end-3 rounded-[14px] border border-sea/15 bg-card p-4 shadow-[0_18px_44px_-18px_rgba(7,39,42,0.4)] sm:-end-8">
-              <div className="flex items-center gap-3">
-                <span
-                  className={`grid h-10 w-10 place-items-center rounded-full ${
-                    open ? "pulse-ring bg-sea/15 text-sea" : "bg-clay/15 text-clay"
-                  }`}
-                >
-                  <IconClock className="h-5 w-5" />
-                </span>
-                <span>
-                  <span className="block text-sm font-extrabold text-pine">
-                    امروز {open ? "باز است" : "بسته است"}
-                  </span>
-                  <span className="block text-[0.72rem] text-inksoft">
-                    ساعت کاری: ۷:۰۰ تا ۲۳:۰۰
-                  </span>
+              <Stamp className="absolute -top-7 -start-3 h-24 w-24 drop-shadow-xl sm:-start-8 sm:h-32 sm:w-32" />
+              {/* کاشی شناور پذیرش */}
+              <div className="lift absolute -bottom-5 -end-2 hidden items-center gap-3 rounded-[14px] border border-gold/40 bg-goldsoft px-4 py-3 shadow-lg sm:flex">
+                <span className="font-display text-3xl leading-none text-golddeep">{faNum(35)}</span>
+                <span className="text-[0.72rem] font-extrabold leading-5 text-pine">
+                  اتاق مراجعه
+                  <br />
+                  <span className="font-bold text-inksoft">در ۴ طبقه + زیرزمین</span>
                 </span>
               </div>
             </div>
@@ -165,12 +139,9 @@ export default function Hero({
         </div>
       </div>
 
-      {/* ecg strip */}
-      <div className="relative mt-2 border-y border-sea/15 bg-mist/70">
-        <EcgLine className="h-16 w-full sm:h-20" />
-        <span className="absolute start-1/2 top-1/2 -translate-y-1/2 translate-x-1/2 rounded-full bg-card px-4 py-1 text-[0.72rem] font-bold text-seadeep shadow-sm">
-          ضربانِ {faNum(27)} ساله‌ی خدمت
-        </span>
+      {/* نوار ضربان قلب */}
+      <div className="relative border-t border-sea/15 bg-card/70">
+        <EcgLine className="h-12 w-full text-sea sm:h-14" />
       </div>
     </section>
   );
