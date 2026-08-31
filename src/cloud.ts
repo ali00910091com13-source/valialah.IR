@@ -17,10 +17,26 @@ export function getCloudCfg(): CloudCfg | null {
   }
 }
 
+/**
+ * آدرس پروژه را از هر شکلی که کاربر بچسباند استخراج و یکدست می‌کند:
+ * - https://supabase.com/dashboard/project/xyzcompany/database/... → https://xyzcompany.supabase.co
+ * - xyzcompany.supabase.co → https://xyzcompany.supabase.co
+ * - https://xyzcompany.supabase.co/ → https://xyzcompany.supabase.co
+ */
+export function normalizeProjectUrl(raw: string): string | null {
+  const t = raw.trim().replace(/\/+$/, "");
+  if (!t) return null;
+  const dash = t.match(/dashboard\/project\/([a-zA-Z0-9-]+)/);
+  if (dash) return `https://${dash[1]}.supabase.co`;
+  const plain = t.match(/^(?:https?:\/\/)?([a-zA-Z0-9-]+\.supabase\.(?:co|in|net))/);
+  if (plain) return `https://${plain[1]}`;
+  return null;
+}
+
 export const saveCloudCfg = (url: string, key: string) =>
   localStorage.setItem(
     CFG_KEY,
-    JSON.stringify({ url: url.trim().replace(/\/+$/, ""), key: key.trim() }),
+    JSON.stringify({ url: normalizeProjectUrl(url) ?? url.trim(), key: key.trim() }),
   );
 
 export const clearCloudCfg = () => localStorage.removeItem(CFG_KEY);
@@ -77,8 +93,9 @@ export async function pushCloudDoctors(list: Doctor[]): Promise<boolean> {
 export async function testCloud(
   urlRaw: string,
   key: string,
-): Promise<{ ok: boolean; missingTable: boolean }> {
-  const url = urlRaw.trim().replace(/\/+$/, "");
+): Promise<{ ok: boolean; missingTable: boolean; badUrl?: boolean }> {
+  const url = normalizeProjectUrl(urlRaw);
+  if (!url) return { ok: false, missingTable: false, badUrl: true };
   try {
     const res = await fetch(`${url}/rest/v1/doctors?id=eq.1&select=data`, {
       headers: authHeaders(key.trim()),
