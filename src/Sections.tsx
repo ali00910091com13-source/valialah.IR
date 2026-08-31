@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { STATS, DEPARTMENTS, UNITS, CONTACT, faNum } from "./data";
 import { Reveal, CountUp } from "./fx";
-import { ICONS, IconStar8, IconCheck, IconArrow, IconPhone, IconSpark } from "./Icons";
+import BookingMenu from "./Booking";
+import { ICONS, IconStar8, IconCheck, IconArrow, IconSpark } from "./Icons";
 
 /* ---------------- facilities / stats band ---------------- */
 export function StatsBand() {
@@ -188,10 +189,7 @@ export function Departments({ onNavigate }: { onNavigate?: (id: "doctors") => vo
                     ))}
                   </ul>
                   <div className="mt-7 flex flex-wrap items-center gap-4 border-t border-sea/10 pt-6">
-                    <a href={`tel:${CONTACT.bookingPhone}`} className="btn btn-sea py-2.5! text-sm">
-                      <IconPhone className="h-4 w-4" />
-                      رزرو نوبت {d.title}
-                    </a>
+                    <BookingMenu label={`رزرو نوبت ${d.title}`} variant="sea" />
                     <button
                       onClick={() => onNavigate?.("doctors")}
                       className="group flex items-center gap-2 text-sm font-bold text-seadeep transition-colors hover:text-gold"

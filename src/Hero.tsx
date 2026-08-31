@@ -1,7 +1,7 @@
-import { CONTACT, IMG, faNum } from "./data";
+import { IMG, faNum } from "./data";
 import { Reveal, EcgLine, Stamp, Squiggle, useOpenStatus } from "./fx";
+import BookingMenu from "./Booking";
 import {
-  IconPhone,
   IconArrow,
   IconStar8,
   IconClock,
@@ -76,13 +76,7 @@ export default function Hero({
 
           <Reveal delay={260}>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <a href={`tel:${CONTACT.bookingPhone}`} className="btn btn-gold">
-                <IconPhone className="h-4.5 w-4.5" />
-                نوبت‌دهی تلفنی
-                <span dir="ltr" className="font-display text-base">
-                  {CONTACT.bookingPhoneDisplay}
-                </span>
-              </a>
+              <BookingMenu label="رزرو نوبت آنلاین" />
               <button
                 onClick={() => onNavigate?.("services")}
                 className="btn btn-line"

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { DOCTORS, DOCTOR_SPECS, faNum, CONTACT } from "./data";
+import { DOCTORS, DOCTOR_SPECS, faNum, CONTACT, BOOKING_LINKS } from "./data";
 import { Reveal } from "./fx";
 import {
   IconDoctor,
@@ -8,6 +8,7 @@ import {
   IconPhone,
   IconClose,
   IconCheck,
+  IconArrow,
 } from "./Icons";
 
 const SPEC_LABEL = Object.fromEntries(DOCTOR_SPECS.map((s) => [s.id, s.label]));
@@ -160,13 +161,24 @@ export default function Doctors() {
                       {d.focus}
                     </p>
                   )}
-                  <a
-                    href={`tel:${CONTACT.phone}`}
-                    className="mt-auto pt-4 inline-flex items-center gap-2 text-sm font-bold text-sea transition-colors hover:text-seadeep"
-                  >
-                    <IconPhone className="h-4 w-4" />
-                    رزرو نوبت با پذیرش
-                  </a>
+                  <div className="mt-auto flex items-center justify-between gap-2 pt-4">
+                    <a
+                      href={BOOKING_LINKS[0].url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 text-sm font-bold text-sea transition-colors hover:text-seadeep"
+                    >
+                      <IconArrow className="h-4 w-4 -rotate-45" />
+                      رزرو نوبت آنلاین
+                    </a>
+                    <a
+                      href={`tel:${CONTACT.phone}`}
+                      className="inline-flex items-center gap-1.5 text-[12px] font-bold text-inksoft transition-colors hover:text-seadeep"
+                    >
+                      <IconPhone className="h-3.5 w-3.5" />
+                      تلفنی
+                    </a>
+                  </div>
                 </article>
               </Reveal>
             ))}
@@ -181,19 +193,32 @@ export default function Doctors() {
             برنامه حضور پزشکان در روزهای مختلف هفته متفاوت است.
           </p>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-8 text-white/80">
-            برای اطلاع از روز و ساعت دقیق حضور هر پزشک و رزرو نوبت، با شماره‌های
-            پذیرش تماس بگیرید.
+            برای رزرو نوبت می‌توانید از سامانه‌های آنلاین استفاده کنید یا با
+            شماره‌های پذیرش تماس بگیرید.
           </p>
-          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a href={`tel:${CONTACT.phone}`} className="btn btn-gold w-full sm:w-auto">
-              <IconPhone className="h-5 w-5" />
-              {CONTACT.phoneDisplay}
-            </a>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            {BOOKING_LINKS.slice(0, 2).map((b, i) => (
+              <a
+                key={b.name}
+                href={b.url}
+                target="_blank"
+                rel="noreferrer"
+                className={`btn w-full sm:w-auto ${
+                  i === 0
+                    ? "btn-gold"
+                    : "border-2 border-white/30 text-white hover:bg-white/10"
+                }`}
+              >
+                <IconArrow className="h-4.5 w-4.5 -rotate-45" />
+                نوبت از {b.name}
+              </a>
+            ))}
             <a
               href={`tel:${CONTACT.bookingPhone}`}
               className="btn w-full border-2 border-white/30 text-white hover:bg-white/10 sm:w-auto"
             >
-              نوبت‌دهی: {CONTACT.bookingPhoneDisplay}
+              <IconPhone className="h-4.5 w-4.5" />
+              نوبت‌دهی: <span dir="ltr">{CONTACT.bookingPhoneDisplay}</span>
             </a>
           </div>
         </div>

@@ -5,7 +5,7 @@ export const IMG = {
   physio:
     "https://image.qwenlm.ai/generated-images/8ed6e390-8cfd-403d-96d6-394ad3ec1b3f/_result.png",
   radio:
-    "https://image.qwenlm.ai/generated-images/23621591-8e4e-4381-8e9c-ca510a7b0250/_result.png",
+    "https://image.qwenlm.ai/generated-images/7ae812c7-cafc-4675-a7b1-c7a1a689a247/_result.png",
   team: "https://image.qwenlm.ai/generated-images/19dcb729-7111-483b-95d1-e143a81a701a/_result.png",
   exterior:
     "https://image.qwenlm.ai/generated-images/ee473f35-7172-4768-a3ce-3d054c9c75dc/_result.png",
@@ -227,6 +227,7 @@ export const DOCTOR_SPECS: { id: string; label: string }[] = [
   { id: "int", label: "داخلی و پوست" },
   { id: "psy", label: "روان‌شناسی" },
   { id: "dent", label: "دندانپزشکی" },
+  { id: "mid", label: "مامایی" },
   { id: "coun", label: "مشاوره" },
 ];
 
@@ -298,9 +299,40 @@ export const DOCTORS: Doctor[] = [
     focus: "ترمیم، جراحی و درمان‌های دندانی",
   },
   {
+    name: "غیدا عباس‌زاده",
+    spec: "mid",
+    title: "کارشناس مامایی",
+    focus: "مراقبت‌های دوران بارداری و سلامت زنان",
+  },
+  {
     name: "زهرا خدادادی",
     spec: "coun",
     title: "مشاور",
     focus: "مشاوره و راهنمایی",
+  },
+];
+
+/* ─────────────── سامانه‌های نوبت‌دهی آنلاین ─────────────── */
+
+export const BOOKING_LINKS = [
+  {
+    name: "پذیرش۲۴",
+    note: "رزرو آنلاین با کد ملی",
+    url: "https://www.paziresh24.com/center/%D8%AF%D8%B1%D9%85%D8%A7%D9%86%DA%AF%D8%A7%D9%87-%D8%AE%DB%8C%D8%B1%DB%8C%D9%87-%D8%A2%D9%88%D8%A7%DB%8C-%D9%85%D9%87%D8%B1-%D9%88%D9%84%DB%8C-%D8%A7%D9%84%D9%84%D9%87/",
+  },
+  {
+    name: "دکترتو",
+    note: "همراه با نظرات بیماران",
+    url: "https://doctoreto.com/center/avaye-mehr-valiollah/YJpggL",
+  },
+  {
+    name: "ایران‌نوبت",
+    note: "نوبت‌دهی اینترنتی",
+    url: "https://irannobat.ir/ClinicProfile/avayemehr-tehran-clinic",
+  },
+  {
+    name: "اسکن‌طب",
+    note: "پذیرش فوری بدون معطلی",
+    url: "https://scanteb.com/listing/%D8%AF%D8%B1%D9%85%D8%A7%D9%86%DA%AF%D8%A7%D9%87-%D8%AE%DB%8C%D8%B1%DB%8C%D9%87-%D8%A2%D9%88%D8%A7%DB%8C-%D9%85%D9%87%D8%B1-%D9%88%D9%84%DB%8C-%D8%A7%D9%84%D9%84%D9%87-%D8%AA%D9%87%D8%B1%D8%A7%D9%86",
   },
 ];

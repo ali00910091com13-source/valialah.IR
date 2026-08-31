@@ -3,8 +3,6 @@ import { Reveal, Stamp, CountUp } from "./fx";
 import {
   IconShield,
   IconStar8,
-  IconPhone,
-  IconHandHeart,
   IconHeartPulse,
   IconInstagram,
 } from "./Icons";
@@ -191,80 +189,4 @@ export function Team({ onNavigate }: { onNavigate?: (id: "doctors") => void }) {
   );
 }
 
-/* ---------------- charity band ---------------- */
-export function Charity() {
-  return (
-    <section id="charity" className="relative scroll-mt-24 overflow-hidden bg-goldsoft">
-      <div className="girih absolute inset-0 opacity-50" aria-hidden="true" />
-      <div
-        className="absolute inset-0"
-        aria-hidden="true"
-        style={{
-          background:
-            "radial-gradient(46rem 26rem at 8% 100%, rgba(14,124,116,0.16), transparent 62%)",
-        }}
-      />
-      <div className="wrap relative grid items-center gap-12 py-24 lg:grid-cols-12">
-        <div className="lg:col-span-7">
-          <Reveal>
-            <span className="eyebrow text-golddeep!">
-              <IconHandHeart className="h-4 w-4" />
-              نیکوکاری؛ ریشه‌ی این خانه
-            </span>
-            <h2 className="font-display mt-4 text-4xl leading-tight text-pine sm:text-[3.2rem]">
-              مهری که <span className="text-sea">ادامه</span> دارد
-            </h2>
-            <p className="mt-5 max-w-xl leading-8 text-inksoft">
-              آوای مهر ولی‌الله یک <b className="text-seadeep">درمانگاه خیریه</b> است؛
-              یعنی جایی که سود، جای خودش را به خدمت داده. تعرفه‌های این مجموعه
-              برای توانمندسازی اقشار کم‌برخوردار طراحی شده و با یاری نیکوکاران،
-              هر روز چراغش برای همه روشن می‌ماند.
-            </p>
-          </Reveal>
-          <Reveal delay={150}>
-            <div className="font-display mt-7 text-2xl text-golddeep">
-              {faNum(27)} سال تجربه در خدمت سلامت شما
-            </div>
-          </Reveal>
-        </div>
 
-        <div className="lg:col-span-5">
-          <div className="grid gap-4">
-            <Reveal delay={100}>
-              <a
-                href={`tel:${CONTACT.phone}`}
-                className="lift group flex items-center gap-4 rounded-[16px] bg-pine p-6 text-foam hover:bg-pine2"
-              >
-                <span className="grid h-13 w-13 shrink-0 place-items-center rounded-full bg-gold p-3 text-pine transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
-                  <IconHandHeart className="h-6 w-6" />
-                </span>
-                <span>
-                  <span className="font-display block text-xl text-card">نیکوکار شوید</span>
-                  <span className="mt-1 block text-[0.82rem] leading-6 text-foam/70">
-                    حمایت مالی شما، ویزیتِ یک همشهریِ نیازمند است. همین حالا تماس بگیرید.
-                  </span>
-                </span>
-              </a>
-            </Reveal>
-            <Reveal delay={200}>
-              <a
-                href={`tel:${CONTACT.mobile}`}
-                className="lift group flex items-center gap-4 rounded-[16px] border-2 border-dashed border-sea/40 bg-card/70 p-6 text-pine hover:border-sea hover:bg-card"
-              >
-                <span className="grid h-13 w-13 shrink-0 place-items-center rounded-full bg-sea/15 p-3 text-sea transition-transform duration-300 group-hover:scale-110">
-                  <IconHeartPulse className="heartbeat h-6 w-6" />
-                </span>
-                <span>
-                  <span className="font-display block text-xl">معرفی بیمار نیازمند</span>
-                  <span className="mt-1 block text-[0.82rem] leading-6 text-inksoft">
-                    اگر کسی را می‌شناسید که به کمک درمانی نیاز دارد، با ما در میان بگذارید.
-                  </span>
-                </span>
-              </a>
-            </Reveal>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}

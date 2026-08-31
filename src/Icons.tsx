@@ -246,6 +246,37 @@ export const IconDoctor: FC<P> = (p) => (
   </svg>
 );
 
+/** نشان برند «آوای مهر ولی‌الله»: قلب + خط ضربان + امواج صدا (آوا) */
+export const LogoMark: FC<P> = (p) => (
+  <svg viewBox="0 0 48 48" fill="none" aria-hidden="true" {...p}>
+    <path
+      d="M6.8 18.6c-1.7 3.6-1.7 7.2 0 10.8"
+      stroke="currentColor"
+      strokeWidth="2.1"
+      strokeLinecap="round"
+      opacity="0.5"
+    />
+    <path
+      d="M41.2 18.6c1.7 3.6 1.7 7.2 0 10.8"
+      stroke="currentColor"
+      strokeWidth="2.1"
+      strokeLinecap="round"
+      opacity="0.5"
+    />
+    <path
+      d="M24 39.5C14.8 31.9 9.4 26.6 9.4 19.9c0-4.4 3.4-7.6 7.4-7.6 3.1 0 5.7 1.9 7.2 4.7 1.5-2.8 4.1-4.7 7.2-4.7 4 0 7.4 3.2 7.4 7.6 0 6.7-5.4 12-14.6 19.6z"
+      fill="currentColor"
+    />
+    <path
+      d="M13.5 22.6h5.4l2-4.2 3.3 8.4 2.4-5.8 1.6 1.6h6.3"
+      stroke="var(--color-goldsoft)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export const ICONS: Record<string, FC<P>> = {
   tooth: IconTooth,
   pulse: IconPulse,
