@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { DOCTORS, DOCTOR_SPECS, faNum, CONTACT, BOOKING_LINKS } from "./data";
+import { DOCTOR_SPECS, faNum, CONTACT, BOOKING_LINKS } from "./data";
+import { useDoctors } from "./doctorStore";
 import { Reveal } from "./fx";
 import {
   IconDoctor,
@@ -16,19 +17,20 @@ const SPEC_LABEL = Object.fromEntries(DOCTOR_SPECS.map((s) => [s.id, s.label]));
 export default function Doctors() {
   const [query, setQuery] = useState("");
   const [spec, setSpec] = useState<string>("all");
+  const doctors = useDoctors();
 
   const list = useMemo(() => {
     const q = query.trim();
-    return DOCTORS.filter((d) => {
+    return doctors.filter((d) => {
       const okSpec = spec === "all" || d.spec === spec;
       if (!okSpec) return false;
       if (!q) return true;
       const hay = `${d.name} ${d.title} ${d.focus ?? ""} ${SPEC_LABEL[d.spec]}`;
       return hay.includes(q);
     });
-  }, [query, spec]);
+  }, [query, spec, doctors]);
 
-  const specCount = (id: string) => DOCTORS.filter((d) => d.spec === id).length;
+  const specCount = (id: string) => doctors.filter((d) => d.spec === id).length;
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-20 pt-8 sm:px-6 sm:pt-12">
@@ -79,7 +81,7 @@ export default function Doctors() {
               active={spec === "all"}
               onClick={() => setSpec("all")}
               label="همه تخصص‌ها"
-              count={DOCTORS.length}
+              count={doctors.length}
             />
             {DOCTOR_SPECS.map((s) => (
               <FilterChip

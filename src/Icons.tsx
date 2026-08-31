@@ -277,6 +277,49 @@ export const LogoMark: FC<P> = (p) => (
   </svg>
 );
 
+export const IconPlus: FC<P> = (p) => (
+  <svg {...base} {...p}>
+    <path d="M12 5v14M5 12h14" strokeWidth="2" />
+  </svg>
+);
+
+export const IconTrash: FC<P> = (p) => (
+  <svg {...base} {...p}>
+    <path d="M4 7h16" />
+    <path d="M9 7V5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5v2" />
+    <path d="M6.5 7l.8 12a2 2 0 0 0 2 1.9h5.4a2 2 0 0 0 2-1.9l.8-12" />
+    <path d="M10 11v6M14 11v6" />
+  </svg>
+);
+
+export const IconEdit: FC<P> = (p) => (
+  <svg {...base} {...p}>
+    <path d="M12 20h8" />
+    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4L16.5 3.5z" />
+  </svg>
+);
+
+export const IconGear: FC<P> = (p) => (
+  <svg {...base} {...p}>
+    <circle cx="12" cy="12" r="3.2" />
+    <path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.9 1.9M16.8 16.8l1.9 1.9M18.7 5.3l-1.9 1.9M7.2 16.8l-1.9 1.9" />
+  </svg>
+);
+
+export const IconKey: FC<P> = (p) => (
+  <svg {...base} {...p}>
+    <circle cx="8" cy="15.5" r="4.2" />
+    <path d="M11.2 12.3 20 3.5M16.2 7.3l2.6 2.6M13.6 9.9l1.9 1.9" />
+  </svg>
+);
+
+export const IconRefresh: FC<P> = (p) => (
+  <svg {...base} {...p}>
+    <path d="M20 5v5h-5" />
+    <path d="M20 10a8 8 0 1 0 .6 4" />
+  </svg>
+);
+
 export const ICONS: Record<string, FC<P>> = {
   tooth: IconTooth,
   pulse: IconPulse,
@@ -307,4 +350,10 @@ export const ICONS: Record<string, FC<P>> = {
   cross: IconCross,
   search: IconSearch,
   doctor: IconDoctor,
+  plus: IconPlus,
+  trash: IconTrash,
+  edit: IconEdit,
+  gear: IconGear,
+  key: IconKey,
+  refresh: IconRefresh,
 };

@@ -4,15 +4,28 @@ import Hero from "./Hero";
 import { StatsBand, Departments, OtherUnits } from "./Sections";
 import { Insurance, Team } from "./Sections2";
 import Doctors from "./Doctors";
+import Admin from "./Admin";
 import { ContactSection, Footer } from "./Contact";
 import type { TabId } from "./data";
 
 export default function App() {
   const [tab, setTab] = useState<TabId>("home");
+  const [route, setRoute] = useState(() => window.location.hash);
+
+  useEffect(() => {
+    const onHash = () => setRoute(window.location.hash);
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
-  }, [tab]);
+  }, [tab, route]);
+
+  /* ── پنل ادمین مخفی: yoursite.com/#/admin ── */
+  if (route.startsWith("#/admin")) {
+    return <Admin />;
+  }
 
   return (
     <div className="relative min-h-screen">
