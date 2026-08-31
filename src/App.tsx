@@ -24,7 +24,6 @@ export default function App() {
           <>
             <Hero onNavigate={setTab} />
             <Team onNavigate={setTab} />
-            <Insurance />
           </>
         )}
         {tab === "services" && (
