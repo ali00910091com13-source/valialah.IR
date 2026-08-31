@@ -47,7 +47,7 @@ export default function Hero({
           <Reveal>
             <span className="eyebrow">
               <IconStar8 className="h-4 w-4 text-gold" />
-              درمانگاه خیریه • تهران، محله قیام
+              درمانگاه خیریه • همراه شما در مسیر سلامتی
             </span>
           </Reveal>
 
