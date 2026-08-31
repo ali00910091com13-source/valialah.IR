@@ -178,19 +178,31 @@ export const UNITS: Unit[] = [
   },
 ];
 
-export const INSURANCES = [
-  "بیمه آسیا",
-  "بیمه البرز",
-  "بیمه ملت",
-  "بیمه ایران",
-  "بیمه کارآفرین",
-  "بیمه دی",
-  "کمک‌رسان ایران (SOS)",
-  "بیمه کوثر",
-  "بیمه سینا",
-  "تجارت نو",
-  "بیمه پارسیان",
-  "آتیه‌سازان حافظ",
+export type Insurer = {
+  name: string;
+  mono: string;
+  color: string;
+};
+
+export const BASE_INSURERS = [
+  "تامین اجتماعی",
+  "بیمه سلامت و خدمات درمانی",
+  "و کلیه بیمه‌های پایه دیگر",
+];
+
+export const INSURERS: Insurer[] = [
+  { name: "بیمه آسیا", mono: "آ", color: "#2f7d4f" },
+  { name: "بیمه البرز", mono: "ال", color: "#1f6fb2" },
+  { name: "بیمه ملت", mono: "مل", color: "#24408e" },
+  { name: "بیمه ایران", mono: "ای", color: "#0e7c74" },
+  { name: "بیمه کارآفرین", mono: "کا", color: "#cf7a1c" },
+  { name: "بیمه دی", mono: "دی", color: "#0e7490" },
+  { name: "کمک‌رسان ایران (SOS)", mono: "SOS", color: "#bf3b30" },
+  { name: "بیمه کوثر", mono: "کو", color: "#5d7c2e" },
+  { name: "بیمه سینا", mono: "سی", color: "#5b5bd6" },
+  { name: "بیمه تجارتنو", mono: "تج", color: "#12a594" },
+  { name: "بیمه پارسیان", mono: "پا", color: "#8a5a12" },
+  { name: "آتیه‌سازان حافظ", mono: "حا", color: "#b03052" },
 ];
 
 export const TEAM_SPECIALTIES = [

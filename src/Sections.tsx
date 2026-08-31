@@ -89,7 +89,7 @@ export function Departments({ onNavigate }: { onNavigate?: (id: "doctors") => vo
   const d = DEPARTMENTS[idx];
 
   return (
-    <section id="departments" className="relative scroll-mt-24 bg-paper py-24">
+    <section id="departments" className="relative scroll-mt-24 bg-paper py-14 sm:py-24">
       <div className="wrap">
         <Reveal>
           <div className="max-w-2xl">
@@ -110,7 +110,7 @@ export function Departments({ onNavigate }: { onNavigate?: (id: "doctors") => vo
         <div className="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-8">
           {/* sticky tab rail */}
           <div className="lg:col-span-4">
-            <div className="flex gap-3 overflow-x-auto pb-2 lg:sticky lg:top-28 lg:flex-col lg:overflow-visible lg:pb-0">
+            <div className="no-scrollbar fade-x flex gap-3 overflow-x-auto pb-2 lg:sticky lg:top-28 lg:flex-col lg:overflow-visible lg:pb-0">
               {DEPARTMENTS.map((dep, i) => {
                 const Ic = ICONS[dep.icon];
                 const activeTab = i === idx;
@@ -118,7 +118,7 @@ export function Departments({ onNavigate }: { onNavigate?: (id: "doctors") => vo
                   <button
                     key={dep.id}
                     onClick={() => setIdx(i)}
-                    className={`group flex min-w-[15rem] shrink-0 items-center gap-4 rounded-[14px] border p-4 text-start transition-all duration-300 lg:w-full ${
+                    className={`group flex min-w-[13.5rem] shrink-0 items-center gap-3.5 rounded-[14px] border p-3.5 text-start transition-all duration-300 sm:min-w-[15rem] sm:p-4 lg:w-full ${
                       activeTab
                         ? "border-sea bg-sea text-mist shadow-[0_18px_40px_-16px_rgba(10,90,84,0.55)] lg:-translate-x-2"
                         : "border-sea/20 bg-card text-pine hover:border-sea/50 hover:bg-mist"
@@ -155,10 +155,10 @@ export function Departments({ onNavigate }: { onNavigate?: (id: "doctors") => vo
           <div className="lg:col-span-8">
             <div key={d.id} className="fadeup">
               <div className="relative overflow-hidden rounded-[18px] border border-sea/15 bg-card shadow-[0_24px_60px_-30px_rgba(7,39,42,0.35)]">
-                <div className="relative h-60 overflow-hidden sm:h-72">
+                <div className="relative h-52 overflow-hidden sm:h-72">
                   <img src={d.image} alt={d.title} className="h-full w-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-pine/70 via-pine/10 to-transparent" />
-                  <div className="absolute bottom-4 start-5 flex flex-wrap gap-2">
+                  <div className="absolute bottom-3 start-4 end-4 flex flex-wrap gap-1.5 sm:bottom-4 sm:start-5 sm:end-auto sm:gap-2">
                     {d.badges.map((b) => (
                       <span
                         key={b}
@@ -168,12 +168,12 @@ export function Departments({ onNavigate }: { onNavigate?: (id: "doctors") => vo
                       </span>
                     ))}
                   </div>
-                  <h3 className="font-display absolute start-5 top-4 text-3xl text-card drop-shadow-md sm:text-4xl">
+                  <h3 className="font-display absolute start-4 top-3 text-2xl text-card drop-shadow-md sm:start-5 sm:top-4 sm:text-4xl">
                     {d.title}
                   </h3>
                 </div>
 
-                <div className="p-6 sm:p-8">
+                <div className="p-5 sm:p-8">
                   <p className="leading-8 text-inksoft">{d.desc}</p>
                   <ul className="mt-6 grid gap-x-6 gap-y-3 sm:grid-cols-2">
                     {d.services.map((s, i) => (
