@@ -222,6 +222,30 @@ export const IconCross: FC<P> = (p) => (
   </svg>
 );
 
+export const IconSearch: FC<P> = (p) => (
+  <svg {...base} {...p}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m21 21-4.3-4.3" />
+  </svg>
+);
+
+export const IconHome: FC<P> = (p) => (
+  <svg {...base} {...p}>
+    <path d="M3.5 10.8 12 3.8l8.5 7" />
+    <path d="M5.5 9.5V20h13V9.5" />
+    <path d="M9.5 20v-5.5h5V20" />
+  </svg>
+);
+
+export const IconDoctor: FC<P> = (p) => (
+  <svg {...base} {...p}>
+    <circle cx="12" cy="7" r="3.4" />
+    <path d="M4.5 21c.7-4 3.6-6.2 7.5-6.2s6.8 2.2 7.5 6.2" />
+    <path d="M9.8 12.6v1.8a2.2 2.2 0 0 0 4.4 0v-1.8" />
+    <path d="M12 16.6v.9" strokeWidth="2.2" />
+  </svg>
+);
+
 export const ICONS: Record<string, FC<P>> = {
   tooth: IconTooth,
   pulse: IconPulse,
@@ -250,4 +274,6 @@ export const ICONS: Record<string, FC<P>> = {
   bolt: IconBolt,
   spark: IconSpark,
   cross: IconCross,
+  search: IconSearch,
+  doctor: IconDoctor,
 };

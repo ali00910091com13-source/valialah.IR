@@ -86,7 +86,7 @@ export function Insurance() {
 }
 
 /* ---------------- medical team ---------------- */
-export function Team() {
+export function Team({ onNavigate }: { onNavigate?: (id: "doctors") => void }) {
   return (
     <section id="team" className="relative scroll-mt-24 overflow-hidden bg-paper py-24">
       <div className="wrap grid items-center gap-14 lg:grid-cols-2 lg:gap-10">
@@ -177,9 +177,12 @@ export function Team() {
                 <IconInstagram className="h-4.5 w-4.5" />
                 <span dir="ltr">@{CONTACT.instagramId}</span>
               </a>
-              <a href="#contact" className="text-sm font-bold text-seadeep underline underline-offset-4 transition-colors hover:text-gold">
-                درخواست ویزیت پزشک
-              </a>
+              <button
+                onClick={() => onNavigate?.("doctors")}
+                className="text-sm font-bold text-seadeep underline underline-offset-4 transition-colors hover:text-gold"
+              >
+                مشاهده پزشکان و درخواست ویزیت
+              </button>
             </div>
           </Reveal>
         </div>

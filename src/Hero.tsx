@@ -8,9 +8,14 @@ import {
   IconHeartPulse,
   IconUsers,
   IconCalendar,
+  IconDoctor,
 } from "./Icons";
 
-export default function Hero() {
+export default function Hero({
+  onNavigate,
+}: {
+  onNavigate?: (id: "services" | "doctors") => void;
+}) {
   const open = useOpenStatus();
   return (
     <section id="home" className="relative overflow-hidden scroll-mt-24">
@@ -78,10 +83,20 @@ export default function Hero() {
                   {CONTACT.bookingPhoneDisplay}
                 </span>
               </a>
-              <a href="#departments" className="btn btn-line">
+              <button
+                onClick={() => onNavigate?.("services")}
+                className="btn btn-line"
+              >
                 آشنایی با بخش‌ها
                 <IconArrow className="h-4 w-4" />
-              </a>
+              </button>
+              <button
+                onClick={() => onNavigate?.("doctors")}
+                className="btn bg-pine text-foam hover:bg-seadeep hover:text-foam"
+              >
+                <IconDoctor className="h-4.5 w-4.5" />
+                پزشکان ما
+              </button>
             </div>
           </Reveal>
 
