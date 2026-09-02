@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { TABS, CONTACT, LOGO, faNum, type TabId } from "./data";
 import { useOpenStatus } from "./fx";
-import { ICONS, IconPhone, IconClose } from "./Icons";
+import { ICONS, IconPhone, IconClose, LogoImg } from "./Icons";
 import BookingMenu from "./Booking";
 
 export default function Nav({
@@ -64,7 +64,7 @@ export default function Nav({
         <div className="wrap flex items-center justify-between gap-4 py-3">
           <button onClick={() => go("home")} className="group flex min-w-0 items-center gap-2.5 text-start sm:gap-3">
             <span className="arch-ring grid h-11 w-11 shrink-0 place-items-center overflow-hidden bg-card shadow-[0_6px_18px_-8px_rgba(11,59,56,0.4)] ring-1 ring-sea/20 transition-transform duration-300 group-hover:rotate-3 sm:h-12 sm:w-12">
-              <img src={LOGO} alt="لوگوی درمانگاه خیریه آوای مهر ولی‌الله" className="h-full w-full object-cover" />
+              <LogoImg src={LOGO} className="h-full w-full object-cover" />
             </span>
             <span className="hidden min-w-0 leading-tight sm:block">
               <span className="font-display block truncate text-lg text-pine sm:text-xl">آوای مهر ولی‌الله</span>
