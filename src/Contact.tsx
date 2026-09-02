@@ -9,6 +9,7 @@ import {
   IconArrow,
   IconHeart,
   IconCalendar,
+  LogoImg,
 } from "./Icons";
 
 /* ─────────────── نقشه تزئینی ─────────────── */
@@ -257,7 +258,7 @@ export function Footer({ onNavigate }: { onNavigate: (id: TabId) => void }) {
         <div className="lg:col-span-4">
           <button onClick={() => go("home")} className="group flex items-center gap-3 text-start">
             <span className="arch-ring grid h-13 w-13 shrink-0 place-items-center overflow-hidden bg-card ring-1 ring-gold/40 transition-transform duration-300 group-hover:rotate-3">
-              <img src={LOGO} alt="لوگوی درمانگاه خیریه آوای مهر ولی‌الله" className="h-full w-full object-cover" />
+              <LogoImg src={LOGO} className="h-full w-full object-cover" />
             </span>
             <span className="font-display text-xl text-card">آوای مهر ولی‌الله</span>
           </button>

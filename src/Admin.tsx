@@ -44,6 +44,7 @@ import {
   IconNews,
   IconCheck,
   IconArrow,
+  LogoImg,
 } from "./Icons";
 
 const PASS = "avayemehr";
@@ -115,7 +116,7 @@ function Gate({ onOk }: { onOk: () => void }) {
       <div className={`w-full max-w-sm ${err ? "shake" : ""}`}>
         <div className="fadeup rounded-[20px] border border-foam/12 bg-pine2/80 p-7 shadow-2xl">
           <span className="arch-ring mx-auto grid h-20 w-20 place-items-center overflow-hidden bg-card shadow-xl ring-1 ring-gold/40">
-            <img src={LOGO} alt="لوگوی درمانگاه" className="h-full w-full object-cover" />
+            <LogoImg src={LOGO} className="h-full w-full object-cover" />
           </span>
           <h1 className="font-display mt-5 text-center text-3xl">کنسول مدیریت</h1>
           <p className="mt-2 text-center text-[0.78rem] font-bold text-foam/55">

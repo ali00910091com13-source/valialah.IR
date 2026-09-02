@@ -1,4 +1,4 @@
-import type { FC, SVGProps } from "react";
+import { useState, type FC, type SVGProps } from "react";
 
 export type P = SVGProps<SVGSVGElement>;
 
@@ -308,6 +308,30 @@ export const LogoMark: FC<P> = (p) => (
     />
   </svg>
 );
+
+/**
+ * لوگوی رسمی درمانگاه — اگر تصویر به هر دلیلی بارگذاری نشد
+ * (قطعی اینترنت، فیلترینگ و…) به‌صورت خودکار نشان جایگزین نمایش داده می‌شود.
+ */
+export const LogoImg: FC<{ src: string; className?: string; style?: React.CSSProperties }> = ({
+  src,
+  className = "",
+  style,
+}) => {
+  const [failed, setFailed] = useState(false);
+  if (failed) {
+    return <LogoMark className={`${className} text-sea`} style={style} />;
+  }
+  return (
+    <img
+      src={src}
+      alt="لوگوی درمانگاه خیریه آوای مهر ولی‌الله"
+      className={className}
+      style={style}
+      onError={() => setFailed(true)}
+    />
+  );
+};
 
 export const ICONS: Record<string, FC<P>> = {
   tooth: IconTooth,
