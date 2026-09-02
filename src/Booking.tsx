@@ -6,6 +6,7 @@ type Props = {
   label?: string;
   variant?: "gold" | "sea" | "line";
   className?: string;
+  btnClass?: string;
 };
 
 /**
@@ -16,6 +17,7 @@ export default function BookingMenu({
   label = "رزرو نوبت آنلاین",
   variant = "gold",
   className = "",
+  btnClass = "",
 }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -43,7 +45,7 @@ export default function BookingMenu({
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className={`btn btn-${variant} ${open ? "ring-2 ring-gold/40" : ""}`}
+        className={`btn btn-${variant} ${btnClass} ${open ? "ring-2 ring-gold/40" : ""}`}
       >
         <IconCalendar className="h-4.5 w-4.5" />
         {label}

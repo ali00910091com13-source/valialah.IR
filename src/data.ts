@@ -1,3 +1,7 @@
+/** لوگوی رسمی درمانگاه */
+export const LOGO =
+  "https://i.postimg.cc/tRnLnb88/Chat-GPT-Image-9-shhrywr-1405-12-31-49.png";
+
 export const IMG = {
   hero: "https://image.qwenlm.ai/generated-images/1a8ab95e-8eca-4826-9d50-82a52fcd5c79/_result.png",
   dental: "https://image.qwenlm.ai/generated-images/90faee3b-3032-4f56-82a2-19fdf70a85f5/_result.png",

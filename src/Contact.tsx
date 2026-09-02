@@ -1,4 +1,4 @@
-import { CONTACT, IMG, faNum, TABS, BOOKING_LINKS, type TabId } from "./data";
+import { CONTACT, IMG, LOGO, faNum, TABS, BOOKING_LINKS, type TabId } from "./data";
 import { Reveal, useOpenStatus, useReducedMotion } from "./fx";
 import {
   IconPhone,
@@ -9,7 +9,6 @@ import {
   IconArrow,
   IconHeart,
   IconCalendar,
-  LogoMark,
 } from "./Icons";
 
 /* ─────────────── نقشه تزئینی ─────────────── */
@@ -257,8 +256,8 @@ export function Footer({ onNavigate }: { onNavigate: (id: TabId) => void }) {
       <div className="wrap relative grid gap-10 py-14 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <button onClick={() => go("home")} className="group flex items-center gap-3 text-start">
-            <span className="arch-ring grid h-12 w-12 place-items-center bg-gold text-pine transition-transform duration-300 group-hover:rotate-3">
-              <LogoMark className="h-8 w-8" />
+            <span className="arch-ring grid h-13 w-13 shrink-0 place-items-center overflow-hidden bg-card ring-1 ring-gold/40 transition-transform duration-300 group-hover:rotate-3">
+              <img src={LOGO} alt="لوگوی درمانگاه خیریه آوای مهر ولی‌الله" className="h-full w-full object-cover" />
             </span>
             <span className="font-display text-xl text-card">آوای مهر ولی‌الله</span>
           </button>
