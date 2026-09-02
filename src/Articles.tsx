@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { catMeta, readMinutes, faNum, type Article, type TabId } from "./data";
+import { catMeta, readMinutes, faNum, LOGO, type Article, type TabId } from "./data";
 import { useArticles } from "./articleStore";
 import { Reveal, EcgLine } from "./fx";
-import { ICONS, IconNews, IconStar8, IconArrow, IconClock, IconCalendar } from "./Icons";
+import { ICONS, IconNews, IconStar8, IconArrow, IconClock, IconCalendar, LogoImg } from "./Icons";
 
 type Nav = (tab: TabId, articleId?: string) => void;
 
-/* ─────────────── جلد تزئینی مقاله ─────────────── */
+/* ─────────────── جلد مقاله (با عکس یا طرح تزئینی) ─────────────── */
 function Cover({ art, big = false }: { art: Article; big?: boolean }) {
   const meta = catMeta(art.category);
   const Ic = ICONS[meta.icon] ?? IconNews;
@@ -16,20 +16,35 @@ function Cover({ art, big = false }: { art: Article; big?: boolean }) {
       style={{
         background: `linear-gradient(135deg, ${meta.color}, ${meta.color}cc 55%, #0b3b38)`,
       }}
-      aria-hidden="true"
     >
-      <div className="girih-light absolute inset-0 opacity-70" />
-      <div className="relative flex items-center justify-between p-5">
-        <Ic className={`${big ? "h-16 w-16" : "h-10 w-10"} text-foam/90 drop-shadow`} strokeWidth={1.4} />
-        <span className="rounded-full bg-foam/15 px-3 py-1 text-[0.68rem] font-extrabold text-foam backdrop-blur-sm">
-          {art.category}
-        </span>
-      </div>
-      <div className={`relative ${big ? "pb-7" : "pb-5"} ps-5`}>
-        <span className="font-display block text-[3.2rem] leading-none text-foam/15 sm:text-[4rem]">
-          {art.title.trim().charAt(0)}
-        </span>
-      </div>
+      {/* عکس کاور — اگر مقاله عکس داشته باشد */}
+      {art.cover && (
+        <img
+          src={art.cover}
+          alt=""
+          className={`absolute inset-0 h-full w-full object-cover ${big ? "" : "aspect-[16/9]"}`}
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-pine/70 via-pine/10 to-transparent" aria-hidden="true" />
+      {!art.cover && (
+        <>
+          <div className="girih-light absolute inset-0 opacity-70" aria-hidden="true" />
+          <div className="relative flex items-center justify-between p-5" aria-hidden="true">
+            <Ic className={`${big ? "h-16 w-16" : "h-10 w-10"} text-foam/90 drop-shadow`} strokeWidth={1.4} />
+            <span className="font-display block text-[3.2rem] leading-none text-foam/15 sm:text-[4rem]">
+              {art.title.trim().charAt(0)}
+            </span>
+          </div>
+          <div className={`relative ${big ? "pb-6" : "pb-4"} ps-5`} aria-hidden="true" />
+        </>
+      )}
+      <span className="absolute right-4 top-4 rounded-full bg-foam/15 px-3 py-1 text-[0.68rem] font-extrabold text-foam backdrop-blur-sm">
+        {art.category}
+      </span>
+      {/* مُهر لوگو گوشه‌ی جلد */}
+      <span className="absolute bottom-3 left-4 grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-card/95 shadow ring-1 ring-gold/50">
+        <LogoImg src={LOGO} className="h-full w-full object-cover" />
+      </span>
     </div>
   );
 }
@@ -68,18 +83,23 @@ export function ArticlesList({ onNavigate }: { onNavigate: Nav }) {
       <div className="wrap relative pb-20 pt-10 sm:pt-14">
         {/* سربرگ */}
         <Reveal>
-          <div className="max-w-2xl">
-            <span className="eyebrow">
-              <IconNews className="h-4 w-4 text-gold" />
-              مجله‌ی سلامت آوای مهر
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-2xl">
+              <span className="eyebrow">
+                <IconNews className="h-4 w-4 text-gold" />
+                مجله‌ی سلامت آوای مهر
+              </span>
+              <h1 className="font-display mt-4 text-4xl leading-[1.25] text-pine sm:text-5xl">
+                دانستن، <span className="text-sea">نیمی از درمان</span> است
+              </h1>
+              <p className="mt-4 leading-8 text-inksoft">
+                مقالات کوتاه و کاربردی که تیم درمانی ما برای شما نوشته است؛ از
+                مراقبت دندان تا فیزیوتراپی، سونوگرافی و استفاده‌ی درست از بیمه.
+              </p>
+            </div>
+            <span className="arch-ring hidden h-28 w-28 shrink-0 place-items-center overflow-hidden bg-card shadow-[0_20px_50px_-25px_rgba(11,59,56,0.5)] ring-1 ring-gold/50 sm:grid">
+              <LogoImg src={LOGO} className="h-full w-full object-cover" />
             </span>
-            <h1 className="font-display mt-4 text-4xl leading-[1.25] text-pine sm:text-5xl">
-              دانستن، <span className="text-sea">نیمی از درمان</span> است
-            </h1>
-            <p className="mt-4 leading-8 text-inksoft">
-              مقالات کوتاه و کاربردی که تیم درمانی ما برای شما نوشته است؛ از
-              مراقبت دندان تا فیزیوتراپی، سونوگرافی و استفاده‌ی درست از بیمه.
-            </p>
           </div>
         </Reveal>
 
