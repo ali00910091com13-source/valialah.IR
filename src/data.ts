@@ -55,6 +55,8 @@ export type Article = {
   body: string[];
   date: string;
   author?: string;
+  /** آدرس عکس کاور (اختیاری — در کارت‌ها و صفحه‌ی خواندن) */
+  cover?: string;
 };
 
 export const ARTICLE_CATS = [

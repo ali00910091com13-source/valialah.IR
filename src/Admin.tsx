@@ -31,6 +31,7 @@ import {
   newArticleId,
 } from "./articleStore";
 import { isEmbeddedCfg, ARTICLES_SQL } from "./cloud";
+import ImagePicker from "./ImagePicker";
 import {
   IconGear,
   IconKey,
@@ -821,12 +822,16 @@ function ArticlesPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err"
                 editingId === a.id ? "border-gold/60 bg-gold/10" : "border-foam/10 bg-pine2/60 hover:border-foam/25"
               }`}
             >
-              <span
-                className="font-display grid h-12 w-12 shrink-0 place-items-center rounded-[13px] text-lg"
-                style={{ background: "#0e7c7422", color: "#7fd6cb" }}
-              >
-                {a.title.trim().charAt(0)}
-              </span>
+              {a.cover ? (
+                <img src={a.cover} alt="" className="h-12 w-12 shrink-0 rounded-[13px] border border-foam/20 object-cover" />
+              ) : (
+                <span
+                  className="font-display grid h-12 w-12 shrink-0 place-items-center rounded-[13px] text-lg"
+                  style={{ background: "#0e7c7422", color: "#7fd6cb" }}
+                >
+                  {a.title.trim().charAt(0)}
+                </span>
+              )}
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-display truncate text-lg leading-6">{a.title}</span>
@@ -900,6 +905,7 @@ function ArticleForm({
     category: ARTICLE_CATS[0].id as string,
     excerpt: "",
     body: "",
+    cover: "",
   };
   const [form, setForm] = useState(empty);
   const [errs, setErrs] = useState<{ title?: boolean; excerpt?: boolean; body?: boolean }>({});
@@ -914,6 +920,7 @@ function ArticleForm({
       category: editing.category,
       excerpt: editing.excerpt,
       body: editing.body.join("\n\n"),
+      cover: editing.cover ?? "",
     });
     setErrs({});
   }
@@ -947,6 +954,7 @@ function ArticleForm({
       body: bodyParas,
       date: editing ? editing.date : faDateNow(),
       author: editing?.author ?? "واحد آموزش سلامت درمانگاه",
+      cover: form.cover.trim() || undefined,
     };
     if (editing) {
       updateArticle(editing.id, art);
@@ -1001,6 +1009,20 @@ function ArticleForm({
               </option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label className={labelCls}>عکس کاور مقاله (اختیاری)</label>
+          <ImagePicker
+            value={form.cover}
+            onChange={(v) => setForm({ ...form, cover: v })}
+            maxSize={800}
+            preview="rect"
+            emptyIcon="news"
+          />
+          <p className="mt-1 text-[0.64rem] font-bold text-foam/40">
+            اگر عکس نذارید، جلد تزئینی با رنگ دسته‌بندی نمایش داده می‌شود.
+          </p>
         </div>
 
         <div>
