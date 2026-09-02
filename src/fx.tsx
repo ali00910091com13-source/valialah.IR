@@ -117,12 +117,7 @@ export function EcgLine({ className = "" }: { className?: string }) {
   const d =
     "M0 30 H70 l10-14 10 28 8-20 6 6 H150 l10-14 10 28 8-20 6 6 H240 l10-14 10 28 8-20 6 6 H340 l10-14 10 28 8-20 6 6 H440 l10-14 10 28 8-20 6 6 H600";
   return (
-    <svg
-      viewBox="0 0 600 60"
-      preserveAspectRatio="none"
-      className={className}
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 600 60" preserveAspectRatio="none" className={className} aria-hidden="true">
       <path d={d} fill="none" stroke="currentColor" strokeWidth="2" opacity="0.25" />
       {!reduced && (
         <path
@@ -181,9 +176,7 @@ export function Squiggle({ className = "" }: { className?: string }) {
 export function useOpenStatus() {
   const compute = () => {
     try {
-      const now = new Date(
-        new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" }),
-      );
+      const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" }));
       const h = now.getHours() + now.getMinutes() / 60;
       return h >= 7 && h < 23;
     } catch {

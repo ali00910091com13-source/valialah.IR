@@ -1,11 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { DOCTORS, type Doctor } from "./data";
-import {
-  fetchCloudDoctors,
-  pushCloudDoctors,
-  getCloudCfg,
-  clearCloudCfg,
-} from "./cloud";
+import { fetchCloudDoctors, pushCloudDoctors, getCloudCfg, clearCloudCfg } from "./cloud";
 
 const KEY = "aavm-doctors-v1";
 
@@ -72,9 +67,10 @@ export const reconnectCloud = () => initCloud(true);
 export function disconnectCloud() {
   clearCloudCfg();
   initStarted = false;
-  sync = "off";
+  sync = getCloudCfg() ? "loading" : "off";
   cache = loadLocal();
   notify();
+  if (getCloudCfg()) initCloud(true);
 }
 
 const subscribe = (l: () => void) => {
@@ -115,8 +111,7 @@ export const resetDoctors = () => commit([...DOCTORS]);
 export const publishNow = () => pushCloudDoctors(cache);
 
 export const isDefaultList = () =>
-  cache.length === DOCTORS.length &&
-  cache.every((d, i) => d.name === DOCTORS[i].name);
+  cache.length === DOCTORS.length && cache.every((d, i) => d.name === DOCTORS[i].name);
 
 /* به‌محض باز شدن سایت، فهرست مشترک دریافت می‌شود */
 initCloud();

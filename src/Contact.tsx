@@ -16,25 +16,21 @@ import {
 function MapCard() {
   const reduced = useReducedMotion();
   return (
-    <div className="relative overflow-hidden rounded-[18px] border border-sea/20 bg-mist">
+    <div className="relative h-full overflow-hidden rounded-[18px] border border-sea/20 bg-mist">
       <svg viewBox="0 0 340 200" className="h-full w-full" role="img" aria-label="نقشه محل درمانگاه">
         <rect width="340" height="200" fill="#dde9e2" />
-        {/* خیابان‌ها */}
         <path d="M0 150 C 80 140, 140 165, 340 130" stroke="#fbf7ec" strokeWidth="16" fill="none" />
         <path d="M0 150 C 80 140, 140 165, 340 130" stroke="#b9ccc2" strokeWidth="1.4" strokeDasharray="7 7" fill="none" />
         <path d="M60 0 C 70 70, 50 130, 70 200" stroke="#fbf7ec" strokeWidth="11" fill="none" />
         <path d="M250 0 C 240 60, 265 120, 245 200" stroke="#fbf7ec" strokeWidth="9" fill="none" />
         <path d="M0 60 C 120 45, 220 75, 340 50" stroke="#fbf7ec" strokeWidth="8" fill="none" />
-        {/* بلوک‌ها */}
         <rect x="95" y="80" width="48" height="34" rx="5" fill="#cfe0d6" />
         <rect x="160" y="20" width="58" height="40" rx="5" fill="#cfe0d6" />
         <rect x="280" y="80" width="40" height="30" rx="5" fill="#cfe0d6" />
         <rect x="20" y="95" width="30" height="34" rx="5" fill="#cfe0d6" />
-        {/* برچسب بزرگراه */}
         <text x="18" y="188" fontSize="10" fontWeight="700" fill="#566864" fontFamily="Vazirmatn, sans-serif">
           بزرگراه شهید محلاتی
         </text>
-        {/* پین درمانگاه */}
         <g transform="translate(176,96)">
           <circle cx="0" cy="0" r="22" fill="#d69a25" opacity="0.16">
             {!reduced && (
@@ -80,17 +76,14 @@ export function ContactSection() {
             <IconPhone className="h-4 w-4" />
             در خدمت شما
           </span>
-          <h1 className="font-display mt-4 text-4xl leading-[1.25] text-pine sm:text-5xl">
-            تماس با درمانگاه
-          </h1>
+          <h1 className="font-display mt-4 text-4xl leading-[1.25] text-pine sm:text-5xl">تماس با درمانگاه</h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-inksoft sm:text-lg">
-            هم آنلاین، هم تلفنی؛ همکاران ما هر روز از ساعت ۷ صبح تا ۲۳ پاسخگوی شما
-            هستند.
+            هم آنلاین، هم تلفنی؛ همکاران ما هر روز از ساعت ۷ صبح تا ۲۳ پاسخگوی شما هستند.
           </p>
         </div>
       </Reveal>
 
-      {/* ── نوبت‌دهی آنلاین ── */}
+      {/* نوبت‌دهی آنلاین */}
       <Reveal delay={60}>
         <div className="relative mt-10 overflow-hidden rounded-[20px] bg-pine p-6 sm:p-8">
           <div className="girih-light absolute inset-0" aria-hidden="true" />
@@ -105,8 +98,8 @@ export function ContactSection() {
               </span>
             </div>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-foam/75">
-              درمانگاه آوای مهر ولی‌الله در سامانه‌های معتبر نوبت‌دهی کشور حضور
-              دارد؛ روی هر سامانه بزنید تا مستقیم وارد صفحه نوبت‌دهی شوید:
+              درمانگاه آوای مهر ولی‌الله در سامانه‌های معتبر نوبت‌دهی کشور حضور دارد؛ روی هر
+              سامانه بزنید تا مستقیم وارد صفحه نوبت‌دهی شوید:
             </p>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {BOOKING_LINKS.map((b, i) => (
@@ -153,7 +146,7 @@ export function ContactSection() {
         </div>
       </Reveal>
 
-      {/* ── کارت‌های اطلاعات ── */}
+      {/* کارت‌های اطلاعات */}
       <div className="mt-8 grid gap-4 lg:grid-cols-3">
         <Reveal delay={100}>
           <div className="lift h-full rounded-[18px] border border-sea/15 bg-card p-6">
@@ -163,7 +156,7 @@ export function ContactSection() {
             <h3 className="font-display mt-4 text-2xl text-pine">تلفن‌ها</h3>
             <ul className="mt-3 space-y-2.5 text-sm font-bold text-ink">
               <li className="flex items-center justify-between gap-2">
-                <span className="text-inksoft">پذیرش و نوبت‌دهی</span>
+                <span className="text-inksoft">پذیرش</span>
                 <a dir="ltr" href={`tel:${CONTACT.phone}`} className="text-seadeep underline-offset-4 hover:underline">
                   {CONTACT.phoneDisplay}
                 </a>
@@ -212,7 +205,11 @@ export function ContactSection() {
                 </li>
               ))}
             </ul>
-            <p className={`mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.72rem] font-extrabold ${open ? "bg-sea/10 text-seadeep" : "bg-clay/10 text-clay"}`}>
+            <p
+              className={`mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.72rem] font-extrabold ${
+                open ? "bg-sea/10 text-seadeep" : "bg-clay/10 text-clay"
+              }`}
+            >
               <span className={`h-2 w-2 rounded-full ${open ? "bg-teal pulse-ring" : "bg-clay"}`} />
               {open ? "هم‌اکنون باز هستیم" : "هم‌اکنون بسته‌ایم"}
             </p>
@@ -220,7 +217,7 @@ export function ContactSection() {
         </Reveal>
       </div>
 
-      {/* ── نقشه + نمای ساختمان ── */}
+      {/* نقشه + نمای ساختمان */}
       <div className="mt-8 grid gap-4 lg:grid-cols-5">
         <Reveal delay={120} className="lg:col-span-3">
           <div className="h-full min-h-[16rem]">
@@ -266,8 +263,8 @@ export function Footer({ onNavigate }: { onNavigate: (id: TabId) => void }) {
             <span className="font-display text-xl text-card">آوای مهر ولی‌الله</span>
           </button>
           <p className="mt-4 text-sm leading-7 text-foam/60">
-            درمانگاه خیریه با بیش از {faNum(27)} سال سابقه؛ جایی که مهر، صدای
-            سلامتی است. خدمات تشخیصی و درمانی با تعرفه‌ی خیریه، برای همه.
+            درمانگاه خیریه با بیش از {faNum(27)} سال سابقه؛ جایی که مهر، صدای سلامتی است.
+            خدمات تشخیصی و درمانی با تعرفه‌ی خیریه، برای همه.
           </p>
           <a
             href={CONTACT.instagram}
@@ -301,7 +298,7 @@ export function Footer({ onNavigate }: { onNavigate: (id: TabId) => void }) {
               <IconPin className="mt-1 h-4.5 w-4.5 shrink-0 text-teal" />
               {CONTACT.address}
             </li>
-            <li className="flex items-center gap-3">
+            <li className="flex flex-wrap items-center gap-3">
               <IconPhone className="h-4.5 w-4.5 shrink-0 text-teal" />
               <a dir="ltr" href={`tel:${CONTACT.phone}`} className="font-bold text-card underline-offset-4 hover:underline">
                 {CONTACT.phoneDisplay}

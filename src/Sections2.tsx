@@ -174,9 +174,7 @@ export function Team({ onNavigate }: { onNavigate?: (id: TabId) => void }) {
           <Reveal delay={220}>
             <blockquote className="relative mt-8 rounded-[16px] border border-sea/20 bg-card p-6 pe-8">
               <span className="font-display absolute -top-5 start-6 text-7xl leading-none text-gold">”</span>
-              <p className="font-display text-2xl leading-relaxed text-seadeep">
-                سلامت شما، اولویت ماست.
-              </p>
+              <p className="font-display text-2xl leading-relaxed text-seadeep">سلامت شما، اولویت ماست.</p>
               <footer className="mt-2 flex items-center gap-2 text-sm font-semibold text-inksoft">
                 <svg
                   viewBox="0 0 24 24"

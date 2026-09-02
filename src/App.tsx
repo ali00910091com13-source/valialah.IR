@@ -5,60 +5,92 @@ import { StatsBand, Departments, OtherUnits } from "./Sections";
 import { Insurance, Team } from "./Sections2";
 import Doctors from "./Doctors";
 import Admin from "./Admin";
+import { ArticlesList, ArticleView } from "./Articles";
 import { ContactSection, Footer } from "./Contact";
-import { IMG, faNum, type TabId } from "./data";
+import { IMG, TABS, faNum, type TabId } from "./data";
 import { Reveal } from "./fx";
 import { IconBuilding } from "./Icons";
 
+type View = { tab: TabId; articleId: string | null };
+
+/** آدرس مرورگر را به نمای فعلی تبدیل می‌کند */
+function parseHash(): View {
+  const h = window.location.hash.replace(/^#\/?/, "");
+  const [seg, sub] = h.split("/");
+  if (seg === "articles" && sub) return { tab: "articles", articleId: sub };
+  const found = TABS.find((t) => t.id === seg);
+  return { tab: found ? found.id : "home", articleId: null };
+}
+
 export default function App() {
-  const [tab, setTab] = useState<TabId>("home");
-  const [route, setRoute] = useState(() => window.location.hash);
+  const [view, setView] = useState<View>(parseHash);
+  const [admin, setAdmin] = useState(() => window.location.hash.startsWith("#/admin"));
 
   useEffect(() => {
-    const onHash = () => setRoute(window.location.hash);
+    const onHash = () => {
+      setAdmin(window.location.hash.startsWith("#/admin"));
+      setView(parseHash());
+    };
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
-  }, [tab, route]);
+  }, [view, admin]);
+
+  /** ناوبری با تغییر آدرس — هر بخش، زیرآدرس خودش را دارد */
+  const go = (tab: TabId, articleId?: string) => {
+    const target = articleId
+      ? `#/articles/${articleId}`
+      : tab === "home"
+        ? "#/"
+        : `#/${tab}`;
+    if (window.location.hash === target) return;
+    window.location.hash = target; // hashchange → view به‌روز می‌شود
+  };
 
   /* ── پنل ادمین مخفی: yoursite.com/#/admin ── */
-  if (route.startsWith("#/admin")) {
+  if (admin) {
     return <Admin />;
   }
 
   return (
     <div className="relative min-h-screen">
       <div className="noise-layer" aria-hidden="true" />
-      <Nav active={tab} onNavigate={setTab} />
+      <Nav active={view.tab} onNavigate={go} />
 
-      <main key={tab} className="view-enter">
-        {tab === "home" && (
+      <main key={`${view.tab}-${view.articleId ?? ""}`} className="view-enter">
+        {view.tab === "home" && (
           <>
-            <Hero onNavigate={setTab} />
-            <Team onNavigate={setTab} />
+            <Hero onNavigate={go} />
+            <Team onNavigate={go} />
           </>
         )}
-        {tab === "services" && (
+        {view.tab === "services" && (
           <>
-            <Departments onNavigate={setTab} />
+            <Departments onNavigate={go} />
             <OtherUnits />
           </>
         )}
-        {tab === "doctors" && <Doctors />}
-        {tab === "facilities" && (
+        {view.tab === "doctors" && <Doctors />}
+        {view.tab === "articles" &&
+          (view.articleId ? (
+            <ArticleView id={view.articleId} onNavigate={go} />
+          ) : (
+            <ArticlesList onNavigate={go} />
+          ))}
+        {view.tab === "facilities" && (
           <>
             <FacilitiesIntro />
             <StatsBand />
           </>
         )}
-        {tab === "insurance" && <Insurance />}
-        {tab === "contact" && <ContactSection />}
+        {view.tab === "insurance" && <Insurance />}
+        {view.tab === "contact" && <ContactSection />}
       </main>
 
-      <Footer onNavigate={setTab} />
+      <Footer onNavigate={go} />
     </div>
   );
 }

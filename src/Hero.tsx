@@ -105,19 +105,14 @@ export default function Hero({ onNavigate }: { onNavigate?: (id: TabId) => void 
                     className="kenburns h-full w-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-pine/55 via-transparent to-transparent" />
-                  {/* کارت وضعیت زنده */}
                   <div className="absolute bottom-4 start-4 end-4 flex items-center justify-between gap-3 rounded-[13px] bg-card/95 px-4 py-3 shadow-lg sm:end-auto">
                     <span className="flex items-center gap-2.5">
-                      <span
-                        className={`h-2.5 w-2.5 rounded-full ${open ? "bg-teal pulse-ring" : "bg-clay"}`}
-                      />
+                      <span className={`h-2.5 w-2.5 rounded-full ${open ? "bg-teal pulse-ring" : "bg-clay"}`} />
                       <span>
                         <span className="block text-[0.8rem] font-extrabold text-pine">
                           {open ? "همین حالا باز هستیم" : "فعلاً بسته‌ایم"}
                         </span>
-                        <span className="block text-[0.66rem] font-bold text-inksoft">
-                          هر روز • ۷ صبح تا ۲۳
-                        </span>
+                        <span className="block text-[0.66rem] font-bold text-inksoft">هر روز • ۷ صبح تا ۲۳</span>
                       </span>
                     </span>
                     <IconHeartPulse className={`h-6 w-6 text-sea ${open ? "heartbeat" : ""}`} />
@@ -125,7 +120,6 @@ export default function Hero({ onNavigate }: { onNavigate?: (id: TabId) => void 
                 </div>
               </div>
               <Stamp className="absolute -top-7 -start-3 h-24 w-24 drop-shadow-xl sm:-start-8 sm:h-32 sm:w-32" />
-              {/* کاشی شناور پذیرش */}
               <div className="lift absolute -bottom-5 -end-2 hidden items-center gap-3 rounded-[14px] border border-gold/40 bg-goldsoft px-4 py-3 shadow-lg sm:flex">
                 <span className="font-display text-3xl leading-none text-golddeep">{faNum(35)}</span>
                 <span className="text-[0.72rem] font-extrabold leading-5 text-pine">
