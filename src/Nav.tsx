@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { TABS, CONTACT, faNum, type TabId } from "./data";
+import { TABS, CONTACT, LOGO, faNum, type TabId } from "./data";
 import { useOpenStatus } from "./fx";
-import { ICONS, IconPhone, IconClose, LogoMark } from "./Icons";
+import { ICONS, IconPhone, IconClose } from "./Icons";
 import BookingMenu from "./Booking";
 
 export default function Nav({
@@ -62,12 +62,12 @@ export default function Nav({
         }`}
       >
         <div className="wrap flex items-center justify-between gap-4 py-3">
-          <button onClick={() => go("home")} className="group flex items-center gap-3 text-start">
-            <span className="arch-ring grid h-12 w-12 shrink-0 place-items-center bg-pine text-gold transition-transform duration-300 group-hover:rotate-3">
-              <LogoMark className="h-8 w-8" />
+          <button onClick={() => go("home")} className="group flex min-w-0 items-center gap-2.5 text-start sm:gap-3">
+            <span className="arch-ring grid h-11 w-11 shrink-0 place-items-center overflow-hidden bg-card shadow-[0_6px_18px_-8px_rgba(11,59,56,0.4)] ring-1 ring-sea/20 transition-transform duration-300 group-hover:rotate-3 sm:h-12 sm:w-12">
+              <img src={LOGO} alt="لوگوی درمانگاه خیریه آوای مهر ولی‌الله" className="h-full w-full object-cover" />
             </span>
-            <span className="leading-tight">
-              <span className="font-display block text-lg text-pine sm:text-xl">آوای مهر ولی‌الله</span>
+            <span className="hidden min-w-0 leading-tight sm:block">
+              <span className="font-display block truncate text-lg text-pine sm:text-xl">آوای مهر ولی‌الله</span>
               <span className="block text-[0.62rem] font-bold text-sea sm:text-[0.68rem]">
                 درمانگاه خیریه • {faNum(27)} سال خدمت
               </span>
@@ -94,8 +94,11 @@ export default function Nav({
             })}
           </nav>
 
-          <div className="flex items-center gap-2">
-            <BookingMenu label="رزرو نوبت" className="hidden sm:block" />
+          <div className="flex shrink-0 items-center gap-2">
+            <BookingMenu
+              label="رزرو نوبت"
+              btnClass="max-sm:gap-1.5! max-sm:px-3! max-sm:py-2! max-sm:text-[0.72rem]!"
+            />
             <button
               onClick={() => setMenu((m) => !m)}
               aria-label="منو"

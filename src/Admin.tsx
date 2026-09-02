@@ -2,6 +2,7 @@ import { useMemo, useRef, useState, type FormEvent } from "react";
 import {
   DOCTOR_SPECS,
   ARTICLE_CATS,
+  LOGO,
   faNum,
   faDateNow,
   readMinutes,
@@ -43,7 +44,6 @@ import {
   IconNews,
   IconCheck,
   IconArrow,
-  LogoMark,
 } from "./Icons";
 
 const PASS = "avayemehr";
@@ -114,8 +114,8 @@ function Gate({ onOk }: { onOk: () => void }) {
     <div className="relative flex min-h-screen items-center justify-center px-4 py-10">
       <div className={`w-full max-w-sm ${err ? "shake" : ""}`}>
         <div className="fadeup rounded-[20px] border border-foam/12 bg-pine2/80 p-7 shadow-2xl">
-          <span className="arch-ring mx-auto grid h-16 w-16 place-items-center bg-gold text-pine">
-            <LogoMark className="h-10 w-10" />
+          <span className="arch-ring mx-auto grid h-20 w-20 place-items-center overflow-hidden bg-card shadow-xl ring-1 ring-gold/40">
+            <img src={LOGO} alt="لوگوی درمانگاه" className="h-full w-full object-cover" />
           </span>
           <h1 className="font-display mt-5 text-center text-3xl">کنسول مدیریت</h1>
           <p className="mt-2 text-center text-[0.78rem] font-bold text-foam/55">
