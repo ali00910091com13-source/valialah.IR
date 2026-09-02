@@ -279,6 +279,14 @@ export const IconClose: FC<P> = (p) => (
   </svg>
 );
 
+export const IconNews: FC<P> = (p) => (
+  <svg {...base} {...p}>
+    <path d="M4 5.5h13v14H5.5A1.5 1.5 0 0 1 4 18z" />
+    <path d="M17 8.5h2a1 1 0 0 1 1 1v8a1.5 1.5 0 0 1-1.5 1.5H17" />
+    <path d="M7 9h7M7 12.5h7M7 16h4.5" />
+  </svg>
+);
+
 export const LogoMark: FC<P> = (p) => (
   <svg viewBox="0 0 48 48" fill="none" aria-hidden="true" {...p}>
     <path

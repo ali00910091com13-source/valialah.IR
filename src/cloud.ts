@@ -1,4 +1,4 @@
-import type { Doctor } from "./data";
+import type { Article, Doctor } from "./data";
 
 const CFG_KEY = "aavm-cloud-cfg";
 
@@ -72,6 +72,7 @@ const authHeaders = (key: string): Record<string, string> => ({
 });
 
 const endpoint = (cfg: CloudCfg) => `${cfg.url}/rest/v1/doctors`;
+const articlesEndpoint = (cfg: CloudCfg) => `${cfg.url}/rest/v1/articles`;
 
 /**
  * دریافت فهرست پزشک‌ها از فضای ابری.
@@ -112,3 +113,56 @@ export async function pushCloudDoctors(list: Doctor[]): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * دریافت مقالات از فضای ابری.
+ * - `null` → خطا (مثلاً جدول articles هنوز ساخته نشده)
+ * - `[]`   → اتصال برقرار است ولی هنوز مقاله‌ای منتشر نشده
+ */
+export async function fetchCloudArticles(): Promise<Article[] | null> {
+  const cfg = getCloudCfg();
+  if (!cfg) return null;
+  try {
+    const res = await fetch(`${articlesEndpoint(cfg)}?id=eq.1&select=data`, {
+      headers: authHeaders(cfg.key),
+    });
+    if (!res.ok) return null;
+    const rows = (await res.json()) as { data?: Article[] }[];
+    const list = rows[0]?.data;
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return null;
+  }
+}
+
+/** انتشار مقالات برای همه‌ی بازدیدکنندگان */
+export async function pushCloudArticles(list: Article[]): Promise<boolean> {
+  const cfg = getCloudCfg();
+  if (!cfg) return false;
+  try {
+    const res = await fetch(articlesEndpoint(cfg), {
+      method: "POST",
+      headers: {
+        ...authHeaders(cfg.key),
+        Prefer: "resolution=merge-duplicates",
+      },
+      body: JSON.stringify({ id: 1, data: list, updated_at: new Date().toISOString() }),
+    });
+    return res.ok || res.status === 201;
+  } catch {
+    return false;
+  }
+}
+
+/** کد ساخت جدول مقالات — یک‌بار در SQL Editor اجرا می‌شود */
+export const ARTICLES_SQL = `create table if not exists articles (
+  id int primary key,
+  data jsonb not null,
+  updated_at timestamptz default now()
+);
+
+alter table articles enable row level security;
+
+drop policy if exists "public access" on articles;
+create policy "public access" on articles
+  for all using (true) with check (true);`;
