@@ -32,7 +32,6 @@ const notify = () => listeners.forEach((l) => l());
 
 let initStarted = false;
 
-/** دریافت مقالات مشترک از فضای ابری */
 export function initArticlesCloud(force = false) {
   if (initStarted && !force) return;
   initStarted = true;
@@ -53,19 +52,15 @@ export function initArticlesCloud(force = false) {
     if (remote.length > 0) {
       cache = remote;
       saveLocal(cache);
-    } else {
-      // جدول خالی است → مقالات پیش‌فرض منتشر می‌شوند
-      void pushCloudArticles(cache).then((ok) => {
-        sync = ok ? "cloud" : "pushfail";
-        notify();
-        return;
-      });
       sync = "cloud";
       notify();
       return;
     }
-    sync = "cloud";
-    notify();
+    // جدول خالی است → مقالات پیش‌فرض منتشر می‌شوند
+    void pushCloudArticles(cache).then((ok) => {
+      sync = ok ? "cloud" : "pushfail";
+      notify();
+    });
   });
 }
 
@@ -101,8 +96,7 @@ export const addArticle = (a: Article) => commit([a, ...cache]);
 export const updateArticle = (id: string, a: Article) =>
   commit(cache.map((x) => (x.id === id ? a : x)));
 
-export const removeArticle = (id: string) =>
-  commit(cache.filter((x) => x.id !== id));
+export const removeArticle = (id: string) => commit(cache.filter((x) => x.id !== id));
 
 export const resetArticles = () => commit([...ARTICLES]);
 
@@ -111,5 +105,4 @@ export const publishArticlesNow = () => pushCloudArticles(cache);
 export const isDefaultArticles = () =>
   cache.length === ARTICLES.length && cache.every((a, i) => a.id === ARTICLES[i].id);
 
-/* به‌محض باز شدن سایت، مقالات مشترک دریافت می‌شوند */
 initArticlesCloud();

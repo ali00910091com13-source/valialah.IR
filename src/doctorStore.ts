@@ -33,7 +33,6 @@ const notify = () => listeners.forEach((l) => l());
 
 let initStarted = false;
 
-/** دریافت فهرست مشترک از فضای ابری (برای همه‌ی بازدیدکنندگان) */
 export function initCloud(force = false) {
   if (initStarted && !force) return;
   initStarted = true;
@@ -54,7 +53,6 @@ export function initCloud(force = false) {
       cache = remote;
       saveLocal(cache);
     } else {
-      // جدول خالی است → فهرست فعلی به‌عنوان نسخه‌ی اولیه منتشر می‌شود
       void pushCloudDoctors(cache);
     }
     sync = "cloud";
@@ -103,8 +101,7 @@ export const addDoctor = (d: Doctor) => commit([d, ...cache]);
 export const updateDoctor = (index: number, d: Doctor) =>
   commit(cache.map((x, j) => (j === index ? d : x)));
 
-export const removeDoctor = (index: number) =>
-  commit(cache.filter((_, j) => j !== index));
+export const removeDoctor = (index: number) => commit(cache.filter((_, j) => j !== index));
 
 export const resetDoctors = () => commit([...DOCTORS]);
 
@@ -113,5 +110,4 @@ export const publishNow = () => pushCloudDoctors(cache);
 export const isDefaultList = () =>
   cache.length === DOCTORS.length && cache.every((d, i) => d.name === DOCTORS[i].name);
 
-/* به‌محض باز شدن سایت، فهرست مشترک دریافت می‌شود */
 initCloud();

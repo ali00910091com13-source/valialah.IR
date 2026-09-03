@@ -6,8 +6,7 @@ export type CloudCfg = { url: string; key: string };
 
 /**
  * تنظیمات اتصالِ خود سایت — مستقیم داخل کد قرار گرفته تا «همه‌ی بازدیدکنندگان»
- * در هر مرورگر و دستگاهی، به‌طور خودکار از فهرست مشترک پزشکان استفاده کنند.
- * کلید anon برای استفاده‌ی عمومی طراحی شده و RLS از داده محافظت می‌کند.
+ * در هر مرورگر و دستگاهی، به‌طور خودکار از فهرست مشترک پزشکان و مقالات استفاده کنند.
  */
 export const DEFAULT_CFG: CloudCfg = {
   url: "https://nrcezlwxksqmfzfsjsyw.supabase.co",
@@ -15,7 +14,6 @@ export const DEFAULT_CFG: CloudCfg = {
 };
 
 export function getCloudCfg(): CloudCfg | null {
-  // اولویت با تنظیمات دستی (localStorage) است؛ در غیر این صورت تنظیمات خود سایت
   try {
     const raw = localStorage.getItem(CFG_KEY);
     if (raw) {
@@ -29,7 +27,6 @@ export function getCloudCfg(): CloudCfg | null {
   return DEFAULT_CFG;
 }
 
-/** آیا از تنظیمات داخل خود سایت استفاده می‌شود؟ */
 export function isEmbeddedCfg(): boolean {
   try {
     const raw = localStorage.getItem(CFG_KEY);
@@ -74,87 +71,102 @@ const authHeaders = (key: string): Record<string, string> => ({
 const endpoint = (cfg: CloudCfg) => `${cfg.url}/rest/v1/doctors`;
 const articlesEndpoint = (cfg: CloudCfg) => `${cfg.url}/rest/v1/articles`;
 
-/**
- * دریافت فهرست پزشک‌ها از فضای ابری.
- * - `null` → خطا در ارتباط (قطع/تنظیمات اشتباه)
- * - `[]`   → اتصال برقرار است ولی هنوز فهرستی منتشر نشده
- */
+async function fetchRow(url: string, key: string): Promise<unknown[] | null> {
+  try {
+    const res = await fetch(`${url}?id=eq.1&select=data`, { headers: authHeaders(key) });
+    if (!res.ok) return null;
+    const rows = (await res.json()) as { data?: unknown[] }[];
+    const list = rows[0]?.data;
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return null;
+  }
+}
+
+async function pushRow(url: string, key: string, list: unknown[]): Promise<boolean> {
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { ...authHeaders(key), Prefer: "resolution=merge-duplicates" },
+      body: JSON.stringify({ id: 1,  list, updated_at: new Date().toISOString() }),
+    });
+    return res.ok || res.status === 201;
+  } catch {
+    return false;
+  }
+}
+
+/** پزشک‌ها — null یعنی خطا در ارتباط، [] یعنی اتصال هست ولی فهرست خالی */
 export async function fetchCloudDoctors(): Promise<Doctor[] | null> {
   const cfg = getCloudCfg();
   if (!cfg) return null;
-  try {
-    const res = await fetch(`${endpoint(cfg)}?id=eq.1&select=data`, {
-      headers: authHeaders(cfg.key),
-    });
-    if (!res.ok) return null;
-    const rows = (await res.json()) as { data?: Doctor[] }[];
-    const list = rows[0]?.data;
-    return Array.isArray(list) ? list : [];
-  } catch {
-    return null;
-  }
+  const rows = await fetchRow(endpoint(cfg), cfg.key);
+  return rows as Doctor[] | null;
 }
 
-/** انتشار فهرست برای همه‌ی بازدیدکنندگان */
 export async function pushCloudDoctors(list: Doctor[]): Promise<boolean> {
   const cfg = getCloudCfg();
   if (!cfg) return false;
-  try {
-    const res = await fetch(endpoint(cfg), {
-      method: "POST",
-      headers: {
-        ...authHeaders(cfg.key),
-        Prefer: "resolution=merge-duplicates",
-      },
-      body: JSON.stringify({ id: 1, data: list, updated_at: new Date().toISOString() }),
-    });
-    return res.ok || res.status === 201;
-  } catch {
-    return false;
-  }
+  return pushRow(endpoint(cfg), cfg.key, list);
 }
 
-/**
- * دریافت مقالات از فضای ابری.
- * - `null` → خطا (مثلاً جدول articles هنوز ساخته نشده)
- * - `[]`   → اتصال برقرار است ولی هنوز مقاله‌ای منتشر نشده
- */
+/** مقالات */
 export async function fetchCloudArticles(): Promise<Article[] | null> {
   const cfg = getCloudCfg();
   if (!cfg) return null;
-  try {
-    const res = await fetch(`${articlesEndpoint(cfg)}?id=eq.1&select=data`, {
-      headers: authHeaders(cfg.key),
-    });
-    if (!res.ok) return null;
-    const rows = (await res.json()) as { data?: Article[] }[];
-    const list = rows[0]?.data;
-    return Array.isArray(list) ? list : [];
-  } catch {
-    return null;
-  }
+  const rows = await fetchRow(articlesEndpoint(cfg), cfg.key);
+  return rows as Article[] | null;
 }
 
-/** انتشار مقالات برای همه‌ی بازدیدکنندگان */
 export async function pushCloudArticles(list: Article[]): Promise<boolean> {
   const cfg = getCloudCfg();
   if (!cfg) return false;
+  return pushRow(articlesEndpoint(cfg), cfg.key, list);
+}
+
+/* ─────────────── آزمایش اتصال با تشخیص دقیق ─────────────── */
+export type TestResult =
+  | { status: "ok" }
+  | { status: "bad-url" }
+  | { status: "bad-key-format" }
+  | { status: "network"; detail: string }
+  | { status: "unauthorized"; detail: string }
+  | { status: "no-table"; detail: string }
+  | { status: "other"; code: number; detail: string };
+
+export async function testCloud(urlRaw: string, keyRaw: string): Promise<TestResult> {
+  const url = normalizeProjectUrl(urlRaw);
+  const key = keyRaw.trim().replace(/^Bearer\s+/i, "");
+  if (!url) return { status: "bad-url" };
+  if (key.length < 20) return { status: "bad-key-format" };
   try {
-    const res = await fetch(articlesEndpoint(cfg), {
-      method: "POST",
-      headers: {
-        ...authHeaders(cfg.key),
-        Prefer: "resolution=merge-duplicates",
-      },
-      body: JSON.stringify({ id: 1, data: list, updated_at: new Date().toISOString() }),
+    const res = await fetch(`${url}/rest/v1/doctors?id=eq.1&select=data`, {
+      headers: authHeaders(key),
     });
-    return res.ok || res.status === 201;
-  } catch {
-    return false;
+    if (res.ok) return { status: "ok" };
+    const detail = (await res.text().catch(() => "")).slice(0, 220) || `HTTP ${res.status}`;
+    if (res.status === 401 || res.status === 403 || /invalid api key|jwt|signature/i.test(detail))
+      return { status: "unauthorized", detail };
+    if (res.status === 404 || /PGRST205|could not find the table|schema cache/i.test(detail))
+      return { status: "no-table", detail };
+    return { status: "other", code: res.status, detail };
+  } catch (e) {
+    return { status: "network", detail: e instanceof Error ? e.message : String(e) };
   }
 }
 
-/** کد ساخت جدول مقالات — یک‌بار در SQL Editor اجرا می‌شود */
+export const SETUP_SQL = `create table if not exists doctors (
+  id int primary key,
+  data jsonb not null,
+  updated_at timestamptz default now()
+);
+
+alter table doctors enable row level security;
+
+drop policy if exists "public access" on doctors;
+create policy "public access" on doctors
+  for all using (true) with check (true);`;
+
 export const ARTICLES_SQL = `create table if not exists articles (
   id int primary key,
   data jsonb not null,

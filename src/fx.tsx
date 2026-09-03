@@ -120,14 +120,7 @@ export function EcgLine({ className = "" }: { className?: string }) {
     <svg viewBox="0 0 600 60" preserveAspectRatio="none" className={className} aria-hidden="true">
       <path d={d} fill="none" stroke="currentColor" strokeWidth="2" opacity="0.25" />
       {!reduced && (
-        <path
-          d={d}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          className="ecg-path"
-        />
+        <path d={d} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className="ecg-path" />
       )}
     </svg>
   );
@@ -145,9 +138,7 @@ export function Stamp({ className = "" }: { className?: string }) {
       <circle cx="60" cy="60" r="53" fill="none" stroke="var(--color-gold)" strokeWidth="1.4" strokeDasharray="3 4" />
       <circle cx="60" cy="60" r="34" fill="none" stroke="var(--color-gold)" strokeWidth="1" opacity="0.55" />
       <text fill="var(--color-goldsoft)" fontSize="10.6" fontWeight="700" letterSpacing="2.6">
-        <textPath href="#stampcircle">
-          آوای مهر ولی‌الله • ۲۷ سال خدمت • صدای سلامت •
-        </textPath>
+        <textPath href="#stampcircle">آوای مهر ولی‌الله • ۲۷ سال خدمت • صدای سلامت •</textPath>
       </text>
       <path
         d="M60 76c-8.6-7-13.4-11.4-13.4-17 0-3.7 2.8-6.4 6.2-6.4 2.6 0 5 1.5 6.2 3.8.2.4.8.4 1 0 1.2-2.3 3.6-3.8 6.2-3.8 3.4 0 6.2 2.7 6.2 6.4 0 5.6-4.8 10-13.4 17z"
@@ -172,7 +163,7 @@ export function Squiggle({ className = "" }: { className?: string }) {
   );
 }
 
-/* ─────────────── live open/closed status (Tehran time) ─────────────── */
+/* ─────────────── live open/closed (Tehran time) ─────────────── */
 export function useOpenStatus() {
   const compute = () => {
     try {

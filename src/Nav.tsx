@@ -30,10 +30,7 @@ export default function Nav({
 
   useEffect(() => setMenu(false), [active]);
 
-  const go = (id: TabId) => {
-    onNavigate(id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const go = (id: TabId) => onNavigate(id);
 
   return (
     <>
@@ -61,7 +58,7 @@ export default function Nav({
             : "border-transparent bg-paper/80 backdrop-blur-sm"
         }`}
       >
-        <div className="wrap flex items-center justify-between gap-4 py-3">
+        <div className="wrap flex items-center justify-between gap-3 py-3">
           <button onClick={() => go("home")} className="group flex min-w-0 items-center gap-2.5 text-start sm:gap-3">
             <span className="arch-ring grid h-11 w-11 shrink-0 place-items-center overflow-hidden bg-card shadow-[0_6px_18px_-8px_rgba(11,59,56,0.4)] ring-1 ring-sea/20 transition-transform duration-300 group-hover:rotate-3 sm:h-12 sm:w-12">
               <LogoImg src={LOGO} className="h-full w-full object-cover" />
@@ -83,8 +80,10 @@ export default function Nav({
                 <button
                   key={t.id}
                   onClick={() => go(t.id)}
-                  className={`relative flex items-center gap-1.5 rounded-[11px] px-3.5 py-2.5 text-sm font-bold transition-all duration-200 ${
-                    isActive ? "bg-sea text-foam shadow-[0_10px_24px_-10px_rgba(10,90,84,0.6)]" : "text-pine hover:bg-sea/10"
+                  className={`relative flex items-center gap-1.5 rounded-[11px] px-3 py-2.5 text-[0.85rem] font-bold transition-all duration-200 ${
+                    isActive
+                      ? "bg-sea text-foam shadow-[0_10px_24px_-10px_rgba(10,90,84,0.6)]"
+                      : "text-pine hover:bg-sea/10"
                   }`}
                 >
                   {Ic && <Ic className="h-4 w-4" />}
@@ -133,7 +132,12 @@ export default function Nav({
           />
           <div className="fadeup absolute inset-x-3 top-3 overflow-hidden rounded-[18px] border border-sea/20 bg-paper shadow-2xl">
             <div className="flex items-center justify-between border-b border-sea/10 bg-card px-4 py-3">
-              <span className="font-display text-lg text-pine">منوی درمانگاه</span>
+              <span className="flex items-center gap-2.5">
+                <span className="arch-ring grid h-10 w-10 shrink-0 place-items-center overflow-hidden bg-card shadow-sm ring-1 ring-sea/25">
+                  <LogoImg src={LOGO} className="h-full w-full object-cover" />
+                </span>
+                <span className="font-display text-lg text-pine">منوی درمانگاه</span>
+              </span>
               <button
                 onClick={() => setMenu(false)}
                 aria-label="بستن"
@@ -142,7 +146,7 @@ export default function Nav({
                 <IconClose className="h-5 w-5" />
               </button>
             </div>
-            <nav className="grid gap-1 p-3" aria-label="منوی موبایل">
+            <nav className="no-scrollbar grid max-h-[55vh] gap-1 overflow-y-auto p-3" aria-label="منوی موبایل">
               {TABS.map((t, i) => {
                 const Ic = ICONS[t.icon];
                 const isActive = active === t.id;

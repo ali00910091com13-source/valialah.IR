@@ -1,4 +1,4 @@
-import { useState, type FC, type SVGProps } from "react";
+import { useState, type CSSProperties, type FC, type SVGProps } from "react";
 
 export type P = SVGProps<SVGSVGElement>;
 
@@ -189,24 +189,6 @@ export const IconCalendar: FC<P> = (p) => (
   </svg>
 );
 
-export const IconBolt: FC<P> = (p) => (
-  <svg {...base} {...p}>
-    <path d="M13 3 5 13.5h5.5L10 21l8-10.5h-5.5z" />
-  </svg>
-);
-
-export const IconSpark: FC<P> = (p) => (
-  <svg {...base} {...p}>
-    <path d="M12 4v4M12 16v4M4 12h4M16 12h4M6.8 6.8l2 2M15.2 15.2l2 2M17.2 6.8l-2 2M8.8 15.2l-2 2" />
-  </svg>
-);
-
-export const IconCross: FC<P> = (p) => (
-  <svg {...base} {...p}>
-    <path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z" />
-  </svg>
-);
-
 export const IconSearch: FC<P> = (p) => (
   <svg {...base} {...p}>
     <circle cx="10.5" cy="10.5" r="6" />
@@ -227,6 +209,14 @@ export const IconHome: FC<P> = (p) => (
     <path d="m3.5 11 8.5-7 8.5 7" />
     <path d="M5.5 9.5V20h13V9.5" />
     <path d="M10 20v-5h4v5" />
+  </svg>
+);
+
+export const IconNews: FC<P> = (p) => (
+  <svg {...base} {...p}>
+    <path d="M4 5.5h13.5V19a1.8 1.8 0 0 0 1.8 1.8H5.8A1.8 1.8 0 0 1 4 19z" />
+    <path d="M17.5 9H20v10a1.8 1.8 0 0 1-1.8 1.8" />
+    <path d="M7 9h7.5M7 12.5h7.5M7 16h4.5" />
   </svg>
 );
 
@@ -279,14 +269,6 @@ export const IconClose: FC<P> = (p) => (
   </svg>
 );
 
-export const IconNews: FC<P> = (p) => (
-  <svg {...base} {...p}>
-    <path d="M4 5.5h13v14H5.5A1.5 1.5 0 0 1 4 18z" />
-    <path d="M17 8.5h2a1 1 0 0 1 1 1v8a1.5 1.5 0 0 1-1.5 1.5H17" />
-    <path d="M7 9h7M7 12.5h7M7 16h4.5" />
-  </svg>
-);
-
 export const LogoMark: FC<P> = (p) => (
   <svg viewBox="0 0 48 48" fill="none" aria-hidden="true" {...p}>
     <path
@@ -309,11 +291,8 @@ export const LogoMark: FC<P> = (p) => (
   </svg>
 );
 
-/**
- * لوگوی رسمی درمانگاه — اگر تصویر به هر دلیلی بارگذاری نشد
- * (قطعی اینترنت، فیلترینگ و…) به‌صورت خودکار نشان جایگزین نمایش داده می‌شود.
- */
-export const LogoImg: FC<{ src: string; className?: string; style?: React.CSSProperties }> = ({
+/** لوگوی رسمی با جایگزین خودکار در صورت قطع بودن تصویر */
+export const LogoImg: FC<{ src: string; className?: string; style?: CSSProperties }> = ({
   src,
   className = "",
   style,
@@ -358,12 +337,10 @@ export const ICONS: Record<string, FC<P>> = {
   star8: IconStar8,
   instagram: IconInstagram,
   calendar: IconCalendar,
-  bolt: IconBolt,
-  spark: IconSpark,
-  cross: IconCross,
   search: IconSearch,
   doctor: IconDoctor,
   home: IconHome,
+  news: IconNews,
   plus: IconPlus,
   trash: IconTrash,
   edit: IconEdit,

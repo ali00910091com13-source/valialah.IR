@@ -10,8 +10,8 @@ type Props = {
 };
 
 /**
- * دکمه «رزرو نوبت» — با کلیک، فهرست سامانه‌های نوبت‌دهی آنلاین
- * (پذیرش۲۴ و دکترتو) و تماس تلفنی باز می‌شود.
+ * دکمه «رزرو نوبت» — فهرست سامانه‌های نوبت‌دهی آنلاین
+ * (پذیرش۲۴ و دکترتو) و تماس تلفنی را باز می‌کند.
  */
 export default function BookingMenu({
   label = "رزرو نوبت آنلاین",
@@ -47,11 +47,11 @@ export default function BookingMenu({
         aria-expanded={open}
         className={`btn btn-${variant} ${btnClass} ${open ? "ring-2 ring-gold/40" : ""}`}
       >
-        <IconCalendar className="h-4.5 w-4.5" />
+        <IconCalendar className="h-4.5 w-4.5 shrink-0" />
         {label}
         <svg
           viewBox="0 0 24 24"
-          className={`h-3.5 w-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
           fill="none"
           stroke="currentColor"
           strokeWidth="2.2"
@@ -64,8 +64,8 @@ export default function BookingMenu({
       </button>
 
       {open && (
-        <div className="menu-pop fixed inset-x-3 bottom-4 z-[70] sm:absolute sm:inset-x-auto sm:bottom-auto sm:end-0 sm:top-full sm:mt-3 sm:w-[19.5rem]">
-          <div className="overflow-hidden rounded-[16px] border border-sea/25 bg-card shadow-[0_24px_60px_-18px_rgba(7,39,42,0.45)]">
+        <div className="fixed inset-x-3 bottom-4 z-[70] sm:absolute sm:inset-x-auto sm:bottom-auto sm:end-0 sm:top-full sm:mt-3 sm:w-[19.5rem]">
+          <div className="menu-pop overflow-hidden rounded-[16px] border border-sea/25 bg-card shadow-[0_24px_60px_-18px_rgba(7,39,42,0.45)]">
             <div className="flex items-center justify-between bg-pine px-4 py-3">
               <span className="font-display text-base text-gold">انتخاب سامانه نوبت‌دهی</span>
               <button

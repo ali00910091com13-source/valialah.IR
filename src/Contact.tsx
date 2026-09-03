@@ -83,7 +83,6 @@ export function ContactSection() {
         </div>
       </Reveal>
 
-      {/* نوبت‌دهی آنلاین */}
       <Reveal delay={60}>
         <div className="relative mt-10 overflow-hidden rounded-[20px] bg-pine p-6 sm:p-8">
           <div className="girih-light absolute inset-0" aria-hidden="true" />
@@ -98,8 +97,8 @@ export function ContactSection() {
               </span>
             </div>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-foam/75">
-              درمانگاه آوای مهر ولی‌الله در سامانه‌های معتبر نوبت‌دهی کشور حضور دارد؛ روی هر
-              سامانه بزنید تا مستقیم وارد صفحه نوبت‌دهی شوید:
+              درمانگاه آوای مهر ولی‌الله در سامانه‌های معتبر نوبت‌دهی کشور حضور دارد؛ روی هر سامانه
+              بزنید تا مستقیم وارد صفحه نوبت‌دهی شوید:
             </p>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {BOOKING_LINKS.map((b, i) => (
@@ -146,17 +145,16 @@ export function ContactSection() {
         </div>
       </Reveal>
 
-      {/* کارت‌های اطلاعات */}
       <div className="mt-8 grid gap-4 lg:grid-cols-3">
         <Reveal delay={100}>
-          <div className="lift h-full rounded-[18px] border border-sea/15 bg-card p-6">
+          <div className="card-lift h-full rounded-[18px] border border-sea/15 bg-card p-6">
             <span className="grid h-12 w-12 place-items-center rounded-[13px] bg-mist text-sea">
               <IconPhone className="h-6 w-6" />
             </span>
             <h3 className="font-display mt-4 text-2xl text-pine">تلفن‌ها</h3>
             <ul className="mt-3 space-y-2.5 text-sm font-bold text-ink">
               <li className="flex items-center justify-between gap-2">
-                <span className="text-inksoft">پذیرش</span>
+                <span className="text-inksoft">پذیرش و نوبت‌دهی</span>
                 <a dir="ltr" href={`tel:${CONTACT.phone}`} className="text-seadeep underline-offset-4 hover:underline">
                   {CONTACT.phoneDisplay}
                 </a>
@@ -178,7 +176,7 @@ export function ContactSection() {
         </Reveal>
 
         <Reveal delay={180}>
-          <div className="lift h-full rounded-[18px] border border-sea/15 bg-card p-6">
+          <div className="card-lift h-full rounded-[18px] border border-sea/15 bg-card p-6">
             <span className="grid h-12 w-12 place-items-center rounded-[13px] bg-mist text-sea">
               <IconPin className="h-6 w-6" />
             </span>
@@ -192,7 +190,7 @@ export function ContactSection() {
         </Reveal>
 
         <Reveal delay={260}>
-          <div className="lift h-full rounded-[18px] border border-sea/15 bg-card p-6">
+          <div className="card-lift h-full rounded-[18px] border border-sea/15 bg-card p-6">
             <span className="grid h-12 w-12 place-items-center rounded-[13px] bg-mist text-sea">
               <IconClock className="h-6 w-6" />
             </span>
@@ -217,21 +215,14 @@ export function ContactSection() {
         </Reveal>
       </div>
 
-      {/* نقشه + نمای ساختمان */}
       <div className="mt-8 grid gap-4 lg:grid-cols-5">
         <Reveal delay={120} className="lg:col-span-3">
-          <div className="h-full min-h-[16rem]">
-            <MapCard />
-          </div>
+          <MapCard />
         </Reveal>
         <Reveal delay={200} className="lg:col-span-2">
           <div className="arch-ring h-full bg-gradient-to-b from-sea/20 to-transparent p-2.5">
             <div className="arch relative h-full min-h-[16rem] overflow-hidden">
-              <img
-                src={IMG.exterior}
-                alt="نمای ساختمان درمانگاه خیریه آوای مهر ولی‌الله"
-                className="kenburns h-full w-full object-cover"
-              />
+              <img src={IMG.exterior} alt="نمای ساختمان درمانگاه خیریه آوای مهر ولی‌الله" className="kenburns h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-pine/60 via-transparent to-transparent" />
               <p className="font-display absolute bottom-4 start-5 text-xl text-card drop-shadow">
                 ساختمان {faNum(4)} طبقه‌ی درمانگاه
@@ -263,8 +254,8 @@ export function Footer({ onNavigate }: { onNavigate: (id: TabId) => void }) {
             <span className="font-display text-xl text-card">آوای مهر ولی‌الله</span>
           </button>
           <p className="mt-4 text-sm leading-7 text-foam/60">
-            درمانگاه خیریه با بیش از {faNum(27)} سال سابقه؛ جایی که مهر، صدای سلامتی است.
-            خدمات تشخیصی و درمانی با تعرفه‌ی خیریه، برای همه.
+            درمانگاه خیریه با بیش از {faNum(27)} سال سابقه؛ جایی که مهر، صدای سلامتی است. خدمات
+            تشخیصی و درمانی با تعرفه‌ی خیریه، برای همه.
           </p>
           <a
             href={CONTACT.instagram}
@@ -317,10 +308,16 @@ export function Footer({ onNavigate }: { onNavigate: (id: TabId) => void }) {
       </div>
 
       <div className="relative border-t border-foam/10">
-        <div className="wrap flex flex-wrap items-center justify-between gap-3 py-5 text-[0.74rem] font-bold text-foam/50">
+        <div className="wrap flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5 py-5 text-[0.74rem] font-bold text-foam/50">
           <span>© {faNum(1404)} درمانگاه خیریه آوای مهر ولی‌الله — تمامی حقوق محفوظ است.</span>
-          <span className="flex items-center gap-1.5">
-            ساخته‌شده با <IconHeart className="heartbeat h-3.5 w-3.5 text-clay" /> برای سلامتی شما
+          <span className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <span className="flex items-center gap-1.5">
+              ساخته‌شده با <IconHeart className="heartbeat h-3.5 w-3.5 text-clay" /> برای سلامتی شما
+            </span>
+            <span className="flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3.5 py-1.5 text-gold">
+              قدرت گرفته از
+              <span className="font-display text-base tracking-wider">MK</span>
+            </span>
           </span>
         </div>
       </div>

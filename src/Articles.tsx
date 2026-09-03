@@ -6,56 +6,56 @@ import { ICONS, IconNews, IconStar8, IconArrow, IconClock, IconCalendar, LogoImg
 
 type Nav = (tab: TabId, articleId?: string) => void;
 
-/* ─────────────── جلد مقاله (با عکس یا طرح تزئینی) ─────────────── */
+/* ─────────────── جلد مقاله (عکس یا طرح رنگی) ─────────────── */
 function Cover({ art, big = false }: { art: Article; big?: boolean }) {
   const meta = catMeta(art.category);
   const Ic = ICONS[meta.icon] ?? IconNews;
   return (
     <div
       className={`relative overflow-hidden ${big ? "rounded-[16px]" : "rounded-t-[14px]"}`}
-      style={{
-        background: `linear-gradient(135deg, ${meta.color}, ${meta.color}cc 55%, #0b3b38)`,
-      }}
+      style={
+        art.cover
+          ? undefined
+          : { background: `linear-gradient(135deg, ${meta.color}, ${meta.color}cc 55%, #0b3b38)` }
+      }
     >
-      {/* عکس کاور — اگر مقاله عکس داشته باشد */}
-      {art.cover && (
-        <img
-          src={art.cover}
-          alt=""
-          className={`absolute inset-0 h-full w-full object-cover ${big ? "" : "aspect-[16/9]"}`}
-        />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-t from-pine/70 via-pine/10 to-transparent" aria-hidden="true" />
-      {!art.cover && (
+      {art.cover ? (
         <>
-          <div className="girih-light absolute inset-0 opacity-70" aria-hidden="true" />
-          <div className="relative flex items-center justify-between p-5" aria-hidden="true">
+          <img src={art.cover} alt="" className={`w-full object-cover ${big ? "h-56 sm:h-72" : "h-40"}`} />
+          <div className="absolute inset-0 bg-gradient-to-t from-pine/70 via-transparent to-transparent" aria-hidden="true" />
+        </>
+      ) : (
+        <div aria-hidden="true">
+          <div className="girih-light absolute inset-0 opacity-70" />
+          <div className="relative flex items-center justify-between p-5">
             <Ic className={`${big ? "h-16 w-16" : "h-10 w-10"} text-foam/90 drop-shadow`} strokeWidth={1.4} />
+          </div>
+          <div className={`relative ${big ? "pb-7" : "pb-5"} ps-5`}>
             <span className="font-display block text-[3.2rem] leading-none text-foam/15 sm:text-[4rem]">
               {art.title.trim().charAt(0)}
             </span>
           </div>
-          <div className={`relative ${big ? "pb-6" : "pb-4"} ps-5`} aria-hidden="true" />
-        </>
+        </div>
       )}
-      <span className="absolute right-4 top-4 rounded-full bg-foam/15 px-3 py-1 text-[0.68rem] font-extrabold text-foam backdrop-blur-sm">
-        {art.category}
-      </span>
-      {/* مُهر لوگو گوشه‌ی جلد */}
-      <span className="absolute bottom-3 left-4 grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-card/95 shadow ring-1 ring-gold/50">
+      {/* مُهر لوگو */}
+      <span
+        className={`arch-ring absolute end-3 ${big ? "top-3" : "top-2.5"} grid place-items-center overflow-hidden bg-card/90 shadow ring-1 ring-gold/50 ${
+          big ? "h-11 w-11" : "h-8 w-8"
+        }`}
+        title="درمانگاه خیریه آوای مهر ولی‌الله"
+      >
         <LogoImg src={LOGO} className="h-full w-full object-cover" />
+      </span>
+      <span className="absolute bottom-3 start-3.5 rounded-full bg-foam/20 px-3 py-1 text-[0.68rem] font-extrabold text-foam backdrop-blur-sm">
+        {art.category}
       </span>
     </div>
   );
 }
 
-function Meta({ art, light = false }: { art: Article; light?: boolean }) {
+function Meta({ art }: { art: Article }) {
   return (
-    <span
-      className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.72rem] font-bold ${
-        light ? "text-foam/70" : "text-inksoft"
-      }`}
-    >
+    <span className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.72rem] font-bold text-inksoft">
       <span className="flex items-center gap-1.5">
         <IconCalendar className="h-3.5 w-3.5" />
         {art.date}
@@ -81,9 +81,11 @@ export function ArticlesList({ onNavigate }: { onNavigate: Nav }) {
     <div className="relative overflow-hidden">
       <div className="girih absolute inset-0 opacity-40" aria-hidden="true" />
       <div className="wrap relative pb-20 pt-10 sm:pt-14">
-        {/* سربرگ */}
         <Reveal>
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-5">
+            <span className="arch-ring hidden h-20 w-20 shrink-0 place-items-center overflow-hidden bg-card shadow-lg ring-1 ring-gold/40 sm:grid">
+              <LogoImg src={LOGO} className="h-full w-full object-cover" />
+            </span>
             <div className="max-w-2xl">
               <span className="eyebrow">
                 <IconNews className="h-4 w-4 text-gold" />
@@ -97,13 +99,9 @@ export function ArticlesList({ onNavigate }: { onNavigate: Nav }) {
                 مراقبت دندان تا فیزیوتراپی، سونوگرافی و استفاده‌ی درست از بیمه.
               </p>
             </div>
-            <span className="arch-ring hidden h-28 w-28 shrink-0 place-items-center overflow-hidden bg-card shadow-[0_20px_50px_-25px_rgba(11,59,56,0.5)] ring-1 ring-gold/50 sm:grid">
-              <LogoImg src={LOGO} className="h-full w-full object-cover" />
-            </span>
           </div>
         </Reveal>
 
-        {/* فیلتر دسته‌ها */}
         <Reveal delay={120}>
           <div className="no-scrollbar mt-8 flex gap-2 overflow-x-auto pb-1">
             {cats.map((c) => {
@@ -120,11 +118,7 @@ export function ArticlesList({ onNavigate }: { onNavigate: Nav }) {
                   }`}
                 >
                   {c}
-                  <span
-                    className={`rounded-full px-1.5 py-0.5 text-[0.62rem] ${
-                      active ? "bg-gold/20 text-gold" : "bg-mist text-inksoft"
-                    }`}
-                  >
+                  <span className={`rounded-full px-1.5 py-0.5 text-[0.62rem] ${active ? "bg-gold/20 text-gold" : "bg-mist text-inksoft"}`}>
                     {faNum(n)}
                   </span>
                 </button>
@@ -140,12 +134,11 @@ export function ArticlesList({ onNavigate }: { onNavigate: Nav }) {
           </div>
         )}
 
-        {/* مقاله‌ی ویژه */}
         {featured && (
           <Reveal delay={180}>
             <button
               onClick={() => onNavigate("articles", featured.id)}
-              className="lift group mt-8 grid w-full overflow-hidden rounded-[20px] border border-sea/20 bg-card text-start shadow-[0_30px_70px_-40px_rgba(11,59,56,0.5)] lg:grid-cols-5"
+              className="card-lift group mt-8 grid w-full overflow-hidden rounded-[20px] border border-sea/20 bg-card text-start shadow-[0_30px_70px_-40px_rgba(11,59,56,0.5)] lg:grid-cols-5"
             >
               <div className="lg:col-span-2">
                 <Cover art={featured} big />
@@ -171,22 +164,19 @@ export function ArticlesList({ onNavigate }: { onNavigate: Nav }) {
           </Reveal>
         )}
 
-        {/* شبکه‌ی مقالات */}
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {rest.map((a, i) => (
             <Reveal key={a.id} delay={Math.min(i * 80, 320)}>
               <button
                 onClick={() => onNavigate("articles", a.id)}
-                className="lift group flex h-full w-full flex-col overflow-hidden rounded-[16px] border border-sea/15 bg-card text-start"
+                className="card-lift group flex h-full w-full flex-col overflow-hidden rounded-[16px] border border-sea/15 bg-card text-start"
               >
                 <Cover art={a} />
                 <div className="flex flex-1 flex-col p-5">
                   <h3 className="font-display text-xl leading-[1.45] text-pine transition-colors group-hover:text-seadeep">
                     {a.title}
                   </h3>
-                  <p className="mt-2.5 line-clamp-3 text-[0.84rem] leading-7 text-inksoft">
-                    {a.excerpt}
-                  </p>
+                  <p className="mt-2.5 line-clamp-3 text-[0.84rem] leading-7 text-inksoft">{a.excerpt}</p>
                   <div className="mt-auto flex items-center justify-between gap-3 pt-4">
                     <Meta art={a} />
                     <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-mist text-sea transition-all group-hover:bg-sea group-hover:text-foam">
@@ -206,7 +196,7 @@ export function ArticlesList({ onNavigate }: { onNavigate: Nav }) {
   );
 }
 
-/* ─────────────── صفحه‌ی خواندن مقاله (با آدرس اختصاصی) ─────────────── */
+/* ─────────────── صفحه‌ی خواندن مقاله ─────────────── */
 export function ArticleView({ id, onNavigate }: { id: string; onNavigate: Nav }) {
   const articles = useArticles();
   const art = articles.find((a) => a.id === id);
@@ -243,7 +233,6 @@ export function ArticleView({ id, onNavigate }: { id: string; onNavigate: Nav })
         </Reveal>
 
         <div className="mt-6 grid gap-8 lg:grid-cols-12">
-          {/* بدنه */}
           <div className="lg:col-span-8">
             <Reveal>
               <span
@@ -292,15 +281,12 @@ export function ArticleView({ id, onNavigate }: { id: string; onNavigate: Nav })
             </Reveal>
           </div>
 
-          {/* ستون کناری */}
           <aside className="lg:col-span-4">
             <Reveal delay={150}>
               <div className="overflow-hidden rounded-[18px] border border-sea/15 bg-card">
                 <Cover art={art} big />
                 <div className="p-5">
-                  <p className="text-[0.78rem] font-bold leading-7 text-inksoft">
-                    {art.excerpt}
-                  </p>
+                  <p className="text-[0.78rem] font-bold leading-7 text-inksoft">{art.excerpt}</p>
                   <div className="mt-4 space-y-2 text-[0.74rem] font-bold text-inksoft">
                     <p className="flex items-center justify-between">
                       <span>دسته‌بندی</span>
@@ -319,13 +305,13 @@ export function ArticleView({ id, onNavigate }: { id: string; onNavigate: Nav })
               </div>
             </Reveal>
 
-            {/* مقالات مرتبط */}
             {related.length > 0 && (
               <Reveal delay={230}>
                 <h3 className="font-display mt-8 text-xl text-pine">بیشتر بخوانید</h3>
                 <div className="mt-4 space-y-3">
                   {related.map((r) => {
                     const m = catMeta(r.category);
+                    const Ic = ICONS[m.icon] ?? IconNews;
                     return (
                       <button
                         key={r.id}
@@ -336,10 +322,7 @@ export function ArticleView({ id, onNavigate }: { id: string; onNavigate: Nav })
                           className="grid h-11 w-11 shrink-0 place-items-center rounded-[12px]"
                           style={{ background: `${m.color}18`, color: m.color }}
                         >
-                          {(() => {
-                            const Ic = ICONS[m.icon] ?? IconNews;
-                            return <Ic className="h-5 w-5" />;
-                          })()}
+                          <Ic className="h-5 w-5" />
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-[0.82rem] font-extrabold leading-6 text-pine transition-colors group-hover:text-seadeep">

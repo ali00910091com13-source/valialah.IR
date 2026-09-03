@@ -22,7 +22,7 @@ import {
 function InsurerTile({ ins, i }: { ins: Insurer; i: number }) {
   return (
     <Reveal delay={Math.min(i * 60, 360)}>
-      <div className="lift group relative h-full overflow-hidden rounded-[16px] border border-sea/15 bg-card p-5 pt-6 text-center">
+      <div className="card-lift group relative h-full overflow-hidden rounded-[16px] border border-sea/15 bg-card p-5 pt-6 text-center">
         <span
           className="absolute inset-x-0 top-0 h-1.5 transition-all duration-300 group-hover:h-2.5"
           style={{ background: ins.color }}
@@ -46,7 +46,7 @@ function InsurerTile({ ins, i }: { ins: Insurer; i: number }) {
 
 export function Insurance() {
   return (
-    <section id="insurance" className="relative overflow-hidden bg-paper py-14 sm:py-24">
+    <div className="relative overflow-hidden bg-paper py-14 sm:py-24">
       <div className="girih absolute inset-0 opacity-50" aria-hidden="true" />
       <div className="wrap relative">
         <Reveal>
@@ -60,14 +60,12 @@ export function Insurance() {
             </h2>
             <p className="mt-4 leading-8 text-inksoft">
               برای سهولت و رفاه بیشتر مراجعین، درمانگاه با{" "}
-              <b className="text-seadeep">کلیه بیمه‌های پایه و خدمات درمانی</b>، بیمه
-              نیروهای مسلح و طیف گسترده‌ای از بیمه‌های تکمیلی طرف قرارداد است؛ تا
-              دغدغه‌ی شما فقط سلامتی باشد.
+              <b className="text-seadeep">کلیه بیمه‌های پایه و خدمات درمانی</b>، بیمه نیروهای مسلح و
+              طیف گسترده‌ای از بیمه‌های تکمیلی طرف قرارداد است؛ تا دغدغه‌ی شما فقط سلامتی باشد.
             </p>
           </div>
         </Reveal>
 
-        {/* بیمه‌های پایه */}
         <Reveal delay={120}>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-2.5">
             <span className="text-[0.78rem] font-extrabold text-inksoft">بیمه‌های پایه:</span>
@@ -80,7 +78,6 @@ export function Insurance() {
           </div>
         </Reveal>
 
-        {/* دیوار بیمه‌های تکمیلی */}
         <Reveal delay={200}>
           <h3 className="font-display mt-10 text-center text-2xl text-seadeep sm:text-3xl">
             بیمه‌های تکمیلی طرف قرارداد
@@ -101,7 +98,6 @@ export function Insurance() {
           </Reveal>
         </div>
 
-        {/* نوار استعلام */}
         <Reveal delay={260}>
           <div className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-[16px] bg-pine px-5 py-5 text-foam sm:px-7">
             <p className="flex items-center gap-3 text-sm font-bold leading-7 sm:text-base">
@@ -114,23 +110,19 @@ export function Insurance() {
           </div>
         </Reveal>
       </div>
-    </section>
+    </div>
   );
 }
 
 /* ─────────────── تیم پزشکی (صفحه خانه) ─────────────── */
-export function Team({ onNavigate }: { onNavigate?: (id: TabId) => void }) {
+export function Team({ onNavigate }: { onNavigate?: (id: TabId, articleId?: string) => void }) {
   return (
-    <section id="team" className="relative scroll-mt-24 overflow-hidden bg-paper py-20 sm:py-24">
+    <section className="relative overflow-hidden bg-paper py-20 sm:py-24">
       <div className="wrap grid items-center gap-12 lg:grid-cols-2 lg:gap-10">
         <Reveal className="relative order-2 lg:order-1">
           <div className="arch-ring relative bg-gradient-to-b from-sea/25 to-transparent p-3">
             <div className="arch relative aspect-[4/4.4] overflow-hidden">
-              <img
-                src={IMG.team}
-                alt="تیم پزشکی درمانگاه خیریه آوای مهر ولی‌الله"
-                className="kenburns h-full w-full object-cover"
-              />
+              <img src={IMG.team} alt="تیم پزشکی درمانگاه خیریه آوای مهر ولی‌الله" className="kenburns h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-pine/50 via-transparent to-transparent" />
               <div className="absolute bottom-4 start-4 flex items-center gap-3 rounded-[12px] bg-card/95 px-4 py-3 shadow-lg">
                 <IconHeartPulse className="heartbeat h-6 w-6 text-sea" />
@@ -154,9 +146,9 @@ export function Team({ onNavigate }: { onNavigate?: (id: TabId) => void }) {
             </h2>
             <p className="mt-5 leading-8 text-inksoft">
               با حضور <b className="text-seadeep">{faNum(27)} پزشک متخصص و پزشک عمومی</b> و{" "}
-              <b className="text-seadeep">{faNum(15)} دندانپزشک مجرب</b>، درمانگاه آوای مهر
-              آمادگی کامل دارد تا با بهره‌گیری از دانش، تجربه و امکانات تخصصی،
-              خدمات تشخیصی و درمانی مورد نیاز مراجعین را ارائه نماید.
+              <b className="text-seadeep">{faNum(15)} دندانپزشک مجرب</b>، درمانگاه آوای مهر آمادگی
+              کامل دارد تا با بهره‌گیری از دانش، تجربه و امکانات تخصصی، خدمات تشخیصی و درمانی مورد
+              نیاز مراجعین را ارائه نماید.
             </p>
           </Reveal>
 
@@ -176,16 +168,7 @@ export function Team({ onNavigate }: { onNavigate?: (id: TabId) => void }) {
               <span className="font-display absolute -top-5 start-6 text-7xl leading-none text-gold">”</span>
               <p className="font-display text-2xl leading-relaxed text-seadeep">سلامت شما، اولویت ماست.</p>
               <footer className="mt-2 flex items-center gap-2 text-sm font-semibold text-inksoft">
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-4.5 w-4.5 text-sea"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
+                <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 text-sea" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M5.5 18.5c8.5 1 13.5-4.5 13.5-13.5-9.5 0-14.5 5.5-13.5 13.5z" />
                   <path d="M5.5 18.5c2.8-4.8 6.8-8.5 11.5-10.5" />
                 </svg>
@@ -196,12 +179,7 @@ export function Team({ onNavigate }: { onNavigate?: (id: TabId) => void }) {
 
           <Reveal delay={300}>
             <div className="mt-6 flex flex-wrap items-center gap-4">
-              <a
-                href={CONTACT.instagram}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-line py-2.5! text-sm"
-              >
+              <a href={CONTACT.instagram} target="_blank" rel="noreferrer" className="btn btn-line py-2.5! text-sm">
                 <IconInstagram className="h-4.5 w-4.5" />
                 <span dir="ltr">@{CONTACT.instagramId}</span>
               </a>

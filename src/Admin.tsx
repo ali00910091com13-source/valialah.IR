@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import {
   DOCTOR_SPECS,
   ARTICLE_CATS,
@@ -8,6 +8,7 @@ import {
   readMinutes,
   type Doctor,
   type Article,
+  type SpecId,
 } from "./data";
 import {
   useDoctors,
@@ -30,7 +31,7 @@ import {
   isDefaultArticles,
   newArticleId,
 } from "./articleStore";
-import { isEmbeddedCfg, ARTICLES_SQL } from "./cloud";
+import { isEmbeddedCfg, SETUP_SQL, ARTICLES_SQL } from "./cloud";
 import ImagePicker from "./ImagePicker";
 import {
   IconGear,
@@ -52,16 +53,12 @@ const PASS = "avayemehr";
 const AUTH_KEY = "aavm-admin-auth";
 
 const SPEC_LABEL = Object.fromEntries(DOCTOR_SPECS.map((s) => [s.id, s.label]));
-const TINTS = [
-  "#d69a25", "#0e7c74", "#b65a45", "#5d7c2e", "#24408e",
-  "#8a5a12", "#0e7490", "#5b5bd6", "#b03052", "#12a594",
-];
+const TINTS = ["#d69a25", "#1ba396", "#b65a45", "#5d7c2e", "#24408e", "#8a5a12", "#0e7490", "#5b5bd6", "#b03052", "#12a594", "#2f7d4f", "#1f6fb2", "#cf7a1c"];
 const tintOf = (spec: string) => {
   const i = DOCTOR_SPECS.findIndex((s) => s.id === spec);
   return TINTS[(i < 0 ? 0 : i) % TINTS.length];
 };
-const monoOf = (name: string) =>
-  name.replace(/^دکتر\s*/, "").replace(/^مهندس\s*/, "").trim().charAt(0) || "؟";
+const monoOf = (name: string) => name.replace(/^دکتر\s*/, "").trim().charAt(0) || "؟";
 
 const inputCls =
   "w-full rounded-[10px] border border-foam/15 bg-pine2 px-3.5 py-2.5 text-sm text-foam outline-none transition-all placeholder:text-foam/35 focus:border-gold focus:shadow-[0_0_0_3px_rgba(214,154,37,0.18)]";
@@ -86,12 +83,7 @@ export default function Admin() {
           }}
         />
       ) : (
-        <Gate
-          onOk={() => {
-            sessionStorage.setItem(AUTH_KEY, "1");
-            setAuthed(true);
-          }}
-        />
+        <Gate onOk={() => setAuthed(true)} />
       )}
     </div>
   );
@@ -104,8 +96,10 @@ function Gate({ onOk }: { onOk: () => void }) {
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    if (pass === PASS) onOk();
-    else {
+    if (pass === PASS) {
+      sessionStorage.setItem(AUTH_KEY, "1");
+      onOk();
+    } else {
       setErr(true);
       setPass("");
       setTimeout(() => setErr(false), 600);
@@ -156,31 +150,21 @@ function Gate({ onOk }: { onOk: () => void }) {
 
 /* ─────────────── داشبورد ─────────────── */
 function Dashboard({ onLogout }: { onLogout: () => void }) {
-  const [mode, setMode] = useState<"doctors" | "articles">("doctors");
+  const [panel, setPanel] = useState<"doctors" | "articles">("doctors");
   const [toast, setToast] = useState<Toast | null>(null);
+  const doctors = useDoctors();
+  const articles = useArticles();
 
   const notify = (msg: string, kind: "ok" | "err" = "ok") => {
     setToast({ msg, kind });
     window.setTimeout(() => setToast(null), 3200);
   };
 
-  const doctors = useDoctors();
-  const articles = useArticles();
-  const doctorsSync = useSyncState();
-  const articlesSync = useArticleSync();
-
-  const worst: "cloud" | "loading" | "error" =
-    doctorsSync === "error" || articlesSync === "error"
-      ? "error"
-      : doctorsSync === "loading" || articlesSync === "loading"
-        ? "loading"
-        : "cloud";
-
   return (
     <div className="relative">
       {toast && (
         <div
-          className={`menu-pop fixed bottom-5 start-1/2 z-[90] translate-x-1/2 rounded-full border px-5 py-3 text-sm font-extrabold shadow-2xl ${
+          className={`menu-pop fixed bottom-5 start-1/2 z-[90] w-max max-w-[92vw] translate-x-1/2 rounded-full border px-5 py-3 text-center text-sm font-extrabold shadow-2xl ${
             toast.kind === "ok"
               ? "border-teal/50 bg-seadeep text-foam"
               : "border-clay/60 bg-[#5a2015] text-[#f6d3c8]"
@@ -191,7 +175,6 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
         </div>
       )}
 
-      {/* سربرگ */}
       <header className="sticky top-0 z-40 border-b border-foam/10 bg-pine/90 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3.5 sm:px-6">
           <div className="flex items-center gap-3">
@@ -201,7 +184,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
             <div>
               <span className="font-display block text-lg leading-6">کنسول مدیریت</span>
               <span className="block text-[0.68rem] text-foam/50">
-                پزشکان و مقالات — تغییرات برای همه‌ی بازدیدکنندگان منتشر می‌شود
+                آوای مهر ولی‌الله — پزشکان: {faNum(doctors.length)} • مقالات: {faNum(articles.length)}
               </span>
             </div>
           </div>
@@ -215,149 +198,42 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
             </button>
           </div>
         </div>
-      </header>
-
-      <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-8 sm:px-6">
-        {/* ── وضعیت همگام‌سازی ── */}
-        <SyncBar worst={worst} doctorsSync={doctorsSync} articlesSync={articlesSync} onToast={notify} />
-
-        {/* ── انتخاب بخش ── */}
-        <div className="mt-6 flex w-full max-w-md rounded-full border border-foam/15 bg-pine2/70 p-1.5">
-          {(
-            [
-              { id: "doctors", label: "پزشکان", n: doctors.length, Ic: IconDoctor },
-              { id: "articles", label: "مقالات", n: articles.length, Ic: IconNews },
-            ] as const
-          ).map((m) => {
-            const active = mode === m.id;
-            return (
-              <button
-                key={m.id}
-                onClick={() => setMode(m.id)}
-                className={`flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-extrabold transition-all duration-200 ${
-                  active ? "bg-gold text-pine shadow-lg" : "text-foam/60 hover:text-foam"
-                }`}
-              >
-                <m.Ic className="h-4.5 w-4.5" />
-                {m.label}
-                <span className={`rounded-full px-2 py-0.5 text-[0.66rem] ${active ? "bg-pine/15" : "bg-foam/10"}`}>
-                  {faNum(m.n)}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {mode === "doctors" ? <DoctorsPanel onToast={notify} /> : <ArticlesPanel onToast={notify} />}
-      </main>
-    </div>
-  );
-}
-
-/* ─────────────── نوار وضعیت ابری ─────────────── */
-function SyncBar({
-  worst,
-  doctorsSync,
-  articlesSync,
-  onToast,
-}: {
-  worst: "cloud" | "loading" | "error";
-  doctorsSync: string;
-  articlesSync: string;
-  onToast: (msg: string, kind?: "ok" | "err") => void;
-}) {
-  const [publishing, setPublishing] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const embedded = isEmbeddedCfg();
-
-  const meta =
-    worst === "cloud"
-      ? {
-          text: "متصل به فضای ابری — هر تغییر، همان لحظه برای همه منتشر می‌شود",
-          cls: "border-sea/50 bg-sea/15 text-[#7fd6cb]",
-          dot: "bg-teal pulse-ring",
-        }
-      : worst === "loading"
-        ? {
-            text: "در حال دریافت فهرست مشترک از فضای ابری…",
-            cls: "border-foam/20 bg-foam/5 text-foam/80",
-            dot: "bg-foam/70 pulse-ring",
-          }
-        : {
-            text: "ارتباط با فضای ابری برقرار نشد — تغییرات فقط در همین مرورگر ذخیره می‌شود",
-            cls: "border-clay/50 bg-clay/10 text-[#f0b3a3]",
-            dot: "bg-clay",
-          };
-
-  const publish = async () => {
-    setPublishing(true);
-    const ok1 = await publishNow();
-    const ok2 = await publishArticlesNow();
-    setPublishing(false);
-    onToast(
-      ok1 && ok2
-        ? "پزشکان و مقالات برای همه منتشر شد ✅"
-        : ok1 || ok2
-          ? "بخشی از انتشار انجام شد؛ برای بخش ناموفق، SQL را بررسی کنید ❌"
-          : "انتشار ناموفق بود — اتصال را بررسی کنید ❌",
-      ok1 && ok2 ? "ok" : "err",
-    );
-  };
-
-  return (
-    <section className="rounded-[18px] border border-foam/10 bg-pine2/70 px-4 py-3.5 sm:px-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <span className={`flex items-center gap-2.5 rounded-full border px-3.5 py-1.5 text-[0.74rem] font-extrabold ${meta.cls}`}>
-          <span className={`h-2 w-2 shrink-0 rounded-full ${meta.dot}`} />
-          {meta.text}
-        </span>
-        <button
-          onClick={publish}
-          disabled={publishing}
-          className="flex items-center gap-1.5 rounded-[10px] bg-gold px-3.5 py-2 text-[0.76rem] font-extrabold text-pine transition-all hover:bg-golddeep hover:text-goldsoft active:scale-95 disabled:opacity-60"
-        >
-          <IconRefresh className={`h-4 w-4 ${publishing ? "animate-spin" : ""}`} />
-          {publishing ? "در حال انتشار…" : "انتشار فوری"}
-        </button>
-      </div>
-
-      {/* جدول مقالات ساخته نشده؟ */}
-      {doctorsSync !== "error" && articlesSync === "error" && (
-        <div className="mt-3 rounded-[12px] border border-clay/50 bg-clay/10 p-4">
-          <p className="text-[0.76rem] font-bold leading-7 text-[#f0b3a3]">
-            جدول <span dir="ltr">doctors</span> کار می‌کند ولی جدول <span dir="ltr">articles</span> هنوز در
-            دیتابیس ساخته نشده. این کد را یک‌بار در <b>SQL Editor</b> پروژه‌ی Supabase اجرا (Run) کنید،
-            سپس «انتشار فوری» را بزنید:
-          </p>
-          <div className="relative mt-2.5">
-            <pre dir="ltr" className="no-scrollbar overflow-x-auto rounded-[12px] border border-foam/10 bg-[#082a2c] p-4 text-left text-[0.68rem] leading-6 text-[#9fdcd3]">
-              {ARTICLES_SQL}
-            </pre>
-            <button
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(ARTICLES_SQL);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                } catch {
-                  /* clipboard در دسترس نیست */
-                }
-              }}
-              className="absolute left-2.5 top-2.5 flex items-center gap-1.5 rounded-[8px] bg-gold px-2.5 py-1.5 text-[0.66rem] font-extrabold text-pine transition-all hover:bg-golddeep hover:text-goldsoft active:scale-95"
-            >
-              {copied ? <IconCheck className="h-3.5 w-3.5" strokeWidth={2.4} /> : <IconPlus className="h-3.5 w-3.5 rotate-45" strokeWidth={2.4} />}
-              {copied ? "کپی شد" : "کپی کد"}
-            </button>
+        {/* سوییچر بخش‌ها */}
+        <div className="mx-auto w-full max-w-6xl px-4 pb-3 sm:px-6">
+          <div className="flex w-max gap-1.5 rounded-[13px] border border-foam/12 bg-pine2/70 p-1.5">
+            {(
+              [
+                { id: "doctors", label: "پزشکان", icon: IconDoctor, n: doctors.length },
+                { id: "articles", label: "مقالات", icon: IconNews, n: articles.length },
+              ] as const
+            ).map((p) => {
+              const active = panel === p.id;
+              const Ic = p.icon;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setPanel(p.id)}
+                  className={`flex items-center gap-2 rounded-[10px] px-4 py-2 text-sm font-extrabold transition-all ${
+                    active ? "bg-gold text-pine shadow" : "text-foam/60 hover:bg-foam/5 hover:text-foam"
+                  }`}
+                >
+                  <Ic className="h-4.5 w-4.5" />
+                  {p.label}
+                  <span className={`rounded-full px-1.5 py-0.5 text-[0.62rem] ${active ? "bg-pine/15" : "bg-foam/10"}`}>
+                    {faNum(p.n)}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
-      )}
+      </header>
 
-      {embedded && (
-        <p className="mt-3 text-[0.66rem] font-bold leading-6 text-foam/40">
-          اتصال ابری داخل خود سایت پیکربندی شده؛ نیازی به وارد کردن آدرس و کلید نیست.
-        </p>
-      )}
-    </section>
+      <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-6 sm:px-6">
+        <CloudPanel onToast={notify} />
+        {panel === "doctors" ? <DoctorsPanel onToast={notify} /> : <ArticlesPanel onToast={notify} />}
+      </main>
+    </div>
   );
 }
 
@@ -380,140 +256,159 @@ function DoctorsPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err")
       });
   }, [doctors, query, spec]);
 
+  const dentists = doctors.filter((d) => d.spec === "dent").length;
+  const specCount = new Set(doctors.map((d) => d.spec)).size;
+
   return (
-    <div className="mt-8 grid gap-6 lg:grid-cols-5">
-      <section className="scroll-mt-24 rounded-[20px] border border-foam/10 bg-pine2/70 p-5 lg:col-span-2 lg:sticky lg:top-24 lg:self-start">
-        <DoctorForm
-          editing={editing}
-          doctors={doctors}
-          onDone={(msg) => {
-            setEditing(null);
-            onToast(msg);
-          }}
-          onCancel={() => setEditing(null)}
-        />
-      </section>
-
-      <section className="lg:col-span-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-display flex items-center gap-2.5 text-2xl">
-            <IconDoctor className="h-6 w-6 text-gold" />
-            فهرست پزشکان
-            <span className="rounded-full bg-foam/10 px-2.5 py-0.5 text-[0.72rem] font-bold text-foam/70">
-              {faNum(list.length)} نفر
+    <>
+      <div className="mt-6 grid grid-cols-3 gap-3">
+        {[
+          { n: doctors.length, label: "پزشک و متخصص", tint: "#d69a25" },
+          { n: dentists, label: "دندانپزشک", tint: "#1ba396" },
+          { n: specCount, label: "تخصص فعال", tint: "#b65a45" },
+        ].map((s) => (
+          <div key={s.label} className="relative overflow-hidden rounded-[16px] border border-foam/10 bg-pine2/70 px-4 py-4">
+            <span className="absolute inset-y-0 start-0 w-1" style={{ background: s.tint }} aria-hidden="true" />
+            <span className="font-display block text-3xl sm:text-4xl" style={{ color: s.tint }}>
+              {faNum(s.n)}
             </span>
-          </h2>
-          {!isDefaultList() && (
-            <button
-              onClick={() => {
-                if (window.confirm("فهرست پزشکان به حالت پیش‌فرض سایت برگردد؟")) {
-                  resetDoctors();
-                  onToast("فهرست به حالت پیش‌فرض برگشت");
-                }
-              }}
-              className="flex items-center gap-1.5 rounded-[10px] border border-clay/50 bg-clay/10 px-3.5 py-2 text-[0.74rem] font-extrabold text-[#f0b3a3] transition-colors hover:bg-clay/20"
-            >
-              <IconRefresh className="h-4 w-4" />
-              بازنشانی پیش‌فرض
-            </button>
-          )}
-        </div>
-
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-          <div className="relative flex-1">
-            <IconSearch className="pointer-events-none absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-foam/40" />
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="جستجوی نام پزشک…" className={`${inputCls} pr-10`} />
+            <span className="mt-1 block text-[0.7rem] font-bold text-foam/55 sm:text-[0.78rem]">{s.label}</span>
           </div>
-          <select value={spec} onChange={(e) => setSpec(e.target.value)} className={`${inputCls} sm:w-48`}>
-            <option value="all">همه تخصص‌ها</option>
-            {DOCTOR_SPECS.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        ))}
+      </div>
 
-        <div className="mt-4 space-y-2.5">
-          {list.length === 0 && (
-            <div className="rounded-[16px] border border-dashed border-foam/20 p-10 text-center text-sm font-bold text-foam/50">
-              موردی یافت نشد.
+      <div className="mt-8 grid gap-6 lg:grid-cols-5">
+        <section className="scroll-mt-24 rounded-[20px] border border-foam/10 bg-pine2/70 p-5 lg:col-span-2 lg:sticky lg:top-40 lg:self-start">
+          <DoctorForm
+            editing={editing}
+            doctors={doctors}
+            onDone={(msg) => {
+              setEditing(null);
+              onToast(msg);
+            }}
+            onCancel={() => setEditing(null)}
+          />
+        </section>
+
+        <section className="lg:col-span-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="font-display flex items-center gap-2.5 text-2xl">
+              <IconDoctor className="h-6 w-6 text-gold" />
+              فهرست پزشکان
+              <span className="rounded-full bg-foam/10 px-2.5 py-0.5 text-[0.72rem] font-bold text-foam/70">
+                {faNum(list.length)} نفر
+              </span>
+            </h2>
+            {!isDefaultList() && (
+              <button
+                onClick={() => {
+                  if (window.confirm("فهرست پزشکان به حالت پیش‌فرض سایت برگردد؟ تغییرات شما پاک می‌شود.")) {
+                    resetDoctors();
+                    onToast("فهرست به حالت پیش‌فرض برگشت");
+                  }
+                }}
+                className="flex items-center gap-1.5 rounded-[10px] border border-clay/50 bg-clay/10 px-3.5 py-2 text-[0.74rem] font-extrabold text-[#f0b3a3] transition-colors hover:bg-clay/20"
+              >
+                <IconRefresh className="h-4 w-4" />
+                بازنشانی پیش‌فرض
+              </button>
+            )}
+          </div>
+
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+            <div className="relative flex-1">
+              <IconSearch className="pointer-events-none absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-foam/40" />
+              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="جستجوی نام پزشک…" className={`${inputCls} pr-10`} />
             </div>
-          )}
-          {list.map(({ d, i }) => (
-            <div
-              key={`${d.name}-${i}`}
-              className={`fadeup flex flex-wrap items-center gap-3.5 rounded-[14px] border px-4 py-3 transition-colors sm:flex-nowrap ${
-                editing === i ? "border-gold/60 bg-gold/10" : "border-foam/10 bg-pine2/60 hover:border-foam/25"
-              }`}
-            >
-              {d.photo ? (
-                <img src={d.photo} alt={d.name} className="h-12 w-12 shrink-0 rounded-[13px] border border-foam/20 object-cover" />
-              ) : (
-                <span
-                  className="font-display grid h-12 w-12 shrink-0 place-items-center rounded-[13px] text-xl"
-                  style={{ background: `${tintOf(d.spec)}22`, color: tintOf(d.spec) }}
-                >
-                  {monoOf(d.name)}
-                </span>
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-display text-lg leading-6">{d.name}</span>
-                  <span className="rounded-full px-2 py-0.5 text-[0.64rem] font-extrabold" style={{ background: `${tintOf(d.spec)}22`, color: tintOf(d.spec) }}>
-                    {SPEC_LABEL[d.spec] ?? d.spec}
-                  </span>
-                </div>
-                <p className="mt-0.5 truncate text-[0.78rem] text-foam/60">
-                  {d.title}
-                  {d.focus ? ` • ${d.focus}` : ""}
-                </p>
-              </div>
-              <div className="flex shrink-0 items-center gap-1.5">
-                {confirming === i ? (
-                  <>
-                    <span className="text-[0.72rem] font-bold text-[#f0b3a3]">حذف شود؟</span>
-                    <button
-                      onClick={() => {
-                        removeDoctor(i);
-                        setConfirming(null);
-                        onToast(`«${d.name}» حذف شد`, "err");
-                      }}
-                      className="rounded-[9px] bg-clay px-3 py-1.5 text-[0.72rem] font-extrabold text-foam transition-transform active:scale-95"
-                    >
-                      بله
-                    </button>
-                    <button onClick={() => setConfirming(null)} className="rounded-[9px] border border-foam/20 px-3 py-1.5 text-[0.72rem] font-bold text-foam/70 hover:bg-foam/10">
-                      انصراف
-                    </button>
-                  </>
+            <select value={spec} onChange={(e) => setSpec(e.target.value)} className={`${inputCls} sm:w-48`}>
+              <option value="all">همه تخصص‌ها</option>
+              {DOCTOR_SPECS.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="mt-4 space-y-2.5">
+            {list.length === 0 && (
+              <div className="rounded-[16px] border border-dashed border-foam/20 p-10 text-center text-sm font-bold text-foam/50">موردی یافت نشد.</div>
+            )}
+            {list.map(({ d, i }) => (
+              <div
+                key={`${d.name}-${i}`}
+                className={`fadeup group flex flex-wrap items-center gap-3.5 rounded-[14px] border px-4 py-3 transition-colors sm:flex-nowrap ${
+                  editing === i ? "border-gold/60 bg-gold/10" : "border-foam/10 bg-pine2/60 hover:border-foam/25"
+                }`}
+              >
+                {d.photo ? (
+                  <img src={d.photo} alt={d.name} className="h-12 w-12 shrink-0 rounded-[13px] border border-foam/20 object-cover" />
                 ) : (
-                  <>
-                    <button
-                      onClick={() => {
-                        setEditing(i);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      aria-label={`ویرایش ${d.name}`}
-                      className="grid h-9 w-9 place-items-center rounded-[10px] border border-foam/15 text-foam/70 transition-colors hover:border-gold hover:text-gold"
-                    >
-                      <IconEdit className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => setConfirming(i)}
-                      aria-label={`حذف ${d.name}`}
-                      className="grid h-9 w-9 place-items-center rounded-[10px] border border-foam/15 text-foam/70 transition-colors hover:border-clay hover:text-[#f0b3a3]"
-                    >
-                      <IconTrash className="h-4 w-4" />
-                    </button>
-                  </>
+                  <span
+                    className="font-display grid h-12 w-12 shrink-0 place-items-center rounded-[13px] text-xl"
+                    style={{ background: `${tintOf(d.spec)}22`, color: tintOf(d.spec) }}
+                  >
+                    {monoOf(d.name)}
+                  </span>
                 )}
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-display text-lg leading-6">{d.name}</span>
+                    <span className="rounded-full px-2 py-0.5 text-[0.64rem] font-extrabold" style={{ background: `${tintOf(d.spec)}22`, color: tintOf(d.spec) }}>
+                      {SPEC_LABEL[d.spec] ?? d.spec}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 truncate text-[0.78rem] text-foam/60">
+                    {d.title}
+                    {d.focus ? ` • ${d.focus}` : ""}
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-1.5">
+                  {confirming === i ? (
+                    <>
+                      <span className="text-[0.72rem] font-bold text-[#f0b3a3]">حذف شود؟</span>
+                      <button
+                        onClick={() => {
+                          removeDoctor(i);
+                          setConfirming(null);
+                          onToast(`«${d.name}» حذف شد`, "err");
+                        }}
+                        className="rounded-[9px] bg-clay px-3 py-1.5 text-[0.72rem] font-extrabold text-foam transition-transform active:scale-95"
+                      >
+                        بله
+                      </button>
+                      <button onClick={() => setConfirming(null)} className="rounded-[9px] border border-foam/20 px-3 py-1.5 text-[0.72rem] font-bold text-foam/70 hover:bg-foam/10">
+                        انصراف
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          setEditing(i);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        aria-label={`ویرایش ${d.name}`}
+                        className="grid h-9 w-9 place-items-center rounded-[10px] border border-foam/15 text-foam/70 transition-colors hover:border-gold hover:text-gold"
+                      >
+                        <IconEdit className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => setConfirming(i)}
+                        aria-label={`حذف ${d.name}`}
+                        className="grid h-9 w-9 place-items-center rounded-[10px] border border-foam/15 text-foam/70 transition-colors hover:border-clay hover:text-[#f0b3a3]"
+                      >
+                        <IconTrash className="h-4 w-4" />
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </>
   );
 }
 
@@ -529,12 +424,11 @@ function DoctorForm({
   onDone: (msg: string) => void;
   onCancel: () => void;
 }) {
-  const empty = { name: "", spec: DOCTOR_SPECS[0].id as string, title: "", focus: "", photo: "" };
+  const empty = { name: "", spec: DOCTOR_SPECS[0].id as SpecId, title: "", focus: "", photo: "" };
   const [form, setForm] = useState(empty);
   const [errs, setErrs] = useState<{ name?: boolean; title?: boolean }>({});
-  const [photoErr, setPhotoErr] = useState("");
-  const fileRef = useRef<HTMLInputElement>(null);
   const [loadedFor, setLoadedFor] = useState<number | null>(null);
+  const sync = useSyncState();
 
   if (editing !== null && loadedFor !== editing) {
     const d = doctors[editing];
@@ -551,69 +445,35 @@ function DoctorForm({
   }
 
   const isEdit = editing !== null;
-
-  const onPickFile = (file: File | undefined) => {
-    setPhotoErr("");
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setPhotoErr("فایل انتخابی تصویر نیست؛ لطفاً JPG یا PNG انتخاب کنید.");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const max = 360;
-        const scale = Math.min(1, max / Math.max(img.width, img.height));
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          setForm((f) => ({ ...f, photo: String(reader.result) }));
-          return;
-        }
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        setForm((f) => ({ ...f, photo: canvas.toDataURL("image/jpeg", 0.82) }));
-      };
-      img.onerror = () => setPhotoErr("خواندن تصویر ممکن نشد؛ فایل دیگری امتحان کنید.");
-      img.src = String(reader.result);
-    };
-    reader.onerror = () => setPhotoErr("خواندن فایل ممکن نشد.");
-    reader.readAsDataURL(file);
-  };
+  const field = (bad?: boolean) => `${inputCls} ${bad ? "border-clay! shadow-[0_0_0_3px_rgba(182,90,69,0.18)]" : ""}`;
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const name = form.name.trim();
     const title = form.title.trim();
-    const next: { name?: boolean; title?: boolean } = {};
-    if (!name) next.name = true;
-    if (!title) next.title = true;
+    const next = { name: !name || undefined, title: !title || undefined };
     setErrs(next);
     if (next.name || next.title) return;
 
     const doc: Doctor = {
       name,
-      spec: form.spec as Doctor["spec"],
+      spec: form.spec,
       title,
       focus: form.focus.trim() || undefined,
       photo: form.photo.trim() || undefined,
     };
     if (isEdit) {
       updateDoctor(editing, doc);
-      onDone(`تغییرات «${name}» ذخیره و منتشر شد`);
+      onDone(`تغییرات «${name}» ذخیره شد${sync === "cloud" ? " و برای همه منتشر شد" : ""}`);
     } else {
       addDoctor(doc);
-      onDone(`«${name}» به فهرست پزشکان اضافه و منتشر شد`);
+      onDone(`«${name}» به فهرست پزشکان اضافه شد${sync === "cloud" ? " و برای همه منتشر شد" : ""}`);
     }
     setForm(empty);
   };
 
-  const field = (bad?: boolean) => `${inputCls} ${bad ? "border-clay! shadow-[0_0_0_3px_rgba(182,90,69,0.18)]" : ""}`;
-
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={submit} id="admin-form" className="scroll-mt-44">
       <div className="flex items-center justify-between gap-3">
         <h3 className="font-display flex items-center gap-2.5 text-2xl">
           <span className={`grid h-9 w-9 place-items-center rounded-[11px] ${isEdit ? "bg-gold/20 text-gold" : "bg-sea/25 text-[#7fd6cb]"}`}>
@@ -646,7 +506,7 @@ function DoctorForm({
 
         <div>
           <label className={labelCls}>تخصص *</label>
-          <select value={form.spec} onChange={(e) => setForm({ ...form, spec: e.target.value })} className={inputCls}>
+          <select value={form.spec} onChange={(e) => setForm({ ...form, spec: e.target.value as SpecId })} className={inputCls}>
             {DOCTOR_SPECS.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.label}
@@ -671,68 +531,12 @@ function DoctorForm({
 
         <div>
           <label className={labelCls}>حوزه تمرکز (اختیاری)</label>
-          <input
-            value={form.focus}
-            onChange={(e) => setForm({ ...form, focus: e.target.value })}
-            placeholder="مثلاً: بیماری‌های گوارشی"
-            className={inputCls}
-          />
+          <input value={form.focus} onChange={(e) => setForm({ ...form, focus: e.target.value })} placeholder="مثلاً: بیماری‌های گوارشی" className={inputCls} />
         </div>
 
         <div>
           <label className={labelCls}>عکس پزشک (اختیاری)</label>
-          <div className="flex items-center gap-3">
-            <span className={`grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border-2 ${form.photo ? "border-gold" : "border-foam/15"} bg-pine2`}>
-              {form.photo ? (
-                <img src={form.photo} alt="پیش‌نمایش عکس پزشک" className="h-full w-full object-cover" />
-              ) : (
-                <IconDoctor className="h-6 w-6 text-foam/30" />
-              )}
-            </span>
-            <div className="min-w-0 flex-1 space-y-2">
-              <input
-                dir="ltr"
-                value={form.photo}
-                onChange={(e) => {
-                  setForm({ ...form, photo: e.target.value });
-                  setPhotoErr("");
-                }}
-                placeholder="آدرس اینترنتی عکس (URL)…"
-                className={inputCls}
-              />
-              <div className="flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-1.5 rounded-[9px] border border-gold/50 bg-gold/10 px-3 py-1.5 text-[0.72rem] font-extrabold text-gold transition-colors hover:bg-gold/20"
-                >
-                  <IconPlus className="h-3.5 w-3.5" strokeWidth={2.2} />
-                  بارگذاری از دستگاه
-                </button>
-                {form.photo && (
-                  <button
-                    type="button"
-                    onClick={() => setForm({ ...form, photo: "" })}
-                    className="flex items-center gap-1.5 rounded-[9px] border border-clay/50 bg-clay/10 px-3 py-1.5 text-[0.72rem] font-extrabold text-[#f0b3a3] transition-colors hover:bg-clay/20"
-                  >
-                    <IconTrash className="h-3.5 w-3.5" />
-                    حذف عکس
-                  </button>
-                )}
-              </div>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  onPickFile(e.target.files?.[0]);
-                  e.target.value = "";
-                }}
-              />
-            </div>
-          </div>
-          {photoErr && <p className={errCls}>{photoErr}</p>}
+          <ImagePicker value={form.photo} onChange={(v) => setForm({ ...form, photo: v })} />
         </div>
       </div>
 
@@ -740,15 +544,22 @@ function DoctorForm({
         {isEdit ? (
           <>
             <IconCheck className="h-4.5 w-4.5" strokeWidth={2.2} />
-            ذخیره و انتشار
+            ذخیره تغییرات
           </>
         ) : (
           <>
             <IconPlus className="h-4.5 w-4.5" strokeWidth={2.2} />
-            افزودن و انتشار
+            افزودن به فهرست
           </>
         )}
       </button>
+
+      <p className="mt-3 flex items-start gap-2 text-[0.7rem] leading-6 text-foam/45">
+        <IconGear className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        {sync === "cloud"
+          ? "اتصال ابری برقرار است؛ تغییرات همان لحظه برای همه‌ی بازدیدکنندگان منتشر می‌شود."
+          : "اتصال ابری برقرار نیست یا در حال بارگذاری است؛ تغییرات فعلاً در همین مرورگر ذخیره می‌شود."}
+      </p>
     </form>
   );
 }
@@ -756,6 +567,7 @@ function DoctorForm({
 /* ─────────────── پنل مقالات ─────────────── */
 function ArticlesPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") => void }) {
   const articles = useArticles();
+  const sync = useArticleSync();
   const [query, setQuery] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<string | null>(null);
@@ -767,7 +579,7 @@ function ArticlesPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err"
 
   return (
     <div className="mt-8 grid gap-6 lg:grid-cols-5">
-      <section className="scroll-mt-24 rounded-[20px] border border-foam/10 bg-pine2/70 p-5 lg:col-span-2 lg:sticky lg:top-24 lg:self-start">
+      <section className="scroll-mt-24 rounded-[20px] border border-foam/10 bg-pine2/70 p-5 lg:col-span-2 lg:sticky lg:top-40 lg:self-start">
         <ArticleForm
           editingId={editingId}
           articles={articles}
@@ -783,59 +595,64 @@ function ArticlesPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err"
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display flex items-center gap-2.5 text-2xl">
             <IconNews className="h-6 w-6 text-gold" />
-            مقالات منتشرشده
-            <span className="rounded-full bg-foam/10 px-2.5 py-0.5 text-[0.72rem] font-bold text-foam/70">
-              {faNum(list.length)} مورد
-            </span>
+            فهرست مقالات
+            <span className="rounded-full bg-foam/10 px-2.5 py-0.5 text-[0.72rem] font-bold text-foam/70">{faNum(list.length)}</span>
           </h2>
-          {!isDefaultArticles() && (
-            <button
-              onClick={() => {
-                if (window.confirm("مقالات به حالت پیش‌فرض سایت برگردند؟")) {
-                  resetArticles();
-                  onToast("مقالات به حالت پیش‌فرض برگشتند");
-                }
-              }}
-              className="flex items-center gap-1.5 rounded-[10px] border border-clay/50 bg-clay/10 px-3.5 py-2 text-[0.74rem] font-extrabold text-[#f0b3a3] transition-colors hover:bg-clay/20"
-            >
-              <IconRefresh className="h-4 w-4" />
-              بازنشانی پیش‌فرض
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {!isDefaultArticles() && (
+              <button
+                onClick={() => {
+                  if (window.confirm("مقالات به حالت پیش‌فرض سایت برگردند؟ تغییرات شما پاک می‌شود.")) {
+                    resetArticles();
+                    onToast("مقالات به حالت پیش‌فرض برگشتند");
+                  }
+                }}
+                className="flex items-center gap-1.5 rounded-[10px] border border-clay/50 bg-clay/10 px-3.5 py-2 text-[0.74rem] font-extrabold text-[#f0b3a3] transition-colors hover:bg-clay/20"
+              >
+                <IconRefresh className="h-4 w-4" />
+                بازنشانی
+              </button>
+            )}
+            {sync !== "cloud" && !isEmbeddedCfg() && (
+              <button
+                onClick={async () => {
+                  const ok = await publishArticlesNow();
+                  onToast(ok ? "مقالات برای همه منتشر شد ✅" : "انتشار ناموفق بود ❌", ok ? "ok" : "err");
+                }}
+                className="flex items-center gap-1.5 rounded-[10px] bg-gold px-3.5 py-2 text-[0.74rem] font-extrabold text-pine transition-all hover:bg-golddeep hover:text-goldsoft active:scale-95"
+              >
+                <IconRefresh className="h-4 w-4" />
+                انتشار فوری
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="mt-4 relative">
+        <div className="relative mt-4">
           <IconSearch className="pointer-events-none absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-foam/40" />
           <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="جستجوی عنوان مقاله…" className={`${inputCls} pr-10`} />
         </div>
 
         <div className="mt-4 space-y-2.5">
           {list.length === 0 && (
-            <div className="rounded-[16px] border border-dashed border-foam/20 p-10 text-center text-sm font-bold text-foam/50">
-              موردی یافت نشد.
-            </div>
+            <div className="rounded-[16px] border border-dashed border-foam/20 p-10 text-center text-sm font-bold text-foam/50">مقاله‌ای یافت نشد.</div>
           )}
           {list.map((a) => (
             <div
               key={a.id}
-              className={`fadeup flex flex-wrap items-center gap-3.5 rounded-[14px] border px-4 py-3.5 transition-colors sm:flex-nowrap ${
+              className={`fadeup flex flex-wrap items-center gap-3.5 rounded-[14px] border px-4 py-3 transition-colors sm:flex-nowrap ${
                 editingId === a.id ? "border-gold/60 bg-gold/10" : "border-foam/10 bg-pine2/60 hover:border-foam/25"
               }`}
             >
               {a.cover ? (
                 <img src={a.cover} alt="" className="h-12 w-12 shrink-0 rounded-[13px] border border-foam/20 object-cover" />
               ) : (
-                <span
-                  className="font-display grid h-12 w-12 shrink-0 place-items-center rounded-[13px] text-lg"
-                  style={{ background: "#0e7c7422", color: "#7fd6cb" }}
-                >
+                <span className="font-display grid h-12 w-12 shrink-0 place-items-center rounded-[13px] text-lg" style={{ background: "#0e7c7422", color: "#7fd6cb" }}>
                   {a.title.trim().charAt(0)}
                 </span>
               )}
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-display truncate text-lg leading-6">{a.title}</span>
-                </div>
+                <span className="font-display block truncate text-lg leading-6">{a.title}</span>
                 <p className="mt-0.5 truncate text-[0.76rem] text-foam/60">
                   {a.category} • {a.date} • {faNum(readMinutes(a.body))} دقیقه مطالعه
                 </p>
@@ -910,6 +727,7 @@ function ArticleForm({
   const [form, setForm] = useState(empty);
   const [errs, setErrs] = useState<{ title?: boolean; excerpt?: boolean; body?: boolean }>({});
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
+  const sync = useArticleSync();
 
   const editing = editingId ? (articles.find((a) => a.id === editingId) ?? null) : null;
 
@@ -933,6 +751,7 @@ function ArticleForm({
   const isEdit = !!editing;
   const bodyParas = form.body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
   const previewMin = bodyParas.length ? readMinutes(bodyParas) : 0;
+  const field = (bad?: boolean) => `${inputCls} ${bad ? "border-clay! shadow-[0_0_0_3px_rgba(182,90,69,0.18)]" : ""}`;
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -958,15 +777,13 @@ function ArticleForm({
     };
     if (editing) {
       updateArticle(editing.id, art);
-      onDone(`مقاله‌ی «${title}» ویرایش و منتشر شد`);
+      onDone(`مقاله‌ی «${title}» ویرایش شد${sync === "cloud" ? " و برای همه منتشر شد" : ""}`);
     } else {
       addArticle(art);
-      onDone(`مقاله‌ی «${title}» منتشر شد`);
+      onDone(`مقاله‌ی «${title}» منتشر شد${sync === "cloud" ? " و برای همه" : ""}`);
     }
     setForm(empty);
   };
-
-  const field = (bad?: boolean) => `${inputCls} ${bad ? "border-clay! shadow-[0_0_0_3px_rgba(182,90,69,0.18)]" : ""}`;
 
   return (
     <form onSubmit={submit}>
@@ -1012,20 +829,6 @@ function ArticleForm({
         </div>
 
         <div>
-          <label className={labelCls}>عکس کاور مقاله (اختیاری)</label>
-          <ImagePicker
-            value={form.cover}
-            onChange={(v) => setForm({ ...form, cover: v })}
-            maxSize={800}
-            preview="rect"
-            emptyIcon="news"
-          />
-          <p className="mt-1 text-[0.64rem] font-bold text-foam/40">
-            اگر عکس نذارید، جلد تزئینی با رنگ دسته‌بندی نمایش داده می‌شود.
-          </p>
-        </div>
-
-        <div>
           <label className={labelCls}>چکیده (در کارت مقاله نمایش داده می‌شود) *</label>
           <textarea
             value={form.excerpt}
@@ -1038,6 +841,17 @@ function ArticleForm({
             className={`${field(errs.excerpt)} resize-y`}
           />
           {errs.excerpt && <p className={errCls}>چکیده الزامی است</p>}
+        </div>
+
+        <div>
+          <label className={labelCls}>عکس کاور مقاله (اختیاری)</label>
+          <ImagePicker
+            value={form.cover}
+            onChange={(v) => setForm({ ...form, cover: v })}
+            maxSize={900}
+            preview="rect"
+            emptyIcon="news"
+          />
         </div>
 
         <div>
@@ -1077,5 +891,119 @@ function ArticleForm({
         )}
       </button>
     </form>
+  );
+}
+
+/* ─────────────── پنل اتصال ابری ─────────────── */
+const SYNC_META: Record<string, { text: string; cls: string; dot: string }> = {
+  off: { text: "ذخیره‌سازی محلی — تغییرات فقط در همین مرورگر دیده می‌شود", cls: "border-gold/50 bg-gold/10 text-gold", dot: "bg-gold" },
+  loading: { text: "در حال دریافت فهرست مشترک از فضای ابری…", cls: "border-foam/20 bg-foam/5 text-foam/80", dot: "bg-foam/70 pulse-ring" },
+  cloud: { text: "متصل به فضای ابری — هر تغییر، همان لحظه برای همه منتشر می‌شود", cls: "border-sea/50 bg-sea/15 text-[#7fd6cb]", dot: "bg-teal pulse-ring" },
+  error: { text: "ارتباط با فضای ابری برقرار نشد — حالت محلی فعال است", cls: "border-clay/50 bg-clay/10 text-[#f0b3a3]", dot: "bg-clay" },
+  pushfail: { text: "انتشار ناموفق — SQL را دوباره اجرا کنید یا «انتشار فوری» را بزنید", cls: "border-clay/50 bg-clay/10 text-[#f0b3a3]", dot: "bg-clay pulse-ring" },
+};
+
+function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") => void }) {
+  const sync = useSyncState();
+  const artSync = useArticleSync();
+  const [showSql, setShowSql] = useState(false);
+  const [copied, setCopied] = useState<"d" | "a" | null>(null);
+  const [publishing, setPublishing] = useState(false);
+
+  const meta = SYNC_META[sync] ?? SYNC_META.off;
+  const artMeta = SYNC_META[artSync] ?? SYNC_META.off;
+
+  const copy = async (kind: "d" | "a") => {
+    try {
+      await navigator.clipboard.writeText(kind === "d" ? SETUP_SQL : ARTICLES_SQL);
+      setCopied(kind);
+      setTimeout(() => setCopied(null), 2000);
+    } catch {
+      /* clipboard در دسترس نیست */
+    }
+  };
+
+  const handlePublish = async () => {
+    setPublishing(true);
+    const [okD, okA] = await Promise.all([publishNow(), publishArticlesNow()]);
+    setPublishing(false);
+    onToast(
+      okD && okA
+        ? "پزشکان و مقالات برای همه‌ی بازدیدکنندگان منتشر شد ✅"
+        : okD || okA
+          ? "بخشی منتشر شد؛ برای بخش دیگر SQL مربوطه را اجرا کنید"
+          : "انتشار ناموفق بود — اتصال را بررسی کنید ❌",
+      okD && okA ? "ok" : "err",
+    );
+  };
+
+  return (
+    <section className="overflow-hidden rounded-[18px] border border-foam/10 bg-pine2/70">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 sm:px-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className={`flex items-center gap-2.5 rounded-full border px-3.5 py-1.5 text-[0.72rem] font-extrabold ${meta.cls}`}>
+            <span className={`h-2 w-2 shrink-0 rounded-full ${meta.dot}`} />
+            پزشکان: {meta.text}
+          </span>
+          <span className={`flex items-center gap-2.5 rounded-full border px-3.5 py-1.5 text-[0.72rem] font-extrabold ${artMeta.cls}`}>
+            <span className={`h-2 w-2 shrink-0 rounded-full ${artMeta.dot}`} />
+            مقالات: {artMeta.text}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handlePublish}
+            disabled={publishing}
+            className="flex items-center gap-1.5 rounded-[10px] bg-gold px-3.5 py-2 text-[0.76rem] font-extrabold text-pine transition-all hover:bg-golddeep hover:text-goldsoft active:scale-95 disabled:opacity-60"
+          >
+            <IconRefresh className={`h-4 w-4 ${publishing ? "animate-spin" : ""}`} />
+            {publishing ? "در حال انتشار…" : "انتشار فوری همه"}
+          </button>
+          <button
+            onClick={() => setShowSql((s) => !s)}
+            className="rounded-[10px] border border-foam/15 px-3 py-2 text-[0.72rem] font-bold text-foam/60 transition-colors hover:bg-foam/10 hover:text-foam"
+          >
+            {showSql ? "بستن راهنمای SQL" : "راهنمای SQL"}
+          </button>
+        </div>
+      </div>
+
+      {showSql && (
+        <div className="border-t border-foam/10 px-4 py-5 sm:px-6">
+          <p className="text-[0.8rem] leading-7 text-foam/80">
+            {isEmbeddedCfg() ? (
+              <>اتصال این سایت به فضای ابری انجام شده است. اگر جدول <b className="text-foam">مقالات</b> وجود ندارد، کد زیر را در <b className="text-foam">SQL Editor</b> پروژه اجرا کنید:</>
+            ) : (
+              <>برای راه‌اندازی، این دو کد را در <b className="text-foam">SQL Editor</b> پروژه‌ی Supabase اجرا (Run) کنید:</>
+            )}
+          </p>
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            {([
+              { kind: "d" as const, title: "جدول پزشکان", sql: SETUP_SQL },
+              { kind: "a" as const, title: "جدول مقالات", sql: ARTICLES_SQL },
+            ]).map((b) => (
+              <div key={b.kind} className="relative">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-[0.74rem] font-extrabold text-gold">{b.title}</span>
+                  <button
+                    onClick={() => copy(b.kind)}
+                    className="flex items-center gap-1.5 rounded-[8px] bg-gold px-2.5 py-1.5 text-[0.66rem] font-extrabold text-pine transition-all hover:bg-golddeep hover:text-goldsoft active:scale-95"
+                  >
+                    {copied === b.kind ? <IconCheck className="h-3.5 w-3.5" strokeWidth={2.4} /> : <IconPlus className="h-3.5 w-3.5 rotate-45" strokeWidth={2.4} />}
+                    {copied === b.kind ? "کپی شد" : "کپی کد"}
+                  </button>
+                </div>
+                <pre dir="ltr" className="no-scrollbar overflow-x-auto rounded-[12px] border border-foam/10 bg-[#082a2c] p-4 text-left text-[0.66rem] leading-6 text-[#9fdcd3]">
+                  {b.sql}
+                </pre>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[0.68rem] leading-6 text-foam/45">
+            بعد از اجرا، «انتشار فوری همه» را بزنید تا فهرست‌های فعلی برای همه‌ی بازدیدکنندگان ارسال شود.
+          </p>
+        </div>
+      )}
+    </section>
   );
 }

@@ -10,7 +10,7 @@ import {
   IconCalendar,
 } from "./Icons";
 
-export default function Hero({ onNavigate }: { onNavigate?: (id: TabId) => void }) {
+export default function Hero({ onNavigate }: { onNavigate?: (id: TabId, articleId?: string) => void }) {
   const open = useOpenStatus();
 
   return (
@@ -78,7 +78,7 @@ export default function Hero({ onNavigate }: { onNavigate?: (id: TabId) => void 
               ].map((s) => (
                 <div
                   key={s.t}
-                  className="lift rounded-[14px] border border-sea/15 bg-card/80 px-3 py-3.5 text-center"
+                  className="card-lift rounded-[14px] border border-sea/15 bg-card/80 px-3 py-3.5 text-center"
                 >
                   <s.icon className="mx-auto h-5 w-5 text-sea" />
                   <dt className="sr-only">{s.t}</dt>
@@ -120,7 +120,7 @@ export default function Hero({ onNavigate }: { onNavigate?: (id: TabId) => void 
                 </div>
               </div>
               <Stamp className="absolute -top-7 -start-3 h-24 w-24 drop-shadow-xl sm:-start-8 sm:h-32 sm:w-32" />
-              <div className="lift absolute -bottom-5 -end-2 hidden items-center gap-3 rounded-[14px] border border-gold/40 bg-goldsoft px-4 py-3 shadow-lg sm:flex">
+              <div className="card-lift absolute -bottom-5 -end-2 hidden items-center gap-3 rounded-[14px] border border-gold/40 bg-goldsoft px-4 py-3 shadow-lg sm:flex">
                 <span className="font-display text-3xl leading-none text-golddeep">{faNum(35)}</span>
                 <span className="text-[0.72rem] font-extrabold leading-5 text-pine">
                   اتاق مراجعه

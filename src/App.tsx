@@ -41,16 +41,11 @@ export default function App() {
 
   /** ناوبری با تغییر آدرس — هر بخش، زیرآدرس خودش را دارد */
   const go = (tab: TabId, articleId?: string) => {
-    const target = articleId
-      ? `#/articles/${articleId}`
-      : tab === "home"
-        ? "#/"
-        : `#/${tab}`;
+    const target = articleId ? `#/articles/${articleId}` : tab === "home" ? "#/" : `#/${tab}`;
     if (window.location.hash === target) return;
-    window.location.hash = target; // hashchange → view به‌روز می‌شود
+    window.location.hash = target;
   };
 
-  /* ── پنل ادمین مخفی: yoursite.com/#/admin ── */
   if (admin) {
     return <Admin />;
   }
@@ -100,7 +95,7 @@ function FacilitiesIntro() {
   return (
     <section className="relative overflow-hidden bg-paper px-4 pt-14 sm:px-6 sm:pt-20">
       <div className="girih absolute inset-0 opacity-40" aria-hidden="true" />
-      <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
+      <div className="relative mx-auto max-w-4xl px-4 pb-4 text-center sm:px-6">
         <Reveal>
           <span className="eyebrow justify-center text-seadeep!">
             <IconBuilding className="h-4.5 w-4.5" />
@@ -110,19 +105,14 @@ function FacilitiesIntro() {
             یک مجموعه‌ی کامل، <span className="text-sea">در چهار طبقه</span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-inksoft sm:text-lg">
-            {faNum(4)} طبقه‌ی مجزا به‌همراه زیرزمین، {faNum(35)} اتاق مراجعه و{" "}
-            {faNum(50)} نفر پرسنل اداری و اجرایی؛ همه برای اینکه مراجعت شما
-            راحت، سریع و در شأن شما باشد.
+            {faNum(4)} طبقه‌ی مجزا به‌همراه زیرزمین، {faNum(35)} اتاق مراجعه و {faNum(50)} نفر پرسنل
+            اداری و اجرایی؛ همه برای اینکه مراجعت شما راحت، سریع و در شأن شما باشد.
           </p>
         </Reveal>
         <Reveal delay={150}>
           <div className="arch-ring relative mx-auto mt-10 max-w-3xl bg-gradient-to-b from-sea/25 to-transparent p-2.5">
             <div className="arch relative aspect-[16/8] overflow-hidden">
-              <img
-                src={IMG.exterior}
-                alt="ساختمان درمانگاه خیریه آوای مهر ولی‌الله"
-                className="kenburns h-full w-full object-cover"
-              />
+              <img src={IMG.exterior} alt="ساختمان درمانگاه خیریه آوای مهر ولی‌الله" className="kenburns h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-pine/50 via-transparent to-transparent" />
             </div>
           </div>

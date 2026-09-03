@@ -3,22 +3,14 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
 
-/**
- * محافظ صفحه‌ی سفید — اگر خطایی در اجرای برنامه پیش بیاید،
- * به‌جای صفحه‌ی خالی، پیام راهنما نمایش داده می‌شود.
- */
-class ErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { error: Error | null }
-> {
-  state = { error: null as Error | null };
-
-  static getDerivedStateFromError(error: Error) {
-    return { error };
+/* محافظ خطا: هیچ‌وقت صفحه‌ی سفید نشان داده نمی‌شود */
+class Boundary extends React.Component<{ children: React.ReactNode }, { err: boolean }> {
+  state = { err: false };
+  static getDerivedStateFromError() {
+    return { err: true };
   }
-
   render() {
-    if (this.state.error) {
+    if (this.state.err) {
       return (
         <div
           dir="rtl"
@@ -26,39 +18,37 @@ class ErrorBoundary extends React.Component<
             minHeight: "100vh",
             display: "grid",
             placeItems: "center",
-            padding: "2rem",
             background: "#fbf7ec",
-            fontFamily: "Vazirmatn, Tahoma, sans-serif",
-            color: "#16302c",
+            fontFamily: "Vazirmatn, sans-serif",
+            padding: "2rem",
             textAlign: "center",
           }}
         >
           <div>
-            <h1 style={{ fontFamily: "Lalezar, Vazirmatn, sans-serif", fontSize: "2.2rem", color: "#0b3b38", margin: 0 }}>
-              مشکلی در نمایش سایت پیش آمد
+            <div style={{ fontSize: "3rem" }}>🏥</div>
+            <h1 style={{ color: "#0b3b38", fontSize: "1.6rem", marginTop: "0.75rem" }}>
+              خطای لحظه‌ای در نمایش سایت
             </h1>
-            <p style={{ color: "#566864", lineHeight: 2, maxWidth: "34rem", margin: "1rem auto" }}>
-              لطفاً صفحه را یک‌بار تازه‌سازی کنید (Ctrl+F5). اگر مشکل ادامه داشت،
-              حافظه‌ی پنهان مرورگر را پاک کنید یا با مرورگر دیگری امتحان کنید.
+            <p style={{ color: "#566864", marginTop: "0.5rem", lineHeight: 2 }}>
+              لطفاً صفحه را تازه‌سازی کنید؛ اگر مشکل ادامه داشت، با شماره‌ی ۰۲۱-۳۳۱۳۲۱۱۴ تماس بگیرید.
             </p>
             <button
               onClick={() => window.location.reload()}
               style={{
-                background: "#d69a25",
-                color: "#0b3b38",
+                marginTop: "1.25rem",
+                background: "#0e7c74",
+                color: "#e9f5f1",
                 border: "none",
-                borderRadius: "12px",
-                padding: "0.9rem 2.2rem",
-                fontSize: "1rem",
-                fontWeight: 800,
+                borderRadius: 12,
+                padding: "0.8rem 1.6rem",
+                fontSize: "0.95rem",
+                fontWeight: 700,
                 cursor: "pointer",
+                fontFamily: "inherit",
               }}
             >
               تازه‌سازی صفحه
             </button>
-            <p style={{ color: "#98a8a4", fontSize: "0.72rem", marginTop: "1.5rem" }} dir="ltr">
-              {String(this.state.error?.message ?? this.state.error)}
-            </p>
           </div>
         </div>
       );
@@ -68,7 +58,7 @@ class ErrorBoundary extends React.Component<
 }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <ErrorBoundary>
+  <Boundary>
     <App />
-  </ErrorBoundary>,
+  </Boundary>,
 );
