@@ -23,6 +23,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
@@ -31,6 +32,8 @@ body {
   color: var(--color-ink);
   overflow-x: hidden;
   text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
 }
 
 .font-display {

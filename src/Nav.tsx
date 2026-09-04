@@ -94,10 +94,6 @@ export default function Nav({
           </nav>
 
           <div className="flex shrink-0 items-center gap-2">
-            <BookingMenu
-              label="رزرو نوبت"
-              btnClass="max-sm:gap-1.5! max-sm:px-3! max-sm:py-2! max-sm:text-[0.72rem]!"
-            />
             <button
               onClick={() => setMenu((m) => !m)}
               aria-label="منو"
@@ -168,15 +164,18 @@ export default function Nav({
                 );
               })}
             </nav>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-sea/10 bg-card px-4 py-3.5">
-              <a dir="ltr" href={`tel:${CONTACT.phone}`} className="flex items-center gap-2 text-sm font-extrabold text-seadeep">
-                <IconPhone className="h-4.5 w-4.5" />
-                {CONTACT.phoneDisplay}
-              </a>
-              <span className={`flex items-center gap-1.5 text-[0.7rem] font-bold ${open ? "text-seadeep" : "text-clay"}`}>
-                <span className={`h-2 w-2 rounded-full ${open ? "bg-teal" : "bg-clay"}`} />
-                {open ? "باز • ۷ تا ۲۳" : "بسته • ۷ تا ۲۳"}
-              </span>
+            <div className="space-y-3 border-t border-sea/10 bg-card px-4 py-3.5">
+              <BookingMenu label="رزرو نوبت آنلاین" className="block w-full [&>button]:w-full" />
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <a dir="ltr" href={`tel:${CONTACT.phone}`} className="flex items-center gap-2 text-sm font-extrabold text-seadeep">
+                  <IconPhone className="h-4.5 w-4.5" />
+                  {CONTACT.phoneDisplay}
+                </a>
+                <span className={`flex items-center gap-1.5 text-[0.7rem] font-bold ${open ? "text-seadeep" : "text-clay"}`}>
+                  <span className={`h-2 w-2 rounded-full ${open ? "bg-teal" : "bg-clay"}`} />
+                  {open ? "باز • ۷ تا ۲۳" : "بسته • ۷ تا ۲۳"}
+                </span>
+              </div>
             </div>
           </div>
         </div>
