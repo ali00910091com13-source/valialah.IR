@@ -16,7 +16,7 @@ import {
 function MapCard() {
   const reduced = useReducedMotion();
   return (
-    <div className="relative h-full overflow-hidden rounded-[18px] border border-sea/20 bg-mist">
+    <div className="relative h-full min-h-[15rem] overflow-hidden rounded-[18px] border border-sea/20 bg-mist lg:min-h-[18rem]">
       <svg viewBox="0 0 340 200" className="h-full w-full" role="img" aria-label="نقشه محل درمانگاه">
         <rect width="340" height="200" fill="#dde9e2" />
         <path d="M0 150 C 80 140, 140 165, 340 130" stroke="#fbf7ec" strokeWidth="16" fill="none" />
@@ -216,7 +216,7 @@ export function ContactSection() {
       </div>
 
       <div className="mt-8 grid gap-4 lg:grid-cols-5">
-        <Reveal delay={120} className="lg:col-span-3">
+        <Reveal delay={120} className="lg:col-span-3 [&>div]:h-full">
           <MapCard />
         </Reveal>
         <Reveal delay={200} className="lg:col-span-2">

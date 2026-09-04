@@ -29,13 +29,13 @@ export default function Hero({ onNavigate }: { onNavigate?: (id: TabId, articleI
         {/* ── متن ── */}
         <div className="relative z-10 lg:col-span-6">
           <Reveal>
-            <span className="eyebrow">
-              <IconStar8 className="h-4 w-4 text-gold" />
+            <span className="eyebrow max-w-full flex-wrap">
+              <IconStar8 className="h-4 w-4 shrink-0 text-gold" />
               درمانگاه خیریه • همراه شما در مسیر سلامتی
             </span>
           </Reveal>
           <Reveal delay={100}>
-            <h1 className="font-display mt-5 text-[2.6rem] leading-[1.22] text-pine sm:text-6xl sm:leading-[1.18] lg:text-[4.1rem]">
+            <h1 className="font-display mt-5 text-[2.05rem] leading-[1.25] text-pine min-[420px]:text-[2.5rem] sm:text-6xl sm:leading-[1.18] lg:text-[4.1rem]">
               صدای <span className="text-sea">مهر</span>،
               <br />
               نوای{" "}
