@@ -70,7 +70,6 @@ const authHeaders = (key: string): Record<string, string> => ({
 
 const endpoint = (cfg: CloudCfg) => `${cfg.url}/rest/v1/doctors`;
 const articlesEndpoint = (cfg: CloudCfg) => `${cfg.url}/rest/v1/articles`;
-const insurersEndpoint = (cfg: CloudCfg) => `${cfg.url}/rest/v1/insurers`;
 
 async function fetchRow(url: string, key: string): Promise<unknown[] | null> {
   try {
@@ -84,16 +83,28 @@ async function fetchRow(url: string, key: string): Promise<unknown[] | null> {
   }
 }
 
-async function pushRow(url: string, key: string, list: unknown[]): Promise<boolean> {
+async function pushRow(url: string, key: string, list: unknown[], rowId = 1): Promise<boolean> {
   try {
     const res = await fetch(url, {
       method: "POST",
       headers: { ...authHeaders(key), Prefer: "resolution=merge-duplicates" },
-      body: JSON.stringify({ id: 1,  list, updated_at: new Date().toISOString() }),
+      body: JSON.stringify({ id: rowId,  list, updated_at: new Date().toISOString() }),
     });
     return res.ok || res.status === 201;
   } catch {
     return false;
+  }
+}
+
+async function fetchRowById(url: string, key: string, rowId: number): Promise<unknown[] | null> {
+  try {
+    const res = await fetch(`${url}?id=eq.${rowId}&select=data`, { headers: authHeaders(key) });
+    if (!res.ok) return null;
+    const rows = (await res.json()) as { data?: unknown[] }[];
+    const list = rows[0]?.data;
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return null;
   }
 }
 
@@ -125,18 +136,21 @@ export async function pushCloudArticles(list: Article[]): Promise<boolean> {
   return pushRow(articlesEndpoint(cfg), cfg.key, list);
 }
 
-/** بیمه‌ها */
+/**
+ * بیمه‌ها — برای اینکه بدون ساخت جدول جدید، همان لحظه برای همه‌ی
+ * بازدیدکنندگان منتشر شود، در همان جدول پزشک‌ها با شناسه‌ی ردیف ۲ ذخیره می‌شود.
+ */
 export async function fetchCloudInsurers(): Promise<Insurer[] | null> {
   const cfg = getCloudCfg();
   if (!cfg) return null;
-  const rows = await fetchRow(insurersEndpoint(cfg), cfg.key);
+  const rows = await fetchRowById(endpoint(cfg), cfg.key, 2);
   return rows as Insurer[] | null;
 }
 
 export async function pushCloudInsurers(list: Insurer[]): Promise<boolean> {
   const cfg = getCloudCfg();
   if (!cfg) return false;
-  return pushRow(insurersEndpoint(cfg), cfg.key, list);
+  return pushRow(endpoint(cfg), cfg.key, list, 2);
 }
 
 /* ─────────────── آزمایش اتصال با تشخیص دقیق ─────────────── */

@@ -42,7 +42,7 @@ import {
   publishInsurersNow,
   isDefaultInsurers,
 } from "./insurerStore";
-import { isEmbeddedCfg, SETUP_SQL, ARTICLES_SQL, INSURERS_SQL } from "./cloud";
+import { isEmbeddedCfg, SETUP_SQL, ARTICLES_SQL } from "./cloud";
 import ImagePicker from "./ImagePicker";
 import {
   IconGear,
@@ -1234,12 +1234,14 @@ const SYNC_META: Record<string, { text: string; cls: string; dot: string }> = {
 function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") => void }) {
   const sync = useSyncState();
   const artSync = useArticleSync();
+  const insSync = useInsurerSync();
   const [showSql, setShowSql] = useState(false);
   const [copied, setCopied] = useState<"d" | "a" | null>(null);
   const [publishing, setPublishing] = useState(false);
 
   const meta = SYNC_META[sync] ?? SYNC_META.off;
   const artMeta = SYNC_META[artSync] ?? SYNC_META.off;
+  const insMeta = SYNC_META[insSync] ?? SYNC_META.off;
 
   const copy = async (kind: "d" | "a") => {
     try {
@@ -1253,15 +1255,20 @@ function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") =
 
   const handlePublish = async () => {
     setPublishing(true);
-    const [okD, okA] = await Promise.all([publishNow(), publishArticlesNow()]);
+    const [okD, okA, okI] = await Promise.all([
+      publishNow(),
+      publishArticlesNow(),
+      publishInsurersNow(),
+    ]);
     setPublishing(false);
+    const okCount = [okD, okA, okI].filter(Boolean).length;
     onToast(
-      okD && okA
-        ? "پزشکان و مقالات برای همه‌ی بازدیدکنندگان منتشر شد ✅"
-        : okD || okA
-          ? "بخشی منتشر شد؛ برای بخش دیگر SQL مربوطه را اجرا کنید"
+      okCount === 3
+        ? "پزشکان، مقالات و بیمه‌ها برای همه منتشر شد ✅"
+        : okCount > 0
+          ? `${faNum(okCount)} بخش از ${faNum(3)} منتشر شد؛ بقیه را بررسی کنید`
           : "انتشار ناموفق بود — اتصال را بررسی کنید ❌",
-      okD && okA ? "ok" : "err",
+      okCount === 3 ? "ok" : "err",
     );
   };
 
@@ -1276,6 +1283,10 @@ function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") =
           <span className={`flex items-center gap-2.5 rounded-full border px-3.5 py-1.5 text-[0.72rem] font-extrabold ${artMeta.cls}`}>
             <span className={`h-2 w-2 shrink-0 rounded-full ${artMeta.dot}`} />
             مقالات: {artMeta.text}
+          </span>
+          <span className={`flex items-center gap-2.5 rounded-full border px-3.5 py-1.5 text-[0.72rem] font-extrabold ${insMeta.cls}`}>
+            <span className={`h-2 w-2 shrink-0 rounded-full ${insMeta.dot}`} />
+            بیمه‌ها: {insMeta.text}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -1300,9 +1311,13 @@ function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") =
         <div className="border-t border-foam/10 px-4 py-5 sm:px-6">
           <p className="text-[0.8rem] leading-7 text-foam/80">
             {isEmbeddedCfg() ? (
-              <>اتصال این سایت به فضای ابری انجام شده است. اگر جدول <b className="text-foam">مقالات</b> وجود ندارد، کد زیر را در <b className="text-foam">SQL Editor</b> پروژه اجرا کنید:</>
+              <>
+                اتصال این سایت به فضای ابری انجام شده است. فهرست <b className="text-foam">بیمه‌ها</b> در همان جدول پزشک‌ها
+                ذخیره می‌شود و نیاز به ساخت جدول ندارد. اگر جدول <b className="text-foam">مقالات</b> وجود ندارد، کد زیر را در{" "}
+                <b className="text-foam">SQL Editor</b> پروژه اجرا کنید:
+              </>
             ) : (
-              <>برای راه‌اندازی، این دو کد را در <b className="text-foam">SQL Editor</b> پروژه‌ی Supabase اجرا (Run) کنید:</>
+              <>برای راه‌اندازی، این دو کد را در <b className="text-foam">SQL Editor</b> پروژه‌ی Supabase اجرا (Run) کنید. بیمه‌ها نیازی به جدول جدا ندارند:</>
             )}
           </p>
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
