@@ -8,6 +8,7 @@ import {
   readMinutes,
   type Doctor,
   type Article,
+  type Insurer,
   type SpecId,
 } from "./data";
 import {
@@ -31,7 +32,17 @@ import {
   isDefaultArticles,
   newArticleId,
 } from "./articleStore";
-import { isEmbeddedCfg, SETUP_SQL, ARTICLES_SQL } from "./cloud";
+import {
+  useInsurers,
+  useInsurerSync,
+  addInsurer,
+  updateInsurer,
+  removeInsurer,
+  resetInsurers,
+  publishInsurersNow,
+  isDefaultInsurers,
+} from "./insurerStore";
+import { isEmbeddedCfg, SETUP_SQL, ARTICLES_SQL, INSURERS_SQL } from "./cloud";
 import ImagePicker from "./ImagePicker";
 import {
   IconGear,
@@ -44,6 +55,7 @@ import {
   IconSearch,
   IconDoctor,
   IconNews,
+  IconShield,
   IconCheck,
   IconArrow,
   LogoImg,
@@ -150,9 +162,10 @@ function Gate({ onOk }: { onOk: () => void }) {
 
 /* ─────────────── داشبورد ─────────────── */
 function Dashboard({ onLogout }: { onLogout: () => void }) {
-  const [panel, setPanel] = useState<"doctors" | "articles">("doctors");
+  const [panel, setPanel] = useState<"doctors" | "articles" | "insurers">("doctors");
   const [toast, setToast] = useState<Toast | null>(null);
   const doctors = useDoctors();
+  const insurersCount = useInsurers().length;
   const articles = useArticles();
 
   const notify = (msg: string, kind: "ok" | "err" = "ok") => {
@@ -205,6 +218,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
               [
                 { id: "doctors", label: "پزشکان", icon: IconDoctor, n: doctors.length },
                 { id: "articles", label: "مقالات", icon: IconNews, n: articles.length },
+                { id: "insurers", label: "بیمه‌ها", icon: IconShield, n: insurersCount },
               ] as const
             ).map((p) => {
               const active = panel === p.id;
@@ -231,7 +245,9 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
 
       <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-6 sm:px-6">
         <CloudPanel onToast={notify} />
-        {panel === "doctors" ? <DoctorsPanel onToast={notify} /> : <ArticlesPanel onToast={notify} />}
+        {panel === "doctors" && <DoctorsPanel onToast={notify} />}
+        {panel === "articles" && <ArticlesPanel onToast={notify} />}
+        {panel === "insurers" && <InsurersPanel onToast={notify} />}
       </main>
     </div>
   );
@@ -890,6 +906,318 @@ function ArticleForm({
           </>
         )}
       </button>
+    </form>
+  );
+}
+
+/* ─────────────── پنل بیمه‌ها ─────────────── */
+function InsurersPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") => void }) {
+  const insurers = useInsurers();
+  const sync = useInsurerSync();
+  const [query, setQuery] = useState("");
+  const [editing, setEditing] = useState<number | null>(null);
+  const [confirming, setConfirming] = useState<number | null>(null);
+
+  const list = useMemo(() => {
+    const q = query.trim();
+    return insurers.map((x, i) => ({ x, i })).filter(({ x }) => !q || x.name.includes(q));
+  }, [insurers, query]);
+
+  return (
+    <div className="mt-8 grid gap-6 lg:grid-cols-5">
+      <section className="scroll-mt-24 rounded-[20px] border border-foam/10 bg-pine2/70 p-5 lg:sticky lg:top-24 lg:col-span-2 lg:self-start">
+        <InsurerForm
+          editing={editing}
+          insurers={insurers}
+          sync={sync}
+          onDone={(msg) => {
+            setEditing(null);
+            onToast(msg);
+          }}
+          onCancel={() => setEditing(null)}
+        />
+      </section>
+
+      <section className="lg:col-span-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display flex items-center gap-2.5 text-2xl">
+            <IconShield className="h-6 w-6 text-gold" />
+            بیمه‌های طرف قرارداد
+            <span className="rounded-full bg-foam/10 px-2.5 py-0.5 text-[0.72rem] font-bold text-foam/70">
+              {faNum(list.length)} مورد
+            </span>
+          </h2>
+          {!isDefaultInsurers() && (
+            <button
+              onClick={() => {
+                if (window.confirm("فهرست بیمه‌ها به حالت پیش‌فرض سایت برگردد؟")) {
+                  resetInsurers();
+                  onToast("فهرست بیمه‌ها به حالت پیش‌فرض برگشت");
+                }
+              }}
+              className="flex items-center gap-1.5 rounded-[10px] border border-clay/50 bg-clay/10 px-3.5 py-2 text-[0.74rem] font-extrabold text-[#f0b3a3] transition-colors hover:bg-clay/20"
+            >
+              <IconRefresh className="h-4 w-4" />
+              بازنشانی پیش‌فرض
+            </button>
+          )}
+        </div>
+
+        <div className="relative mt-4">
+          <IconSearch className="pointer-events-none absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-foam/40" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="جستجوی نام بیمه…"
+            className={`${inputCls} pr-10`}
+          />
+        </div>
+
+        <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+          {list.length === 0 && (
+            <div className="rounded-[16px] border border-dashed border-foam/20 p-10 text-center text-sm font-bold text-foam/50 sm:col-span-2">
+              موردی یافت نشد.
+            </div>
+          )}
+          {list.map(({ x, i }) => (
+            <div
+              key={`${x.name}-${i}`}
+              className={`fadeup flex items-center gap-3.5 rounded-[14px] border px-4 py-3 transition-colors ${
+                editing === i ? "border-gold/60 bg-gold/10" : "border-foam/10 bg-pine2/60 hover:border-foam/25"
+              }`}
+            >
+              {x.logo ? (
+                <span className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-[12px] bg-card p-1.5 ring-1 ring-foam/20">
+                  <img src={x.logo} alt="" className="h-full w-full object-contain" />
+                </span>
+              ) : (
+                <span
+                  className="font-display grid h-12 w-12 shrink-0 place-items-center rounded-[12px] text-lg"
+                  style={{ background: `${x.color}22`, color: x.color }}
+                >
+                  {x.mono}
+                </span>
+              )}
+              <div className="min-w-0 flex-1">
+                <span className="font-display block truncate text-base leading-6">{x.name}</span>
+                <span className="mt-0.5 flex items-center gap-1.5 text-[0.68rem] font-bold text-foam/50">
+                  <span className="h-2.5 w-2.5 rounded-full ring-1 ring-foam/30" style={{ background: x.color }} />
+                  رنگ برند
+                  {x.logo && " • دارای لوگو"}
+                </span>
+              </div>
+              <div className="flex shrink-0 items-center gap-1.5">
+                {confirming === i ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        removeInsurer(i);
+                        setConfirming(null);
+                        onToast(`«${x.name}» حذف شد`, "err");
+                      }}
+                      className="rounded-[9px] bg-clay px-2.5 py-1.5 text-[0.68rem] font-extrabold text-foam transition-transform active:scale-95"
+                    >
+                      حذف
+                    </button>
+                    <button
+                      onClick={() => setConfirming(null)}
+                      className="rounded-[9px] border border-foam/20 px-2.5 py-1.5 text-[0.68rem] font-bold text-foam/70 hover:bg-foam/10"
+                    >
+                      انصراف
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => {
+                        setEditing(i);
+                        document.getElementById("insurer-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }}
+                      aria-label={`ویرایش ${x.name}`}
+                      className="grid h-9 w-9 place-items-center rounded-[10px] border border-foam/15 text-foam/70 transition-colors hover:border-gold hover:text-gold"
+                    >
+                      <IconEdit className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setConfirming(i)}
+                      aria-label={`حذف ${x.name}`}
+                      className="grid h-9 w-9 place-items-center rounded-[10px] border border-foam/15 text-foam/70 transition-colors hover:border-clay hover:text-[#f0b3a3]"
+                    >
+                      <IconTrash className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {sync === "pushfail" && (
+          <button
+            onClick={async () => {
+              const ok = await publishInsurersNow();
+              onToast(ok ? "فهرست بیمه‌ها منتشر شد ✅" : "انتشار ناموفق — اتصال را بررسی کنید ❌", ok ? "ok" : "err");
+            }}
+            className="btn btn-gold mt-4 w-full justify-center py-2.5! text-sm"
+          >
+            <IconRefresh className="h-4 w-4" />
+            انتشار فوری فهرست بیمه‌ها
+          </button>
+        )}
+      </section>
+    </div>
+  );
+}
+
+/* ─────────────── فرم بیمه ─────────────── */
+function InsurerForm({
+  editing,
+  insurers,
+  sync,
+  onDone,
+  onCancel,
+}: {
+  editing: number | null;
+  insurers: Insurer[];
+  sync: string;
+  onDone: (msg: string) => void;
+  onCancel: () => void;
+}) {
+  const empty = { name: "", mono: "", color: "#0e7c74", logo: "" };
+  const [form, setForm] = useState(empty);
+  const [err, setErr] = useState(false);
+  const [loadedFor, setLoadedFor] = useState<number | null>(null);
+
+  if (editing !== null && loadedFor !== editing) {
+    const x = insurers[editing];
+    if (x) {
+      setLoadedFor(editing);
+      setForm({ name: x.name, mono: x.mono, color: x.color, logo: x.logo ?? "" });
+      setErr(false);
+    }
+  }
+  if (editing === null && loadedFor !== null) {
+    setLoadedFor(null);
+    setForm(empty);
+    setErr(false);
+  }
+
+  const isEdit = editing !== null;
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    const name = form.name.trim();
+    if (!name) {
+      setErr(true);
+      return;
+    }
+    const mono = form.mono.trim() || name.replace(/^بیمه\s*/, "").slice(0, 2);
+    const ins: Insurer = {
+      name,
+      mono,
+      color: form.color || "#0e7c74",
+      logo: form.logo.trim() || undefined,
+    };
+    if (isEdit) {
+      updateInsurer(editing, ins);
+      onDone(`تغییرات «${name}» ذخیره شد${sync === "cloud" ? " و برای همه منتشر شد" : ""}`);
+    } else {
+      addInsurer(ins);
+      onDone(`بیمه‌ی «${name}» اضافه شد${sync === "cloud" ? " و برای همه منتشر شد" : ""}`);
+    }
+    setForm(empty);
+  };
+
+  return (
+    <form onSubmit={submit} id="insurer-form" className="scroll-mt-24">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="font-display flex items-center gap-2.5 text-2xl">
+          <span className={`grid h-9 w-9 place-items-center rounded-[11px] ${isEdit ? "bg-gold/20 text-gold" : "bg-sea/25 text-[#7fd6cb]"}`}>
+            {isEdit ? <IconEdit className="h-4.5 w-4.5" /> : <IconShield className="h-4.5 w-4.5" />}
+          </span>
+          {isEdit ? "ویرایش بیمه" : "افزودن بیمه"}
+        </h3>
+        {isEdit && (
+          <button type="button" onClick={onCancel} className="flex items-center gap-1 rounded-full border border-foam/15 px-3 py-1.5 text-[0.7rem] font-bold text-foam/60 hover:bg-foam/10">
+            <IconClose className="h-3.5 w-3.5" />
+            انصراف
+          </button>
+        )}
+      </div>
+
+      <div className="mt-5 space-y-4">
+        <div>
+          <label className={labelCls}>نام بیمه *</label>
+          <input
+            value={form.name}
+            onChange={(e) => {
+              setForm({ ...form, name: e.target.value });
+              setErr(false);
+            }}
+            placeholder="مثلاً: بیمه سامان"
+            className={`${inputCls} ${err ? "border-clay! shadow-[0_0_0_3px_rgba(182,90,69,0.18)]" : ""}`}
+          />
+          {err && <p className={errCls}>نام بیمه الزامی است</p>}
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={labelCls}>حروف اختصاری (مونوگرام)</label>
+            <input
+              value={form.mono}
+              onChange={(e) => setForm({ ...form, mono: e.target.value })}
+              placeholder="مثلاً: سا"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>رنگ برند</label>
+            <div className="flex items-center gap-2 rounded-[10px] border border-foam/15 bg-pine2 px-2 py-1.5">
+              <input
+                type="color"
+                value={form.color}
+                onChange={(e) => setForm({ ...form, color: e.target.value })}
+                className="h-8 w-10 cursor-pointer rounded-[6px] border-none bg-transparent p-0"
+                aria-label="انتخاب رنگ برند"
+              />
+              <span dir="ltr" className="text-[0.7rem] font-bold text-foam/50">{form.color}</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label className={labelCls}>لوگوی بیمه (اختیاری — جایگزین مونوگرام می‌شود)</label>
+          <ImagePicker
+            value={form.logo}
+            onChange={(v) => setForm({ ...form, logo: v })}
+            maxSize={240}
+            preview="rect"
+            emptyIcon="news"
+            placeholder="آدرس اینترنتی لوگو (URL)…"
+          />
+        </div>
+      </div>
+
+      <button type="submit" className={`btn mt-6 w-full justify-center ${isEdit ? "btn-gold" : "btn-sea"}`}>
+        {isEdit ? (
+          <>
+            <IconCheck className="h-4.5 w-4.5" strokeWidth={2.2} />
+            ذخیره تغییرات
+          </>
+        ) : (
+          <>
+            <IconPlus className="h-4.5 w-4.5" strokeWidth={2.2} />
+            افزودن به فهرست
+          </>
+        )}
+      </button>
+
+      <p className="mt-3 flex items-start gap-2 text-[0.7rem] leading-6 text-foam/45">
+        <IconGear className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        {sync === "cloud"
+          ? "اتصال ابری برقرار است؛ تغییرات همان لحظه برای همه منتشر می‌شود."
+          : "اتصال ابری کامل نیست؛ تغییرات در همین مرورگر ذخیره می‌شود."}
+      </p>
     </form>
   );
 }

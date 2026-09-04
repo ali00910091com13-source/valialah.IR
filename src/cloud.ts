@@ -1,4 +1,4 @@
-import type { Article, Doctor } from "./data";
+import type { Article, Doctor, Insurer } from "./data";
 
 const CFG_KEY = "aavm-cloud-cfg";
 
@@ -70,6 +70,7 @@ const authHeaders = (key: string): Record<string, string> => ({
 
 const endpoint = (cfg: CloudCfg) => `${cfg.url}/rest/v1/doctors`;
 const articlesEndpoint = (cfg: CloudCfg) => `${cfg.url}/rest/v1/articles`;
+const insurersEndpoint = (cfg: CloudCfg) => `${cfg.url}/rest/v1/insurers`;
 
 async function fetchRow(url: string, key: string): Promise<unknown[] | null> {
   try {
@@ -122,6 +123,20 @@ export async function pushCloudArticles(list: Article[]): Promise<boolean> {
   const cfg = getCloudCfg();
   if (!cfg) return false;
   return pushRow(articlesEndpoint(cfg), cfg.key, list);
+}
+
+/** بیمه‌ها */
+export async function fetchCloudInsurers(): Promise<Insurer[] | null> {
+  const cfg = getCloudCfg();
+  if (!cfg) return null;
+  const rows = await fetchRow(insurersEndpoint(cfg), cfg.key);
+  return rows as Insurer[] | null;
+}
+
+export async function pushCloudInsurers(list: Insurer[]): Promise<boolean> {
+  const cfg = getCloudCfg();
+  if (!cfg) return false;
+  return pushRow(insurersEndpoint(cfg), cfg.key, list);
 }
 
 /* ─────────────── آزمایش اتصال با تشخیص دقیق ─────────────── */
@@ -177,4 +192,16 @@ alter table articles enable row level security;
 
 drop policy if exists "public access" on articles;
 create policy "public access" on articles
+  for all using (true) with check (true);`;
+
+export const INSURERS_SQL = `create table if not exists insurers (
+  id int primary key,
+  data jsonb not null,
+  updated_at timestamptz default now()
+);
+
+alter table insurers enable row level security;
+
+drop policy if exists "public access" on insurers;
+create policy "public access" on insurers
   for all using (true) with check (true);`;
