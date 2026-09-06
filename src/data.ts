@@ -180,7 +180,7 @@ export const UNITS: Unit[] = [
 ];
 
 /* ─────────────── بیمه‌ها ─────────────── */
-export type Insurer = { name: string; mono: string; color: string };
+export type Insurer = { name: string; mono: string; color: string; logo?: string };
 
 export const BASE_INSURERS = [
   "تامین اجتماعی",

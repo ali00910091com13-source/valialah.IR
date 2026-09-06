@@ -1,5 +1,4 @@
 import {
-  INSURERS,
   BASE_INSURERS,
   TEAM_SPECIALTIES,
   CONTACT,
@@ -9,6 +8,7 @@ import {
   type TabId,
 } from "./data";
 import { Reveal, Stamp, CountUp } from "./fx";
+import { useInsurers } from "./insurerStore";
 import {
   IconShield,
   IconStar8,
@@ -28,12 +28,18 @@ function InsurerTile({ ins, i }: { ins: Insurer; i: number }) {
           style={{ background: ins.color }}
           aria-hidden="true"
         />
-        <span
-          className="font-display mx-auto grid h-14 w-14 place-items-center rounded-full text-lg transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105 sm:text-xl"
-          style={{ background: `${ins.color}1a`, color: ins.color }}
-        >
-          {ins.mono}
-        </span>
+        {ins.logo ? (
+          <span className="mx-auto grid h-14 w-14 place-items-center overflow-hidden rounded-[14px] bg-mist p-1.5 ring-1 ring-sea/15 transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105">
+            <img src={ins.logo} alt={`لوگوی ${ins.name}`} className="h-full w-full object-contain" />
+          </span>
+        ) : (
+          <span
+            className="font-display mx-auto grid h-14 w-14 place-items-center rounded-full text-lg transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105 sm:text-xl"
+            style={{ background: `${ins.color}1a`, color: ins.color }}
+          >
+            {ins.mono}
+          </span>
+        )}
         <h3 className="mt-3.5 text-[0.92rem] font-extrabold leading-6 text-pine">{ins.name}</h3>
         <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-mist px-2.5 py-1 text-[0.66rem] font-bold text-seadeep">
           <IconCheck className="h-3 w-3" strokeWidth={2.6} />
@@ -45,6 +51,7 @@ function InsurerTile({ ins, i }: { ins: Insurer; i: number }) {
 }
 
 export function Insurance() {
+  const insurers = useInsurers();
   return (
     <div className="relative overflow-hidden bg-paper py-14 sm:py-24">
       <div className="girih absolute inset-0 opacity-50" aria-hidden="true" />
@@ -84,8 +91,8 @@ export function Insurance() {
           </h3>
         </Reveal>
         <div className="mt-8 grid grid-cols-2 gap-3.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-          {INSURERS.map((ins, i) => (
-            <InsurerTile key={ins.name} ins={ins} i={i} />
+          {insurers.map((ins, i) => (
+            <InsurerTile key={`${ins.name}-${i}`} ins={ins} i={i} />
           ))}
           <Reveal delay={380}>
             <div className="flex h-full flex-col items-center justify-center rounded-[16px] border-2 border-dashed border-gold/60 bg-goldsoft/40 p-5 text-center">
