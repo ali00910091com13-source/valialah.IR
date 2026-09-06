@@ -94,6 +94,8 @@ export default function Nav({
           </nav>
 
           <div className="flex shrink-0 items-center gap-2">
+            {/* رزرو نوبت فقط در دسکتاپ؛ در موبایل داخل منوی کشویی است */}
+            <BookingMenu label="رزرو نوبت" className="hidden lg:block" />
             <button
               onClick={() => setMenu((m) => !m)}
               aria-label="منو"
@@ -142,7 +144,13 @@ export default function Nav({
                 <IconClose className="h-5 w-5" />
               </button>
             </div>
-            <nav className="no-scrollbar grid max-h-[55vh] gap-1 overflow-y-auto p-3" aria-label="منوی موبایل">
+
+            {/* رزرو نوبت — داخل منوی موبایل */}
+            <div className="border-b border-sea/10 p-3 pb-0">
+              <BookingMenu label="رزرو نوبت آنلاین" className="w-full [&>button]:w-full" />
+            </div>
+
+            <nav className="no-scrollbar grid max-h-[48vh] gap-1 overflow-y-auto p-3" aria-label="منوی موبایل">
               {TABS.map((t, i) => {
                 const Ic = ICONS[t.icon];
                 const isActive = active === t.id;
@@ -164,18 +172,15 @@ export default function Nav({
                 );
               })}
             </nav>
-            <div className="space-y-3 border-t border-sea/10 bg-card px-4 py-3.5">
-              <BookingMenu label="رزرو نوبت آنلاین" className="block w-full [&>button]:w-full" />
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <a dir="ltr" href={`tel:${CONTACT.phone}`} className="flex items-center gap-2 text-sm font-extrabold text-seadeep">
-                  <IconPhone className="h-4.5 w-4.5" />
-                  {CONTACT.phoneDisplay}
-                </a>
-                <span className={`flex items-center gap-1.5 text-[0.7rem] font-bold ${open ? "text-seadeep" : "text-clay"}`}>
-                  <span className={`h-2 w-2 rounded-full ${open ? "bg-teal" : "bg-clay"}`} />
-                  {open ? "باز • ۷ تا ۲۳" : "بسته • ۷ تا ۲۳"}
-                </span>
-              </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-sea/10 bg-card px-4 py-3.5">
+              <a dir="ltr" href={`tel:${CONTACT.phone}`} className="flex items-center gap-2 text-sm font-extrabold text-seadeep">
+                <IconPhone className="h-4.5 w-4.5" />
+                {CONTACT.phoneDisplay}
+              </a>
+              <span className={`flex items-center gap-1.5 text-[0.7rem] font-bold ${open ? "text-seadeep" : "text-clay"}`}>
+                <span className={`h-2 w-2 rounded-full ${open ? "bg-teal" : "bg-clay"}`} />
+                {open ? "باز • ۷ تا ۲۳" : "بسته • ۷ تا ۲۳"}
+              </span>
             </div>
           </div>
         </div>

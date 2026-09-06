@@ -1,17 +1,17 @@
 import { useRef, useState } from "react";
-import { IconPlus, IconTrash, IconDoctor, IconNews } from "./Icons";
+import { IconPlus, IconTrash, IconDoctor, IconNews, IconShield } from "./Icons";
 
 type Props = {
   value: string;
   onChange: (v: string) => void;
   maxSize?: number;
   preview?: "circle" | "rect";
-  emptyIcon?: "doctor" | "news";
+  emptyIcon?: "doctor" | "news" | "shield";
   placeholder?: string;
 };
 
 /**
- * انتخابگر تصویر مشترک (عکس پزشک و عکس کاور مقاله):
+ * انتخابگر تصویر مشترک (عکس پزشک، کاور مقاله و لوگوی بیمه):
  * بارگذاری از دستگاه با کوچک‌سازی خودکار + آدرس اینترنتی (URL)
  */
 export default function ImagePicker({
@@ -55,7 +55,7 @@ export default function ImagePicker({
     reader.readAsDataURL(file);
   };
 
-  const EmptyIcon = emptyIcon === "news" ? IconNews : IconDoctor;
+  const EmptyIcon = emptyIcon === "news" ? IconNews : emptyIcon === "shield" ? IconShield : IconDoctor;
   const previewCls = preview === "rect" ? "h-16 w-20 rounded-[12px]" : "h-14 w-14 rounded-full";
 
   return (

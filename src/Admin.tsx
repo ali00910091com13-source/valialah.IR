@@ -131,7 +131,7 @@ function Gate({ onOk }: { onOk: () => void }) {
           </p>
           <form onSubmit={submit} className="mt-6 space-y-4">
             <div>
-              <label className={labelCls}>رمز عبور</label>
+              <label className="mb-1.5 block text-[0.72rem] font-extrabold text-foam/60">رمز عبور</label>
               <input
                 dir="ltr"
                 type="password"
@@ -165,8 +165,8 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
   const [panel, setPanel] = useState<"doctors" | "articles" | "insurers">("doctors");
   const [toast, setToast] = useState<Toast | null>(null);
   const doctors = useDoctors();
-  const insurersCount = useInsurers().length;
   const articles = useArticles();
+  const insurersCount = useInsurers().length;
 
   const notify = (msg: string, kind: "ok" | "err" = "ok") => {
     setToast({ msg, kind });
@@ -177,7 +177,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
     <div className="relative">
       {toast && (
         <div
-          className={`menu-pop fixed bottom-5 start-1/2 z-[90] w-max max-w-[92vw] translate-x-1/2 rounded-full border px-5 py-3 text-center text-sm font-extrabold shadow-2xl ${
+          className={`menu-pop fixed bottom-5 start-1/2 z-[90] translate-x-1/2 rounded-full border px-5 py-3 text-sm font-extrabold shadow-2xl ${
             toast.kind === "ok"
               ? "border-teal/50 bg-seadeep text-foam"
               : "border-clay/60 bg-[#5a2015] text-[#f6d3c8]"
@@ -196,9 +196,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
             </span>
             <div>
               <span className="font-display block text-lg leading-6">کنسول مدیریت</span>
-              <span className="block text-[0.68rem] text-foam/50">
-                آوای مهر ولی‌الله — پزشکان: {faNum(doctors.length)} • مقالات: {faNum(articles.length)}
-              </span>
+              <span className="block text-[0.68rem] text-foam/50">درمانگاه خیریه آوای مهر ولی‌الله</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -213,7 +211,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
         </div>
         {/* سوییچر بخش‌ها */}
         <div className="mx-auto w-full max-w-6xl px-4 pb-3 sm:px-6">
-          <div className="flex w-max gap-1.5 rounded-[13px] border border-foam/12 bg-pine2/70 p-1.5">
+          <div className="no-scrollbar flex w-max max-w-full gap-1.5 overflow-x-auto rounded-[13px] border border-foam/12 bg-pine2/70 p-1.5">
             {(
               [
                 { id: "doctors", label: "پزشکان", icon: IconDoctor, n: doctors.length },
@@ -227,7 +225,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
                 <button
                   key={p.id}
                   onClick={() => setPanel(p.id)}
-                  className={`flex items-center gap-2 rounded-[10px] px-4 py-2 text-sm font-extrabold transition-all ${
+                  className={`flex shrink-0 items-center gap-2 rounded-[10px] px-4 py-2 text-sm font-extrabold transition-all ${
                     active ? "bg-gold text-pine shadow" : "text-foam/60 hover:bg-foam/5 hover:text-foam"
                   }`}
                 >
@@ -272,159 +270,148 @@ function DoctorsPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err")
       });
   }, [doctors, query, spec]);
 
-  const dentists = doctors.filter((d) => d.spec === "dent").length;
-  const specCount = new Set(doctors.map((d) => d.spec)).size;
-
   return (
-    <>
-      <div className="mt-6 grid grid-cols-3 gap-3">
-        {[
-          { n: doctors.length, label: "پزشک و متخصص", tint: "#d69a25" },
-          { n: dentists, label: "دندانپزشک", tint: "#1ba396" },
-          { n: specCount, label: "تخصص فعال", tint: "#b65a45" },
-        ].map((s) => (
-          <div key={s.label} className="relative overflow-hidden rounded-[16px] border border-foam/10 bg-pine2/70 px-4 py-4">
-            <span className="absolute inset-y-0 start-0 w-1" style={{ background: s.tint }} aria-hidden="true" />
-            <span className="font-display block text-3xl sm:text-4xl" style={{ color: s.tint }}>
-              {faNum(s.n)}
+    <div className="mt-8 grid gap-6 lg:grid-cols-5">
+      <section className="scroll-mt-24 rounded-[20px] border border-foam/10 bg-pine2/70 p-5 lg:col-span-2 lg:sticky lg:top-40 lg:self-start">
+        <DoctorForm
+          editing={editing}
+          doctors={doctors}
+          onDone={(msg) => {
+            setEditing(null);
+            onToast(msg);
+          }}
+          onCancel={() => setEditing(null)}
+        />
+      </section>
+
+      <section className="lg:col-span-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display flex items-center gap-2.5 text-2xl">
+            <IconDoctor className="h-6 w-6 text-gold" />
+            فهرست پزشکان
+            <span className="rounded-full bg-foam/10 px-2.5 py-0.5 text-[0.72rem] font-bold text-foam/70">
+              {faNum(list.length)} نفر
             </span>
-            <span className="mt-1 block text-[0.7rem] font-bold text-foam/55 sm:text-[0.78rem]">{s.label}</span>
+          </h2>
+          {!isDefaultList() && (
+            <button
+              onClick={() => {
+                if (window.confirm("فهرست پزشکان به حالت پیش‌فرض سایت برگردد؟ تغییرات شما پاک می‌شود.")) {
+                  resetDoctors();
+                  onToast("فهرست به حالت پیش‌فرض برگشت");
+                }
+              }}
+              className="flex items-center gap-1.5 rounded-[10px] border border-clay/50 bg-clay/10 px-3.5 py-2 text-[0.74rem] font-extrabold text-[#f0b3a3] transition-colors hover:bg-clay/20"
+            >
+              <IconRefresh className="h-4 w-4" />
+              بازنشانی پیش‌فرض
+            </button>
+          )}
+        </div>
+
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <div className="relative flex-1">
+            <IconSearch className="pointer-events-none absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-foam/40" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="جستجوی نام پزشک…"
+              className={`${inputCls} pr-10`}
+            />
           </div>
-        ))}
-      </div>
+          <select value={spec} onChange={(e) => setSpec(e.target.value)} className={`${inputCls} sm:w-48`}>
+            <option value="all">همه تخصص‌ها</option>
+            {DOCTOR_SPECS.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-5">
-        <section className="scroll-mt-24 rounded-[20px] border border-foam/10 bg-pine2/70 p-5 lg:col-span-2 lg:sticky lg:top-40 lg:self-start">
-          <DoctorForm
-            editing={editing}
-            doctors={doctors}
-            onDone={(msg) => {
-              setEditing(null);
-              onToast(msg);
-            }}
-            onCancel={() => setEditing(null)}
-          />
-        </section>
-
-        <section className="lg:col-span-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="font-display flex items-center gap-2.5 text-2xl">
-              <IconDoctor className="h-6 w-6 text-gold" />
-              فهرست پزشکان
-              <span className="rounded-full bg-foam/10 px-2.5 py-0.5 text-[0.72rem] font-bold text-foam/70">
-                {faNum(list.length)} نفر
-              </span>
-            </h2>
-            {!isDefaultList() && (
-              <button
-                onClick={() => {
-                  if (window.confirm("فهرست پزشکان به حالت پیش‌فرض سایت برگردد؟ تغییرات شما پاک می‌شود.")) {
-                    resetDoctors();
-                    onToast("فهرست به حالت پیش‌فرض برگشت");
-                  }
-                }}
-                className="flex items-center gap-1.5 rounded-[10px] border border-clay/50 bg-clay/10 px-3.5 py-2 text-[0.74rem] font-extrabold text-[#f0b3a3] transition-colors hover:bg-clay/20"
-              >
-                <IconRefresh className="h-4 w-4" />
-                بازنشانی پیش‌فرض
-              </button>
-            )}
-          </div>
-
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-            <div className="relative flex-1">
-              <IconSearch className="pointer-events-none absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-foam/40" />
-              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="جستجوی نام پزشک…" className={`${inputCls} pr-10`} />
+        <div className="mt-4 space-y-2.5">
+          {list.length === 0 && (
+            <div className="rounded-[16px] border border-dashed border-foam/20 p-10 text-center text-sm font-bold text-foam/50">
+              موردی یافت نشد.
             </div>
-            <select value={spec} onChange={(e) => setSpec(e.target.value)} className={`${inputCls} sm:w-48`}>
-              <option value="all">همه تخصص‌ها</option>
-              {DOCTOR_SPECS.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="mt-4 space-y-2.5">
-            {list.length === 0 && (
-              <div className="rounded-[16px] border border-dashed border-foam/20 p-10 text-center text-sm font-bold text-foam/50">موردی یافت نشد.</div>
-            )}
-            {list.map(({ d, i }) => (
-              <div
-                key={`${d.name}-${i}`}
-                className={`fadeup group flex flex-wrap items-center gap-3.5 rounded-[14px] border px-4 py-3 transition-colors sm:flex-nowrap ${
-                  editing === i ? "border-gold/60 bg-gold/10" : "border-foam/10 bg-pine2/60 hover:border-foam/25"
-                }`}
-              >
-                {d.photo ? (
-                  <img src={d.photo} alt={d.name} className="h-12 w-12 shrink-0 rounded-[13px] border border-foam/20 object-cover" />
-                ) : (
+          )}
+          {list.map(({ d, i }) => (
+            <div
+              key={`${d.name}-${i}`}
+              className={`fadeup group flex flex-wrap items-center gap-3.5 rounded-[14px] border px-4 py-3 transition-colors sm:flex-nowrap ${
+                editing === i ? "border-gold/60 bg-gold/10" : "border-foam/10 bg-pine2/60 hover:border-foam/25"
+              }`}
+            >
+              {d.photo ? (
+                <img src={d.photo} alt={d.name} className="h-12 w-12 shrink-0 rounded-[13px] border border-foam/20 object-cover" />
+              ) : (
+                <span
+                  className="font-display grid h-12 w-12 shrink-0 place-items-center rounded-[13px] text-xl"
+                  style={{ background: `${tintOf(d.spec)}22`, color: tintOf(d.spec) }}
+                >
+                  {monoOf(d.name)}
+                </span>
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-display text-lg leading-6">{d.name}</span>
                   <span
-                    className="font-display grid h-12 w-12 shrink-0 place-items-center rounded-[13px] text-xl"
+                    className="rounded-full px-2 py-0.5 text-[0.64rem] font-extrabold"
                     style={{ background: `${tintOf(d.spec)}22`, color: tintOf(d.spec) }}
                   >
-                    {monoOf(d.name)}
+                    {SPEC_LABEL[d.spec] ?? d.spec}
                   </span>
-                )}
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-display text-lg leading-6">{d.name}</span>
-                    <span className="rounded-full px-2 py-0.5 text-[0.64rem] font-extrabold" style={{ background: `${tintOf(d.spec)}22`, color: tintOf(d.spec) }}>
-                      {SPEC_LABEL[d.spec] ?? d.spec}
-                    </span>
-                  </div>
-                  <p className="mt-0.5 truncate text-[0.78rem] text-foam/60">
-                    {d.title}
-                    {d.focus ? ` • ${d.focus}` : ""}
-                  </p>
                 </div>
-                <div className="flex shrink-0 items-center gap-1.5">
-                  {confirming === i ? (
-                    <>
-                      <span className="text-[0.72rem] font-bold text-[#f0b3a3]">حذف شود؟</span>
-                      <button
-                        onClick={() => {
-                          removeDoctor(i);
-                          setConfirming(null);
-                          onToast(`«${d.name}» حذف شد`, "err");
-                        }}
-                        className="rounded-[9px] bg-clay px-3 py-1.5 text-[0.72rem] font-extrabold text-foam transition-transform active:scale-95"
-                      >
-                        بله
-                      </button>
-                      <button onClick={() => setConfirming(null)} className="rounded-[9px] border border-foam/20 px-3 py-1.5 text-[0.72rem] font-bold text-foam/70 hover:bg-foam/10">
-                        انصراف
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => {
-                          setEditing(i);
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                        aria-label={`ویرایش ${d.name}`}
-                        className="grid h-9 w-9 place-items-center rounded-[10px] border border-foam/15 text-foam/70 transition-colors hover:border-gold hover:text-gold"
-                      >
-                        <IconEdit className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => setConfirming(i)}
-                        aria-label={`حذف ${d.name}`}
-                        className="grid h-9 w-9 place-items-center rounded-[10px] border border-foam/15 text-foam/70 transition-colors hover:border-clay hover:text-[#f0b3a3]"
-                      >
-                        <IconTrash className="h-4 w-4" />
-                      </button>
-                    </>
-                  )}
-                </div>
+                <p className="mt-0.5 truncate text-[0.78rem] text-foam/60">
+                  {d.title}
+                  {d.focus ? ` • ${d.focus}` : ""}
+                </p>
               </div>
-            ))}
-          </div>
-        </section>
-      </div>
-    </>
+              <div className="flex shrink-0 items-center gap-1.5">
+                {confirming === i ? (
+                  <>
+                    <span className="text-[0.72rem] font-bold text-[#f0b3a3]">حذف شود؟</span>
+                    <button
+                      onClick={() => {
+                        removeDoctor(i);
+                        setConfirming(null);
+                        onToast(`«${d.name}» حذف شد`, "err");
+                      }}
+                      className="rounded-[9px] bg-clay px-3 py-1.5 text-[0.72rem] font-extrabold text-foam transition-transform active:scale-95"
+                    >
+                      بله
+                    </button>
+                    <button
+                      onClick={() => setConfirming(null)}
+                      className="rounded-[9px] border border-foam/20 px-3 py-1.5 text-[0.72rem] font-bold text-foam/70 hover:bg-foam/10"
+                    >
+                      انصراف
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => setEditing(i)}
+                      aria-label={`ویرایش ${d.name}`}
+                      className="grid h-9 w-9 place-items-center rounded-[10px] border border-foam/15 text-foam/70 transition-colors hover:border-gold hover:text-gold"
+                    >
+                      <IconEdit className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setConfirming(i)}
+                      aria-label={`حذف ${d.name}`}
+                      className="grid h-9 w-9 place-items-center rounded-[10px] border border-foam/15 text-foam/70 transition-colors hover:border-clay hover:text-[#f0b3a3]"
+                    >
+                      <IconTrash className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -440,11 +427,16 @@ function DoctorForm({
   onDone: (msg: string) => void;
   onCancel: () => void;
 }) {
-  const empty = { name: "", spec: DOCTOR_SPECS[0].id as SpecId, title: "", focus: "", photo: "" };
+  const empty: { name: string; spec: SpecId; title: string; focus: string; photo: string } = {
+    name: "",
+    spec: DOCTOR_SPECS[0].id,
+    title: "",
+    focus: "",
+    photo: "",
+  };
   const [form, setForm] = useState(empty);
   const [errs, setErrs] = useState<{ name?: boolean; title?: boolean }>({});
   const [loadedFor, setLoadedFor] = useState<number | null>(null);
-  const sync = useSyncState();
 
   if (editing !== null && loadedFor !== editing) {
     const d = doctors[editing];
@@ -461,13 +453,15 @@ function DoctorForm({
   }
 
   const isEdit = editing !== null;
-  const field = (bad?: boolean) => `${inputCls} ${bad ? "border-clay! shadow-[0_0_0_3px_rgba(182,90,69,0.18)]" : ""}`;
+  const sync = useSyncState();
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const name = form.name.trim();
     const title = form.title.trim();
-    const next = { name: !name || undefined, title: !title || undefined };
+    const next: { name?: boolean; title?: boolean } = {};
+    if (!name) next.name = true;
+    if (!title) next.title = true;
     setErrs(next);
     if (next.name || next.title) return;
 
@@ -488,8 +482,11 @@ function DoctorForm({
     setForm(empty);
   };
 
+  const field = (bad?: boolean) =>
+    `${inputCls} ${bad ? "border-clay! shadow-[0_0_0_3px_rgba(182,90,69,0.18)]" : ""}`;
+
   return (
-    <form onSubmit={submit} id="admin-form" className="scroll-mt-44">
+    <form onSubmit={submit} id="admin-form" className="scroll-mt-24">
       <div className="flex items-center justify-between gap-3">
         <h3 className="font-display flex items-center gap-2.5 text-2xl">
           <span className={`grid h-9 w-9 place-items-center rounded-[11px] ${isEdit ? "bg-gold/20 text-gold" : "bg-sea/25 text-[#7fd6cb]"}`}>
@@ -498,7 +495,11 @@ function DoctorForm({
           {isEdit ? "ویرایش پزشک" : "افزودن پزشک جدید"}
         </h3>
         {isEdit && (
-          <button type="button" onClick={onCancel} className="flex items-center gap-1 rounded-full border border-foam/15 px-3 py-1.5 text-[0.7rem] font-bold text-foam/60 hover:bg-foam/10">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex items-center gap-1 rounded-full border border-foam/15 px-3 py-1.5 text-[0.7rem] font-bold text-foam/60 hover:bg-foam/10"
+          >
             <IconClose className="h-3.5 w-3.5" />
             انصراف
           </button>
@@ -522,7 +523,7 @@ function DoctorForm({
 
         <div>
           <label className={labelCls}>تخصص *</label>
-          <select value={form.spec} onChange={(e) => setForm({ ...form, spec: e.target.value as SpecId })} className={inputCls}>
+          <select value={form.spec} onChange={(e) => setForm({ ...form, spec: e.target.value as Doctor["spec"] })} className={inputCls}>
             {DOCTOR_SPECS.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.label}
@@ -547,12 +548,17 @@ function DoctorForm({
 
         <div>
           <label className={labelCls}>حوزه تمرکز (اختیاری)</label>
-          <input value={form.focus} onChange={(e) => setForm({ ...form, focus: e.target.value })} placeholder="مثلاً: بیماری‌های گوارشی" className={inputCls} />
+          <input
+            value={form.focus}
+            onChange={(e) => setForm({ ...form, focus: e.target.value })}
+            placeholder="مثلاً: بیماری‌های گوارشی"
+            className={inputCls}
+          />
         </div>
 
         <div>
           <label className={labelCls}>عکس پزشک (اختیاری)</label>
-          <ImagePicker value={form.photo} onChange={(v) => setForm({ ...form, photo: v })} />
+          <ImagePicker value={form.photo} onChange={(v) => setForm({ ...form, photo: v })} emptyIcon="doctor" />
         </div>
       </div>
 
@@ -574,7 +580,7 @@ function DoctorForm({
         <IconGear className="mt-0.5 h-3.5 w-3.5 shrink-0" />
         {sync === "cloud"
           ? "اتصال ابری برقرار است؛ تغییرات همان لحظه برای همه‌ی بازدیدکنندگان منتشر می‌شود."
-          : "اتصال ابری برقرار نیست یا در حال بارگذاری است؛ تغییرات فعلاً در همین مرورگر ذخیره می‌شود."}
+          : "اتصال ابری کامل نیست؛ تغییرات فقط در همین مرورگر ذخیره می‌شود."}
       </p>
     </form>
   );
@@ -612,46 +618,41 @@ function ArticlesPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err"
           <h2 className="font-display flex items-center gap-2.5 text-2xl">
             <IconNews className="h-6 w-6 text-gold" />
             فهرست مقالات
-            <span className="rounded-full bg-foam/10 px-2.5 py-0.5 text-[0.72rem] font-bold text-foam/70">{faNum(list.length)}</span>
+            <span className="rounded-full bg-foam/10 px-2.5 py-0.5 text-[0.72rem] font-bold text-foam/70">
+              {faNum(list.length)}
+            </span>
           </h2>
-          <div className="flex items-center gap-2">
-            {!isDefaultArticles() && (
-              <button
-                onClick={() => {
-                  if (window.confirm("مقالات به حالت پیش‌فرض سایت برگردند؟ تغییرات شما پاک می‌شود.")) {
-                    resetArticles();
-                    onToast("مقالات به حالت پیش‌فرض برگشتند");
-                  }
-                }}
-                className="flex items-center gap-1.5 rounded-[10px] border border-clay/50 bg-clay/10 px-3.5 py-2 text-[0.74rem] font-extrabold text-[#f0b3a3] transition-colors hover:bg-clay/20"
-              >
-                <IconRefresh className="h-4 w-4" />
-                بازنشانی
-              </button>
-            )}
-            {sync !== "cloud" && !isEmbeddedCfg() && (
-              <button
-                onClick={async () => {
-                  const ok = await publishArticlesNow();
-                  onToast(ok ? "مقالات برای همه منتشر شد ✅" : "انتشار ناموفق بود ❌", ok ? "ok" : "err");
-                }}
-                className="flex items-center gap-1.5 rounded-[10px] bg-gold px-3.5 py-2 text-[0.74rem] font-extrabold text-pine transition-all hover:bg-golddeep hover:text-goldsoft active:scale-95"
-              >
-                <IconRefresh className="h-4 w-4" />
-                انتشار فوری
-              </button>
-            )}
-          </div>
+          {!isDefaultArticles() && (
+            <button
+              onClick={() => {
+                if (window.confirm("مقالات به حالت پیش‌فرض برگردند؟ تغییرات شما پاک می‌شود.")) {
+                  resetArticles();
+                  onToast("مقالات به حالت پیش‌فرض برگشت");
+                }
+              }}
+              className="flex items-center gap-1.5 rounded-[10px] border border-clay/50 bg-clay/10 px-3.5 py-2 text-[0.74rem] font-extrabold text-[#f0b3a3] transition-colors hover:bg-clay/20"
+            >
+              <IconRefresh className="h-4 w-4" />
+              بازنشانی پیش‌فرض
+            </button>
+          )}
         </div>
 
         <div className="relative mt-4">
           <IconSearch className="pointer-events-none absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-foam/40" />
-          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="جستجوی عنوان مقاله…" className={`${inputCls} pr-10`} />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="جستجوی عنوان مقاله…"
+            className={`${inputCls} pr-10`}
+          />
         </div>
 
         <div className="mt-4 space-y-2.5">
           {list.length === 0 && (
-            <div className="rounded-[16px] border border-dashed border-foam/20 p-10 text-center text-sm font-bold text-foam/50">مقاله‌ای یافت نشد.</div>
+            <div className="rounded-[16px] border border-dashed border-foam/20 p-10 text-center text-sm font-bold text-foam/50">
+              موردی یافت نشد.
+            </div>
           )}
           {list.map((a) => (
             <div
@@ -687,17 +688,17 @@ function ArticlesPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err"
                     >
                       بله
                     </button>
-                    <button onClick={() => setConfirming(null)} className="rounded-[9px] border border-foam/20 px-3 py-1.5 text-[0.72rem] font-bold text-foam/70 hover:bg-foam/10">
+                    <button
+                      onClick={() => setConfirming(null)}
+                      className="rounded-[9px] border border-foam/20 px-3 py-1.5 text-[0.72rem] font-bold text-foam/70 hover:bg-foam/10"
+                    >
                       انصراف
                     </button>
                   </>
                 ) : (
                   <>
                     <button
-                      onClick={() => {
-                        setEditingId(a.id);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
+                      onClick={() => setEditingId(a.id)}
                       aria-label={`ویرایش ${a.title}`}
                       className="grid h-9 w-9 place-items-center rounded-[10px] border border-foam/15 text-foam/70 transition-colors hover:border-gold hover:text-gold"
                     >
@@ -716,6 +717,11 @@ function ArticlesPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err"
             </div>
           ))}
         </div>
+        <p className="mt-3 text-[0.7rem] leading-6 text-foam/45">
+          {sync === "cloud"
+            ? "مقالات برای همه‌ی بازدیدکنندگان همگام‌سازی می‌شود."
+            : "اگر جدول مقالات وجود ندارد، کد SQL آن را از «راهنمای SQL» بالا اجرا کنید."}
+        </p>
       </section>
     </div>
   );
@@ -733,13 +739,7 @@ function ArticleForm({
   onDone: (msg: string) => void;
   onCancel: () => void;
 }) {
-  const empty = {
-    title: "",
-    category: ARTICLE_CATS[0].id as string,
-    excerpt: "",
-    body: "",
-    cover: "",
-  };
+  const empty = { title: "", category: ARTICLE_CATS[0].id as string, excerpt: "", body: "", cover: "" };
   const [form, setForm] = useState(empty);
   const [errs, setErrs] = useState<{ title?: boolean; excerpt?: boolean; body?: boolean }>({});
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
@@ -765,19 +765,21 @@ function ArticleForm({
   }
 
   const isEdit = !!editing;
-  const bodyParas = form.body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+
+  const bodyParas = form.body
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
   const previewMin = bodyParas.length ? readMinutes(bodyParas) : 0;
-  const field = (bad?: boolean) => `${inputCls} ${bad ? "border-clay! shadow-[0_0_0_3px_rgba(182,90,69,0.18)]" : ""}`;
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const title = form.title.trim();
     const excerpt = form.excerpt.trim();
-    const next = {
-      title: !title || undefined,
-      excerpt: !excerpt || undefined,
-      body: bodyParas.length === 0 || undefined,
-    };
+    const next: typeof errs = {};
+    if (!title) next.title = true;
+    if (!excerpt) next.excerpt = true;
+    if (bodyParas.length === 0) next.body = true;
     setErrs(next);
     if (next.title || next.excerpt || next.body) return;
 
@@ -793,16 +795,19 @@ function ArticleForm({
     };
     if (editing) {
       updateArticle(editing.id, art);
-      onDone(`مقاله‌ی «${title}» ویرایش شد${sync === "cloud" ? " و برای همه منتشر شد" : ""}`);
+      onDone(`مقاله‌ی «${title}» به‌روزرسانی شد${sync === "cloud" ? " و منتشر شد" : ""}`);
     } else {
       addArticle(art);
-      onDone(`مقاله‌ی «${title}» منتشر شد${sync === "cloud" ? " و برای همه" : ""}`);
+      onDone(`مقاله‌ی «${title}» منتشر شد${sync === "cloud" ? " و برای همه قابل مشاهده است" : ""}`);
     }
     setForm(empty);
   };
 
+  const field = (bad?: boolean) =>
+    `${inputCls} ${bad ? "border-clay! shadow-[0_0_0_3px_rgba(182,90,69,0.18)]" : ""}`;
+
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={submit} className="scroll-mt-24">
       <div className="flex items-center justify-between gap-3">
         <h3 className="font-display flex items-center gap-2.5 text-2xl">
           <span className={`grid h-9 w-9 place-items-center rounded-[11px] ${isEdit ? "bg-gold/20 text-gold" : "bg-sea/25 text-[#7fd6cb]"}`}>
@@ -811,7 +816,11 @@ function ArticleForm({
           {isEdit ? "ویرایش مقاله" : "مقاله‌ی جدید"}
         </h3>
         {isEdit && (
-          <button type="button" onClick={onCancel} className="flex items-center gap-1 rounded-full border border-foam/15 px-3 py-1.5 text-[0.7rem] font-bold text-foam/60 hover:bg-foam/10">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex items-center gap-1 rounded-full border border-foam/15 px-3 py-1.5 text-[0.7rem] font-bold text-foam/60 hover:bg-foam/10"
+          >
             <IconClose className="h-3.5 w-3.5" />
             انصراف
           </button>
@@ -827,14 +836,14 @@ function ArticleForm({
               setForm({ ...form, title: e.target.value });
               setErrs((x) => ({ ...x, title: false }));
             }}
-            placeholder="مثلاً: چرا جرم‌گیری سالانه لازم است؟"
+            placeholder="مثلاً: مسواک doğru؛ راهنمای کامل"
             className={field(errs.title)}
           />
           {errs.title && <p className={errCls}>عنوان الزامی است</p>}
         </div>
 
         <div>
-          <label className={labelCls}>دسته‌بندی *</label>
+          <label className={labelCls}>دسته‌بندی</label>
           <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className={inputCls}>
             {ARTICLE_CATS.map((c) => (
               <option key={c.id} value={c.id}>
@@ -845,7 +854,7 @@ function ArticleForm({
         </div>
 
         <div>
-          <label className={labelCls}>چکیده (در کارت مقاله نمایش داده می‌شود) *</label>
+          <label className={labelCls}>چکیده *</label>
           <textarea
             value={form.excerpt}
             onChange={(e) => {
@@ -853,7 +862,7 @@ function ArticleForm({
               setErrs((x) => ({ ...x, excerpt: false }));
             }}
             rows={2}
-            placeholder="یک یا دو جمله که خواننده را ترغیب کند…"
+            placeholder="یک تا دو جمله برای نمایش در کارت مقاله…"
             className={`${field(errs.excerpt)} resize-y`}
           />
           {errs.excerpt && <p className={errCls}>چکیده الزامی است</p>}
@@ -861,13 +870,7 @@ function ArticleForm({
 
         <div>
           <label className={labelCls}>عکس کاور مقاله (اختیاری)</label>
-          <ImagePicker
-            value={form.cover}
-            onChange={(v) => setForm({ ...form, cover: v })}
-            maxSize={900}
-            preview="rect"
-            emptyIcon="news"
-          />
+          <ImagePicker value={form.cover} onChange={(v) => setForm({ ...form, cover: v })} emptyIcon="news" preview="rect" placeholder="آدرس عکس کاور (URL)…" />
         </div>
 
         <div>
@@ -920,16 +923,17 @@ function InsurersPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err"
 
   const list = useMemo(() => {
     const q = query.trim();
-    return insurers.map((x, i) => ({ x, i })).filter(({ x }) => !q || x.name.includes(q));
+    return insurers
+      .map((x, i) => ({ x, i }))
+      .filter(({ x }) => !q || x.name.includes(q));
   }, [insurers, query]);
 
   return (
     <div className="mt-8 grid gap-6 lg:grid-cols-5">
-      <section className="scroll-mt-24 rounded-[20px] border border-foam/10 bg-pine2/70 p-5 lg:sticky lg:top-24 lg:col-span-2 lg:self-start">
+      <section className="scroll-mt-24 rounded-[20px] border border-foam/10 bg-pine2/70 p-5 lg:col-span-2 lg:sticky lg:top-40 lg:self-start">
         <InsurerForm
           editing={editing}
           insurers={insurers}
-          sync={sync}
           onDone={(msg) => {
             setEditing(null);
             onToast(msg);
@@ -944,15 +948,15 @@ function InsurersPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err"
             <IconShield className="h-6 w-6 text-gold" />
             بیمه‌های طرف قرارداد
             <span className="rounded-full bg-foam/10 px-2.5 py-0.5 text-[0.72rem] font-bold text-foam/70">
-              {faNum(list.length)} مورد
+              {faNum(list.length)}
             </span>
           </h2>
           {!isDefaultInsurers() && (
             <button
               onClick={() => {
-                if (window.confirm("فهرست بیمه‌ها به حالت پیش‌فرض سایت برگردد؟")) {
+                if (window.confirm("بیمه‌ها به حالت پیش‌فرض برگردند؟ تغییرات شما پاک می‌شود.")) {
                   resetInsurers();
-                  onToast("فهرست بیمه‌ها به حالت پیش‌فرض برگشت");
+                  onToast("بیمه‌ها به حالت پیش‌فرض برگشت");
                 }
               }}
               className="flex items-center gap-1.5 rounded-[10px] border border-clay/50 bg-clay/10 px-3.5 py-2 text-[0.74rem] font-extrabold text-[#f0b3a3] transition-colors hover:bg-clay/20"
@@ -987,23 +991,19 @@ function InsurersPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err"
               }`}
             >
               {x.logo ? (
-                <span className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-[12px] bg-card p-1.5 ring-1 ring-foam/20">
-                  <img src={x.logo} alt="" className="h-full w-full object-contain" />
-                </span>
+                <img src={x.logo} alt="" className="h-11 w-11 shrink-0 rounded-full border border-foam/20 bg-white object-contain p-0.5" />
               ) : (
                 <span
-                  className="font-display grid h-12 w-12 shrink-0 place-items-center rounded-[12px] text-lg"
+                  className="font-display grid h-11 w-11 shrink-0 place-items-center rounded-full text-lg"
                   style={{ background: `${x.color}22`, color: x.color }}
                 >
                   {x.mono}
                 </span>
               )}
               <div className="min-w-0 flex-1">
-                <span className="font-display block truncate text-base leading-6">{x.name}</span>
-                <span className="mt-0.5 flex items-center gap-1.5 text-[0.68rem] font-bold text-foam/50">
-                  <span className="h-2.5 w-2.5 rounded-full ring-1 ring-foam/30" style={{ background: x.color }} />
-                  رنگ برند
-                  {x.logo && " • دارای لوگو"}
+                <span className="block truncate text-[0.92rem] font-extrabold">{x.name}</span>
+                <span className="block text-[0.66rem] font-bold text-foam/50">
+                  {x.logo ? "دارای لوگو" : "مونوگرام رنگی"}
                 </span>
               </div>
               <div className="flex shrink-0 items-center gap-1.5">
@@ -1017,7 +1017,7 @@ function InsurersPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err"
                       }}
                       className="rounded-[9px] bg-clay px-2.5 py-1.5 text-[0.68rem] font-extrabold text-foam transition-transform active:scale-95"
                     >
-                      حذف
+                      بله
                     </button>
                     <button
                       onClick={() => setConfirming(null)}
@@ -1029,10 +1029,7 @@ function InsurersPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err"
                 ) : (
                   <>
                     <button
-                      onClick={() => {
-                        setEditing(i);
-                        document.getElementById("insurer-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                      }}
+                      onClick={() => setEditing(i)}
                       aria-label={`ویرایش ${x.name}`}
                       className="grid h-9 w-9 place-items-center rounded-[10px] border border-foam/15 text-foam/70 transition-colors hover:border-gold hover:text-gold"
                     >
@@ -1051,19 +1048,11 @@ function InsurersPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err"
             </div>
           ))}
         </div>
-
-        {sync === "pushfail" && (
-          <button
-            onClick={async () => {
-              const ok = await publishInsurersNow();
-              onToast(ok ? "فهرست بیمه‌ها منتشر شد ✅" : "انتشار ناموفق — اتصال را بررسی کنید ❌", ok ? "ok" : "err");
-            }}
-            className="btn btn-gold mt-4 w-full justify-center py-2.5! text-sm"
-          >
-            <IconRefresh className="h-4 w-4" />
-            انتشار فوری فهرست بیمه‌ها
-          </button>
-        )}
+        <p className="mt-3 text-[0.7rem] leading-6 text-foam/45">
+          {sync === "cloud"
+            ? "بیمه‌ها در همان جدول پزشک‌ها (ردیف ۲) ذخیره می‌شوند و برای همه منتشر می‌شوند — بدون نیاز به SQL جدید."
+            : "اتصال ابری کامل نیست؛ تغییرات فقط در همین مرورگر ذخیره می‌شود."}
+        </p>
       </section>
     </div>
   );
@@ -1073,33 +1062,32 @@ function InsurersPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err"
 function InsurerForm({
   editing,
   insurers,
-  sync,
   onDone,
   onCancel,
 }: {
   editing: number | null;
   insurers: Insurer[];
-  sync: string;
   onDone: (msg: string) => void;
   onCancel: () => void;
 }) {
   const empty = { name: "", mono: "", color: "#0e7c74", logo: "" };
   const [form, setForm] = useState(empty);
-  const [err, setErr] = useState(false);
+  const [nameErr, setNameErr] = useState(false);
   const [loadedFor, setLoadedFor] = useState<number | null>(null);
+  const sync = useInsurerSync();
 
   if (editing !== null && loadedFor !== editing) {
     const x = insurers[editing];
     if (x) {
       setLoadedFor(editing);
       setForm({ name: x.name, mono: x.mono, color: x.color, logo: x.logo ?? "" });
-      setErr(false);
+      setNameErr(false);
     }
   }
   if (editing === null && loadedFor !== null) {
     setLoadedFor(null);
     setForm(empty);
-    setErr(false);
+    setNameErr(false);
   }
 
   const isEdit = editing !== null;
@@ -1108,28 +1096,30 @@ function InsurerForm({
     e.preventDefault();
     const name = form.name.trim();
     if (!name) {
-      setErr(true);
+      setNameErr(true);
       return;
     }
-    const mono = form.mono.trim() || name.replace(/^بیمه\s*/, "").slice(0, 2);
     const ins: Insurer = {
       name,
-      mono,
-      color: form.color || "#0e7c74",
+      mono: form.mono.trim() || name.replace(/^بیمه\s*/, "").trim().slice(0, 2) || "ب",
+      color: form.color,
       logo: form.logo.trim() || undefined,
     };
     if (isEdit) {
       updateInsurer(editing, ins);
-      onDone(`تغییرات «${name}» ذخیره شد${sync === "cloud" ? " و برای همه منتشر شد" : ""}`);
+      onDone(`«${name}» به‌روزرسانی شد${sync === "cloud" ? " و برای همه منتشر شد" : ""}`);
     } else {
       addInsurer(ins);
-      onDone(`بیمه‌ی «${name}» اضافه شد${sync === "cloud" ? " و برای همه منتشر شد" : ""}`);
+      onDone(`«${name}» به بیمه‌ها اضافه شد${sync === "cloud" ? " و برای همه منتشر شد" : ""}`);
     }
     setForm(empty);
   };
 
+  const field = (bad?: boolean) =>
+    `${inputCls} ${bad ? "border-clay! shadow-[0_0_0_3px_rgba(182,90,69,0.18)]" : ""}`;
+
   return (
-    <form onSubmit={submit} id="insurer-form" className="scroll-mt-24">
+    <form onSubmit={submit} className="scroll-mt-24">
       <div className="flex items-center justify-between gap-3">
         <h3 className="font-display flex items-center gap-2.5 text-2xl">
           <span className={`grid h-9 w-9 place-items-center rounded-[11px] ${isEdit ? "bg-gold/20 text-gold" : "bg-sea/25 text-[#7fd6cb]"}`}>
@@ -1138,7 +1128,11 @@ function InsurerForm({
           {isEdit ? "ویرایش بیمه" : "افزودن بیمه"}
         </h3>
         {isEdit && (
-          <button type="button" onClick={onCancel} className="flex items-center gap-1 rounded-full border border-foam/15 px-3 py-1.5 text-[0.7rem] font-bold text-foam/60 hover:bg-foam/10">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex items-center gap-1 rounded-full border border-foam/15 px-3 py-1.5 text-[0.7rem] font-bold text-foam/60 hover:bg-foam/10"
+          >
             <IconClose className="h-3.5 w-3.5" />
             انصراف
           </button>
@@ -1152,48 +1146,48 @@ function InsurerForm({
             value={form.name}
             onChange={(e) => {
               setForm({ ...form, name: e.target.value });
-              setErr(false);
+              setNameErr(false);
             }}
-            placeholder="مثلاً: بیمه سامان"
-            className={`${inputCls} ${err ? "border-clay! shadow-[0_0_0_3px_rgba(182,90,69,0.18)]" : ""}`}
+            placeholder="مثلاً: بیمه پاسارگاد"
+            className={field(nameErr)}
           />
-          {err && <p className={errCls}>نام بیمه الزامی است</p>}
+          {nameErr && <p className={errCls}>نام بیمه الزامی است</p>}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className={labelCls}>حروف اختصاری (مونوگرام)</label>
+            <label className={labelCls}>مونوگرام</label>
             <input
               value={form.mono}
               onChange={(e) => setForm({ ...form, mono: e.target.value })}
-              placeholder="مثلاً: سا"
+              placeholder="مثلاً: پا"
               className={inputCls}
             />
           </div>
           <div>
             <label className={labelCls}>رنگ برند</label>
-            <div className="flex items-center gap-2 rounded-[10px] border border-foam/15 bg-pine2 px-2 py-1.5">
+            <div className="flex items-center gap-2">
               <input
                 type="color"
                 value={form.color}
                 onChange={(e) => setForm({ ...form, color: e.target.value })}
-                className="h-8 w-10 cursor-pointer rounded-[6px] border-none bg-transparent p-0"
-                aria-label="انتخاب رنگ برند"
+                className="h-11 w-14 cursor-pointer rounded-[10px] border border-foam/15 bg-pine2"
               />
-              <span dir="ltr" className="text-[0.7rem] font-bold text-foam/50">{form.color}</span>
+              <span dir="ltr" className="text-[0.7rem] font-bold text-foam/50">
+                {form.color}
+              </span>
             </div>
           </div>
         </div>
 
         <div>
-          <label className={labelCls}>لوگوی بیمه (اختیاری — جایگزین مونوگرام می‌شود)</label>
+          <label className={labelCls}>لوگوی بیمه (اختیاری)</label>
           <ImagePicker
             value={form.logo}
             onChange={(v) => setForm({ ...form, logo: v })}
-            maxSize={240}
-            preview="rect"
-            emptyIcon="news"
-            placeholder="آدرس اینترنتی لوگو (URL)…"
+            emptyIcon="shield"
+            maxSize={200}
+            placeholder="آدرس لوگوی بیمه (URL)…"
           />
         </div>
       </div>
@@ -1207,17 +1201,10 @@ function InsurerForm({
         ) : (
           <>
             <IconPlus className="h-4.5 w-4.5" strokeWidth={2.2} />
-            افزودن به فهرست
+            افزودن بیمه
           </>
         )}
       </button>
-
-      <p className="mt-3 flex items-start gap-2 text-[0.7rem] leading-6 text-foam/45">
-        <IconGear className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-        {sync === "cloud"
-          ? "اتصال ابری برقرار است؛ تغییرات همان لحظه برای همه منتشر می‌شود."
-          : "اتصال ابری کامل نیست؛ تغییرات در همین مرورگر ذخیره می‌شود."}
-      </p>
     </form>
   );
 }
@@ -1228,7 +1215,7 @@ const SYNC_META: Record<string, { text: string; cls: string; dot: string }> = {
   loading: { text: "در حال دریافت فهرست مشترک از فضای ابری…", cls: "border-foam/20 bg-foam/5 text-foam/80", dot: "bg-foam/70 pulse-ring" },
   cloud: { text: "متصل به فضای ابری — هر تغییر، همان لحظه برای همه منتشر می‌شود", cls: "border-sea/50 bg-sea/15 text-[#7fd6cb]", dot: "bg-teal pulse-ring" },
   error: { text: "ارتباط با فضای ابری برقرار نشد — حالت محلی فعال است", cls: "border-clay/50 bg-clay/10 text-[#f0b3a3]", dot: "bg-clay" },
-  pushfail: { text: "انتشار ناموفق — SQL را دوباره اجرا کنید یا «انتشار فوری» را بزنید", cls: "border-clay/50 bg-clay/10 text-[#f0b3a3]", dot: "bg-clay pulse-ring" },
+  pushfail: { text: "انتشار ناموفق — «انتشار فوری همه» را بزنید", cls: "border-clay/50 bg-clay/10 text-[#f0b3a3]", dot: "bg-clay pulse-ring" },
 };
 
 function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") => void }) {
@@ -1278,15 +1265,15 @@ function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") =
         <div className="flex flex-wrap items-center gap-2">
           <span className={`flex items-center gap-2.5 rounded-full border px-3.5 py-1.5 text-[0.72rem] font-extrabold ${meta.cls}`}>
             <span className={`h-2 w-2 shrink-0 rounded-full ${meta.dot}`} />
-            پزشکان: {meta.text}
+            پزشکان
           </span>
           <span className={`flex items-center gap-2.5 rounded-full border px-3.5 py-1.5 text-[0.72rem] font-extrabold ${artMeta.cls}`}>
             <span className={`h-2 w-2 shrink-0 rounded-full ${artMeta.dot}`} />
-            مقالات: {artMeta.text}
+            مقالات
           </span>
           <span className={`flex items-center gap-2.5 rounded-full border px-3.5 py-1.5 text-[0.72rem] font-extrabold ${insMeta.cls}`}>
             <span className={`h-2 w-2 shrink-0 rounded-full ${insMeta.dot}`} />
-            بیمه‌ها: {insMeta.text}
+            بیمه‌ها
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -1312,17 +1299,17 @@ function CloudPanel({ onToast }: { onToast: (msg: string, kind?: "ok" | "err") =
           <p className="text-[0.8rem] leading-7 text-foam/80">
             {isEmbeddedCfg() ? (
               <>
-                اتصال این سایت به فضای ابری انجام شده است. فهرست <b className="text-foam">بیمه‌ها</b> در همان جدول پزشک‌ها
-                ذخیره می‌شود و نیاز به ساخت جدول ندارد. اگر جدول <b className="text-foam">مقالات</b> وجود ندارد، کد زیر را در{" "}
-                <b className="text-foam">SQL Editor</b> پروژه اجرا کنید:
+                اتصال این سایت به فضای ابری انجام شده است. <b className="text-foam">بیمه‌ها</b> در همان جدول پزشک‌ها
+                ذخیره می‌شوند و نیازی به SQL ندارند؛ فقط اگر جدول <b className="text-foam">مقالات</b> وجود ندارد، کد زیر را در{" "}
+                <b className="text-foam">SQL Editor</b> اجرا کنید:
               </>
             ) : (
-              <>برای راه‌اندازی، این دو کد را در <b className="text-foam">SQL Editor</b> پروژه‌ی Supabase اجرا (Run) کنید. بیمه‌ها نیازی به جدول جدا ندارند:</>
+              <>برای راه‌اندازی، این دو کد را در <b className="text-foam">SQL Editor</b> پروژه‌ی Supabase اجرا (Run) کنید:</>
             )}
           </p>
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
             {([
-              { kind: "d" as const, title: "جدول پزشکان", sql: SETUP_SQL },
+              { kind: "d" as const, title: "جدول پزشکان (و بیمه‌ها)", sql: SETUP_SQL },
               { kind: "a" as const, title: "جدول مقالات", sql: ARTICLES_SQL },
             ]).map((b) => (
               <div key={b.kind} className="relative">

@@ -6,7 +6,7 @@ export type CloudCfg = { url: string; key: string };
 
 /**
  * تنظیمات اتصالِ خود سایت — مستقیم داخل کد قرار گرفته تا «همه‌ی بازدیدکنندگان»
- * در هر مرورگر و دستگاهی، به‌طور خودکار از فهرست مشترک پزشکان و مقالات استفاده کنند.
+ * در هر مرورگر و دستگاهی، به‌طور خودکار از فهرست مشترک استفاده کنند.
  */
 export const DEFAULT_CFG: CloudCfg = {
   url: "https://nrcezlwxksqmfzfsjsyw.supabase.co",
@@ -68,12 +68,13 @@ const authHeaders = (key: string): Record<string, string> => ({
   "Content-Type": "application/json",
 });
 
-const endpoint = (cfg: CloudCfg) => `${cfg.url}/rest/v1/doctors`;
-const articlesEndpoint = (cfg: CloudCfg) => `${cfg.url}/rest/v1/articles`;
+const doctorsUrl = (cfg: CloudCfg) => `${cfg.url}/rest/v1/doctors`;
+const articlesUrl = (cfg: CloudCfg) => `${cfg.url}/rest/v1/articles`;
 
-async function fetchRow(url: string, key: string): Promise<unknown[] | null> {
+/** خواندن یک ردیف از جدول بر اساس شناسه — null یعنی خطا در ارتباط */
+async function fetchRowById(url: string, key: string, id: number): Promise<unknown[] | null> {
   try {
-    const res = await fetch(`${url}?id=eq.1&select=data`, { headers: authHeaders(key) });
+    const res = await fetch(`${url}?id=eq.${id}&select=data`, { headers: authHeaders(key) });
     if (!res.ok) return null;
     const rows = (await res.json()) as { data?: unknown[] }[];
     const list = rows[0]?.data;
@@ -83,12 +84,13 @@ async function fetchRow(url: string, key: string): Promise<unknown[] | null> {
   }
 }
 
-async function pushRow(url: string, key: string, list: unknown[], rowId = 1): Promise<boolean> {
+/** نوشتن یک ردیف (upsert با شناسه) */
+async function pushRow(url: string, key: string, list: unknown[], id: number): Promise<boolean> {
   try {
     const res = await fetch(url, {
       method: "POST",
       headers: { ...authHeaders(key), Prefer: "resolution=merge-duplicates" },
-      body: JSON.stringify({ id: rowId,  list, updated_at: new Date().toISOString() }),
+      body: JSON.stringify({ id,  list, updated_at: new Date().toISOString() }),
     });
     return res.ok || res.status === 201;
   } catch {
@@ -96,61 +98,51 @@ async function pushRow(url: string, key: string, list: unknown[], rowId = 1): Pr
   }
 }
 
-async function fetchRowById(url: string, key: string, rowId: number): Promise<unknown[] | null> {
-  try {
-    const res = await fetch(`${url}?id=eq.${rowId}&select=data`, { headers: authHeaders(key) });
-    if (!res.ok) return null;
-    const rows = (await res.json()) as { data?: unknown[] }[];
-    const list = rows[0]?.data;
-    return Array.isArray(list) ? list : [];
-  } catch {
-    return null;
-  }
-}
-
-/** پزشک‌ها — null یعنی خطا در ارتباط، [] یعنی اتصال هست ولی فهرست خالی */
+/* ─────────────── پزشک‌ها → جدول doctors، ردیف ۱ ─────────────── */
 export async function fetchCloudDoctors(): Promise<Doctor[] | null> {
   const cfg = getCloudCfg();
   if (!cfg) return null;
-  const rows = await fetchRow(endpoint(cfg), cfg.key);
+  const rows = await fetchRowById(doctorsUrl(cfg), cfg.key, 1);
   return rows as Doctor[] | null;
 }
 
 export async function pushCloudDoctors(list: Doctor[]): Promise<boolean> {
   const cfg = getCloudCfg();
   if (!cfg) return false;
-  return pushRow(endpoint(cfg), cfg.key, list);
+  return pushRow(doctorsUrl(cfg), cfg.key, list, 1);
 }
 
-/** مقالات */
+/* ─────────────── مقالات → جدول articles، ردیف ۱ ─────────────── */
 export async function fetchCloudArticles(): Promise<Article[] | null> {
   const cfg = getCloudCfg();
   if (!cfg) return null;
-  const rows = await fetchRow(articlesEndpoint(cfg), cfg.key);
+  const rows = await fetchRowById(articlesUrl(cfg), cfg.key, 1);
   return rows as Article[] | null;
 }
 
 export async function pushCloudArticles(list: Article[]): Promise<boolean> {
   const cfg = getCloudCfg();
   if (!cfg) return false;
-  return pushRow(articlesEndpoint(cfg), cfg.key, list);
+  return pushRow(articlesUrl(cfg), cfg.key, list, 1);
 }
 
-/**
- * بیمه‌ها — برای اینکه بدون ساخت جدول جدید، همان لحظه برای همه‌ی
- * بازدیدکنندگان منتشر شود، در همان جدول پزشک‌ها با شناسه‌ی ردیف ۲ ذخیره می‌شود.
+/*
+ * ─────────────── بیمه‌ها → همان جدول doctors، ردیف ۲ ───────────────
+ * برای اینکه بیمه‌ها بدون ساخت جدول جدید، همان لحظه برای همه منتشر شوند،
+ * در همان جدول پزشک‌ها با شناسه‌ی ردیف ۲ ذخیره می‌شوند (ستون data از نوع jsonb
+ * است و هر آرایه‌ای را می‌پذیرد). بنابراین نیازی به اجرای SQL جدید نیست.
  */
 export async function fetchCloudInsurers(): Promise<Insurer[] | null> {
   const cfg = getCloudCfg();
   if (!cfg) return null;
-  const rows = await fetchRowById(endpoint(cfg), cfg.key, 2);
+  const rows = await fetchRowById(doctorsUrl(cfg), cfg.key, 2);
   return rows as Insurer[] | null;
 }
 
 export async function pushCloudInsurers(list: Insurer[]): Promise<boolean> {
   const cfg = getCloudCfg();
   if (!cfg) return false;
-  return pushRow(endpoint(cfg), cfg.key, list, 2);
+  return pushRow(doctorsUrl(cfg), cfg.key, list, 2);
 }
 
 /* ─────────────── آزمایش اتصال با تشخیص دقیق ─────────────── */
@@ -206,16 +198,4 @@ alter table articles enable row level security;
 
 drop policy if exists "public access" on articles;
 create policy "public access" on articles
-  for all using (true) with check (true);`;
-
-export const INSURERS_SQL = `create table if not exists insurers (
-  id int primary key,
-  data jsonb not null,
-  updated_at timestamptz default now()
-);
-
-alter table insurers enable row level security;
-
-drop policy if exists "public access" on insurers;
-create policy "public access" on insurers
   for all using (true) with check (true);`;

@@ -216,7 +216,7 @@ export function ContactSection() {
       </div>
 
       <div className="mt-8 grid gap-4 lg:grid-cols-5">
-        <Reveal delay={120} className="lg:col-span-3 [&>div]:h-full">
+        <Reveal delay={120} className="lg:col-span-3">
           <MapCard />
         </Reveal>
         <Reveal delay={200} className="lg:col-span-2">

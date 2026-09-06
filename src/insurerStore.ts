@@ -32,6 +32,10 @@ const notify = () => listeners.forEach((l) => l());
 
 let initStarted = false;
 
+/*
+ * بیمه‌ها در همان جدول پزشک‌ها (ردیف ۲) ذخیره می‌شوند؛ بنابراین به‌محض اینکه
+ * اتصال پزشک‌ها برقرار باشد، بیمه‌ها هم بدون هیچ SQL جدیدی برای همه منتشر می‌شوند.
+ */
 export function initInsurersCloud(force = false) {
   if (initStarted && !force) return;
   initStarted = true;
@@ -44,7 +48,7 @@ export function initInsurersCloud(force = false) {
   notify();
   void fetchCloudInsurers().then((remote) => {
     if (remote === null) {
-      // احتمالاً جدول insurers هنوز ساخته نشده — فهرست محلی نمایش داده می‌شود
+      // خطا در ارتباط — فهرست محلی نمایش داده می‌شود
       sync = "error";
       notify();
       return;
@@ -56,7 +60,7 @@ export function initInsurersCloud(force = false) {
       notify();
       return;
     }
-    // جدول خالی است → بیمه‌های پیش‌فرض منتشر می‌شوند
+    // ردیف خالی است → بیمه‌های پیش‌فرض همان لحظه منتشر می‌شوند
     void pushCloudInsurers(cache).then((ok) => {
       sync = ok ? "cloud" : "pushfail";
       notify();
@@ -101,6 +105,6 @@ export const resetInsurers = () => commit([...INSURERS]);
 export const publishInsurersNow = () => pushCloudInsurers(cache);
 
 export const isDefaultInsurers = () =>
-  cache.length === INSURERS.length && cache.every((c, i) => c.name === INSURERS[i].name);
+  cache.length === INSURERS.length && cache.every((x, i) => x.name === INSURERS[i].name);
 
 initInsurersCloud();

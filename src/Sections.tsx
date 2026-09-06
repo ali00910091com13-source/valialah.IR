@@ -1,4 +1,4 @@
-import { STATS, DEPARTMENTS, UNITS, faNum, type TabId, type Department } from "./data";
+import { STATS, DEPARTMENTS, UNITS, faNum, type TabId } from "./data";
 import { Reveal, CountUp } from "./fx";
 import { ICONS, IconStar8, IconCheck, IconArrow, IconHeartPulse } from "./Icons";
 
@@ -36,157 +36,123 @@ export function StatsBand() {
   );
 }
 
-/* ─────────────── بخش‌های تخصصی — پرونده‌های درمانی ─────────────── */
+/* ─────────────── خدمات تخصصی — پرونده‌های درمانی ─────────────── */
 export function Departments({ onNavigate }: { onNavigate?: (id: TabId, articleId?: string) => void }) {
   return (
-    <section className="relative overflow-hidden bg-paper py-14 sm:py-24">
+    <section id="departments" className="relative scroll-mt-24 overflow-hidden bg-paper py-14 sm:py-24">
       <div className="girih absolute inset-0 opacity-40" aria-hidden="true" />
       <div className="wrap relative">
-        {/* سربرگ editorial */}
         <Reveal>
-          <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-5 border-b-[3px] border-pine pb-6">
-            <div>
-              <span className="eyebrow">
-                <IconStar8 className="h-4 w-4 text-gold" />
-                پرونده‌های درمانی مجموعه
-              </span>
-              <h1 className="font-display mt-4 text-[2.6rem] leading-[1.15] text-pine sm:text-6xl">
-                بخش‌های <span className="text-sea">تخصصی</span>
-              </h1>
-            </div>
-            <p className="max-w-sm text-sm leading-8 text-inksoft sm:text-[0.95rem]">
-              سه پرونده‌ی مجزا؛ هر کدام با کادر مجرب، تجهیزات اختصاصی و تعرفه‌ی
-              خیریه — از دندان تا تصویربرداری، زیر یک سقف.
+          <div className="max-w-2xl">
+            <span className="eyebrow">
+              <IconStar8 className="h-4 w-4 text-gold" />
+              بخش‌ها و خدمات تخصصی
+            </span>
+            <h1 className="font-display mt-4 text-4xl leading-[1.25] text-pine sm:text-5xl">
+              پرونده‌ی <span className="text-sea">سلامت</span> شما، همین‌جا باز می‌شود
+            </h1>
+            <p className="mt-4 leading-8 text-inksoft">
+              سه بخش تخصصی اصلی درمانگاه را ورق بزنید؛ هر بخش با تعرفه‌ی خیریه و
+              کادری مجرب، آماده‌ی خدمت است.
             </p>
           </div>
         </Reveal>
 
-        {/* پرونده‌ها روی خط‌الوقت */}
-        <div className="relative">
-          <div
-            className="absolute bottom-6 start-[1.3rem] top-6 hidden w-px border-s-2 border-dashed border-sea/30 md:block"
+        {/* خط‌الوقت عمودی */}
+        <div className="relative mt-14">
+          <span
+            className="absolute right-[1.4rem] top-0 hidden h-full w-[3px] rounded-full bg-gradient-to-b from-sea/40 via-gold/40 to-sea/40 sm:block"
             aria-hidden="true"
           />
-          {DEPARTMENTS.map((d, i) => (
-            <Dossier key={d.id} d={d} i={i} onNavigate={onNavigate} />
-          ))}
+          <div className="space-y-16">
+            {DEPARTMENTS.map((d, i) => {
+              const Ic = ICONS[d.icon];
+              const flip = i % 2 === 1;
+              return (
+                <Reveal key={d.id} delay={60}>
+                  <article className="relative grid gap-6 sm:grid-cols-12 sm:gap-8">
+                    {/* شماره روی خط‌الوقت */}
+                    <span
+                      className="font-display absolute right-0 top-1 z-10 hidden h-12 w-12 place-items-center rounded-full border-4 border-paper bg-pine text-2xl text-gold shadow-lg sm:grid"
+                      aria-hidden="true"
+                    >
+                      {faNum(i + 1)}
+                    </span>
+
+                    {/* تصویر قوسی */}
+                    <div className={`sm:col-span-5 ${flip ? "sm:order-2 sm:col-start-8" : ""}`}>
+                      <div className="arch-ring group relative bg-gradient-to-b from-sea/25 to-transparent p-2.5">
+                        <div className="arch relative aspect-[4/4.2] overflow-hidden">
+                          <img
+                            src={d.image}
+                            alt={d.title}
+                            className="kenburns h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-pine/60 via-transparent to-transparent" />
+                          <span className="absolute bottom-4 start-5 flex items-center gap-2 rounded-full bg-card/95 px-3.5 py-1.5 text-[0.7rem] font-extrabold text-seadeep shadow">
+                            {Ic && <Ic className="h-4 w-4 text-sea" />}
+                            {d.short}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* متن */}
+                    <div className={`sm:col-span-7 ${flip ? "sm:order-1 sm:col-start-1" : ""}`}>
+                      <div className="flex items-start gap-4">
+                        <span className="font-display shrink-0 text-6xl leading-none text-sea/15 sm:text-7xl" aria-hidden="true">
+                          {faNum(i + 1)}
+                        </span>
+                        <div className="pt-1.5">
+                          <h2 className="font-display text-3xl leading-tight text-pine sm:text-4xl">{d.title}</h2>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {d.badges.map((b) => (
+                              <span key={b} className="chip">
+                                <IconStar8 className="h-3 w-3 text-gold" />
+                                {b}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <p className="mt-4 leading-8 text-inksoft">{d.desc}</p>
+                      <ul className="mt-5 grid gap-2.5 sm:grid-cols-2">
+                        {d.services.map((s) => (
+                          <li
+                            key={s}
+                            className="flex items-start gap-2.5 rounded-[11px] bg-mist/60 px-3.5 py-2.5 text-[0.83rem] font-bold text-pine transition-colors hover:bg-goldsoft/70"
+                          >
+                            <IconCheck className="mt-0.5 h-4 w-4 shrink-0 text-sea" strokeWidth={2.4} />
+                            {s}
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-6 flex flex-wrap items-center gap-4">
+                        <button
+                          onClick={() => onNavigate?.("doctors")}
+                          className="group inline-flex items-center gap-2 rounded-[10px] bg-sea px-5 py-2.5 text-sm font-bold text-foam transition-all hover:-translate-y-0.5 hover:bg-seadeep"
+                        >
+                          پزشکان این حوزه
+                          <IconArrow className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                </Reveal>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function Dossier({
-  d,
-  i,
-  onNavigate,
-}: {
-  d: Department;
-  i: number;
-  onNavigate?: (id: TabId, articleId?: string) => void;
-}) {
-  const num = faNum(String(i + 1).padStart(2, "0"));
-  const flip = i % 2 === 1;
-  const Ic = ICONS[d.icon];
-
-  return (
-    <article className="relative border-b border-sea/15 py-10 last:border-b-0 sm:py-14">
-      {/* گره‌ی خط‌الوقت */}
-      <span
-        className="absolute start-0 top-14 hidden h-11 w-11 place-items-center rounded-full bg-pine text-gold shadow-[0_10px_24px_-10px_rgba(11,59,56,0.6)] ring-4 ring-paper md:grid"
-        aria-hidden="true"
-      >
-        <span className="font-display text-lg leading-none pt-1">{num}</span>
-      </span>
-
-      <div className="md:ps-20">
-        {/* سرتیتر پرونده با شماره‌ی شبحی */}
-        <Reveal>
-          <div className="relative">
-            <span
-              className="font-display pointer-events-none absolute -top-8 start-0 select-none text-[5rem] leading-none text-sea/10 sm:-top-10 sm:text-[7.5rem]"
-              aria-hidden="true"
-            >
-              {num}
-            </span>
-            <div className="relative flex flex-wrap items-center gap-3 sm:gap-4">
-              {Ic && (
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[14px] bg-pine text-gold shadow-[0_12px_26px_-12px_rgba(11,59,56,0.65)] sm:h-14 sm:w-14">
-                  <Ic className="h-6 w-6 sm:h-7 sm:w-7" />
-                </span>
-              )}
-              <h2 className="font-display text-3xl text-pine sm:text-5xl">{d.title}</h2>
-              <span className="chip">{d.short}</span>
-              <span className="chip max-[400px]:hidden">
-                <IconCheck className="h-3 w-3 text-sea" strokeWidth={2.6} />
-                {faNum(d.services.length)} خدمت فعال
-              </span>
-            </div>
-          </div>
-        </Reveal>
-
-        <div className="mt-7 grid gap-7 lg:grid-cols-12 lg:items-start">
-          {/* تصویر قوسی */}
-          <Reveal delay={120} className={`lg:col-span-5 ${flip ? "lg:order-2" : ""}`}>
-            <div className="arch-ring bg-gradient-to-b from-gold/50 via-sea/25 to-transparent p-2 shadow-[0_30px_60px_-35px_rgba(11,59,56,0.55)] sm:p-2.5">
-              <div className="arch relative aspect-[4/3.3] overflow-hidden">
-                <img src={d.image} alt={d.title} className="kenburns h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-pine/65 via-pine/5 to-transparent" aria-hidden="true" />
-                <span className="font-display absolute end-4 top-3 rounded-full bg-pine/55 px-3 py-1 text-lg leading-7 text-gold backdrop-blur-sm">
-                  {faNum(d.services.length)} خدمت
-                </span>
-                <div className="absolute bottom-3 start-3.5 end-3.5 flex flex-wrap gap-1.5">
-                  {d.badges.slice(0, 2).map((b) => (
-                    <span key={b} className="rounded-full bg-card/90 px-2.5 py-1 text-[0.62rem] font-extrabold text-seadeep">
-                      {b}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </Reveal>
-
-          {/* شرح و خدمات */}
-          <Reveal delay={200} className={`lg:col-span-7 ${flip ? "lg:order-1" : ""}`}>
-            <p className="max-w-2xl text-[0.92rem] leading-8 text-inksoft sm:text-base sm:leading-9">
-              {d.desc}
-            </p>
-            <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
-              {d.services.map((s) => (
-                <li
-                  key={s}
-                  className="group flex items-start gap-3 rounded-[12px] border border-sea/12 bg-card px-3.5 py-3 transition-all duration-300 hover:-translate-y-0.5 hover:border-gold/60 hover:bg-goldsoft/50"
-                >
-                  <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-sea/12 text-sea transition-all duration-300 group-hover:scale-110 group-hover:bg-gold group-hover:text-pine">
-                    <IconCheck className="h-3.5 w-3.5" strokeWidth={2.6} />
-                  </span>
-                  <span className="text-[0.82rem] font-bold leading-6 text-pine">{s}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => onNavigate?.("doctors")}
-                className="group btn btn-sea py-2.5! text-sm"
-              >
-                پزشکان {d.title}
-                <IconArrow className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              </button>
-              {d.badges[2] && <span className="chip">{d.badges[2]}</span>}
-            </div>
-          </Reveal>
-        </div>
-      </div>
-    </article>
-  );
-}
-
 /* ─────────────── سایر بخش‌ها (بنتو) ─────────────── */
 export function OtherUnits() {
   const [big, ...rest] = UNITS;
-  const BigIc = ICONS[big.icon];
   return (
-    <section className="relative bg-mist/60 py-14 sm:py-24">
+    <section id="units" className="relative scroll-mt-24 bg-mist/60 py-14 sm:py-24">
       <div className="wrap">
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -212,13 +178,16 @@ export function OtherUnits() {
               <div className="girih-light absolute inset-0" aria-hidden="true" />
               <div className="relative">
                 <span className="grid h-14 w-14 place-items-center rounded-[15px] bg-gold text-pine">
-                  {BigIc && <BigIc className="h-7 w-7" />}
+                  {ICONS[big.icon] && <span className="[&>svg]:h-7 [&>svg]:w-7">{renderIcon(big.icon)}</span>}
                 </span>
                 <h3 className="font-display mt-5 text-3xl">{big.title}</h3>
                 <p className="mt-2 max-w-md text-[0.85rem] leading-7 text-foam/70">{big.desc}</p>
                 <div className="mt-5 flex flex-wrap gap-2">
                   {big.chips?.map((c) => (
-                    <span key={c} className="rounded-full border border-foam/25 px-3 py-1.5 text-[0.7rem] font-extrabold text-foam/85 transition-colors hover:border-gold hover:text-gold">
+                    <span
+                      key={c}
+                      className="rounded-full border border-foam/25 px-3 py-1.5 text-[0.7rem] font-extrabold text-foam/85 transition-colors hover:border-gold hover:text-gold"
+                    >
                       {c}
                     </span>
                   ))}
@@ -226,22 +195,24 @@ export function OtherUnits() {
               </div>
             </div>
           </Reveal>
-          {rest.map((u, i) => {
-            const Ic = ICONS[u.icon];
-            return (
-              <Reveal key={u.title} delay={120 + i * 80}>
-                <div className="card-lift group h-full rounded-[18px] border border-sea/15 bg-card p-6">
-                  <span className="grid h-12 w-12 place-items-center rounded-[13px] bg-mist text-sea transition-colors duration-300 group-hover:bg-sea group-hover:text-foam">
-                    {Ic && <Ic className="h-6 w-6" />}
-                  </span>
-                  <h3 className="font-display mt-4 text-2xl text-pine">{u.title}</h3>
-                  <p className="mt-1.5 text-[0.8rem] leading-7 text-inksoft">{u.desc}</p>
-                </div>
-              </Reveal>
-            );
-          })}
+          {rest.map((u, i) => (
+            <Reveal key={u.title} delay={120 + i * 80}>
+              <div className="card-lift group h-full rounded-[18px] border border-sea/15 bg-card p-6">
+                <span className="grid h-12 w-12 place-items-center rounded-[13px] bg-mist text-sea transition-colors duration-300 group-hover:bg-sea group-hover:text-foam">
+                  {renderIcon(u.icon)}
+                </span>
+                <h3 className="font-display mt-4 text-2xl text-pine">{u.title}</h3>
+                <p className="mt-1.5 text-[0.8rem] leading-7 text-inksoft">{u.desc}</p>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </div>
     </section>
   );
+}
+
+function renderIcon(name: string) {
+  const Ic = ICONS[name];
+  return Ic ? <Ic className="h-6 w-6" /> : null;
 }

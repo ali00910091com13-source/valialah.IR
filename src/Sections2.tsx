@@ -29,7 +29,7 @@ function InsurerTile({ ins, i }: { ins: Insurer; i: number }) {
           aria-hidden="true"
         />
         {ins.logo ? (
-          <span className="mx-auto grid h-14 w-14 place-items-center overflow-hidden rounded-[14px] bg-mist p-1.5 ring-1 ring-sea/15 transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105">
+          <span className="mx-auto grid h-14 w-14 place-items-center overflow-hidden rounded-full bg-white ring-2 transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105" style={{ boxShadow: `0 0 0 3px ${ins.color}22` }}>
             <img src={ins.logo} alt={`لوگوی ${ins.name}`} className="h-full w-full object-contain" />
           </span>
         ) : (
@@ -52,6 +52,7 @@ function InsurerTile({ ins, i }: { ins: Insurer; i: number }) {
 
 export function Insurance() {
   const insurers = useInsurers();
+
   return (
     <div className="relative overflow-hidden bg-paper py-14 sm:py-24">
       <div className="girih absolute inset-0 opacity-50" aria-hidden="true" />

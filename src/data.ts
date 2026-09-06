@@ -274,7 +274,6 @@ export type Article = {
   title: string;
   category: string;
   excerpt: string;
-  /** پاراگراف‌ها؛ خط‌هایی که با «## » شروع شوند تیتر فرعی می‌شوند */
   body: string[];
   date: string;
   author?: string;

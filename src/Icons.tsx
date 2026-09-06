@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type FC, type SVGProps } from "react";
+import { useState, type FC, type SVGProps } from "react";
 
 export type P = SVGProps<SVGSVGElement>;
 
@@ -144,15 +144,6 @@ export const IconHeartPulse: FC<P> = (p) => (
   </svg>
 );
 
-export const IconHandHeart: FC<P> = (p) => (
-  <svg {...base} {...p}>
-    <path d="M3 14.5V21" />
-    <path d="M3 17h3.5l3 1.5h5a1.6 1.6 0 0 0 0-3.2H10" />
-    <path d="M14.5 15.5 19 12.8a1.7 1.7 0 0 1 2 2.8l-4.5 3.9H9.5" />
-    <path d="M12 9.8C9.9 8.1 8.8 6.9 8.8 5.5 8.8 4.5 9.5 3.8 10.4 3.8c.7 0 1.3.4 1.6 1 .4-.6 1-1 1.7-1 .9 0 1.6.7 1.6 1.7 0 1.4-1.2 2.6-3.3 4.3z" />
-  </svg>
-);
-
 export const IconCheck: FC<P> = (p) => (
   <svg {...base} {...p}>
     <path d="m5 12.5 4.5 4.5L19 7.5" />
@@ -189,6 +180,12 @@ export const IconCalendar: FC<P> = (p) => (
   </svg>
 );
 
+export const IconCross: FC<P> = (p) => (
+  <svg {...base} {...p}>
+    <path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z" />
+  </svg>
+);
+
 export const IconSearch: FC<P> = (p) => (
   <svg {...base} {...p}>
     <circle cx="10.5" cy="10.5" r="6" />
@@ -214,9 +211,9 @@ export const IconHome: FC<P> = (p) => (
 
 export const IconNews: FC<P> = (p) => (
   <svg {...base} {...p}>
-    <path d="M4 5.5h13.5V19a1.8 1.8 0 0 0 1.8 1.8H5.8A1.8 1.8 0 0 1 4 19z" />
-    <path d="M17.5 9H20v10a1.8 1.8 0 0 1-1.8 1.8" />
-    <path d="M7 9h7.5M7 12.5h7.5M7 16h4.5" />
+    <path d="M4 5h13v14a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2z" />
+    <path d="M17 8h3v11a2 2 0 0 1-2 2" />
+    <path d="M7 9h7M7 12.5h7M7 16h4.5" />
   </svg>
 );
 
@@ -291,22 +288,17 @@ export const LogoMark: FC<P> = (p) => (
   </svg>
 );
 
-/** لوگوی رسمی با جایگزین خودکار در صورت قطع بودن تصویر */
-export const LogoImg: FC<{ src: string; className?: string; style?: CSSProperties }> = ({
-  src,
-  className = "",
-  style,
-}) => {
+/** لوگوی تصویر با fallback خودکار */
+export const LogoImg: FC<{ src: string; className?: string }> = ({ src, className = "" }) => {
   const [failed, setFailed] = useState(false);
   if (failed) {
-    return <LogoMark className={`${className} text-sea`} style={style} />;
+    return <LogoMark className={`${className} text-sea`} />;
   }
   return (
     <img
       src={src}
       alt="لوگوی درمانگاه خیریه آوای مهر ولی‌الله"
       className={className}
-      style={style}
       onError={() => setFailed(true)}
     />
   );
@@ -331,12 +323,12 @@ export const ICONS: Record<string, FC<P>> = {
   pin: IconPin,
   heart: IconHeart,
   heartPulse: IconHeartPulse,
-  handHeart: IconHandHeart,
   check: IconCheck,
   arrow: IconArrow,
   star8: IconStar8,
   instagram: IconInstagram,
   calendar: IconCalendar,
+  cross: IconCross,
   search: IconSearch,
   doctor: IconDoctor,
   home: IconHome,

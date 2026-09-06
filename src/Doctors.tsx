@@ -24,8 +24,7 @@ const tintOf = (spec: string) => {
   const i = DOCTOR_SPECS.findIndex((s) => s.id === spec);
   return TINTS[(i < 0 ? 0 : i) % TINTS.length];
 };
-const monoOf = (name: string) =>
-  name.replace(/^دکتر\s*/, "").trim().charAt(0) || "؟";
+const monoOf = (name: string) => name.replace(/^دکتر\s*/, "").trim().charAt(0) || "؟";
 
 export default function Doctors() {
   const [query, setQuery] = useState("");
@@ -63,7 +62,6 @@ export default function Doctors() {
           </div>
         </Reveal>
 
-        {/* جستجو */}
         <Reveal delay={120}>
           <div className="relative mt-8 max-w-xl">
             <IconSearch className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-inksoft/60" />
@@ -76,7 +74,6 @@ export default function Doctors() {
           </div>
         </Reveal>
 
-        {/* فیلتر تخصص‌ها */}
         <Reveal delay={180}>
           <div className="no-scrollbar mt-5 flex gap-2 overflow-x-auto pb-1">
             <button
@@ -110,7 +107,6 @@ export default function Doctors() {
           </div>
         </Reveal>
 
-        {/* کارت پزشکان */}
         {list.length === 0 ? (
           <div className="mt-10 rounded-[18px] border border-dashed border-sea/30 bg-card p-12 text-center">
             <IconDoctor className="mx-auto h-12 w-12 text-sea/40" />
@@ -127,7 +123,7 @@ export default function Doctors() {
                       <img src={d.photo} alt={d.name} className="h-14 w-14 shrink-0 rounded-[15px] object-cover ring-2 ring-sea/25" />
                     ) : (
                       <span
-                        className="font-display grid h-14 w-14 shrink-0 place-items-center rounded-[15px] text-2xl ring-2 transition-transform duration-300 group-hover:-translate-y-1"
+                        className="font-display grid h-14 w-14 shrink-0 place-items-center rounded-[15px] text-2xl transition-transform duration-300 group-hover:-translate-y-1"
                         style={{ background: `${tintOf(d.spec)}1a`, color: tintOf(d.spec), boxShadow: `inset 0 0 0 2px ${tintOf(d.spec)}33` }}
                       >
                         {monoOf(d.name)}
@@ -169,7 +165,6 @@ export default function Doctors() {
           </div>
         )}
 
-        {/* نوار استعلام برنامه پزشکان */}
         <Reveal delay={200}>
           <div className="relative mt-10 overflow-hidden rounded-[20px] bg-pine p-7 text-center text-foam sm:p-9">
             <div className="girih-light absolute inset-0" aria-hidden="true" />
