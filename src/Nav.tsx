@@ -94,8 +94,6 @@ export default function Nav({
           </nav>
 
           <div className="flex shrink-0 items-center gap-2">
-            {/* رزرو نوبت فقط در دسکتاپ؛ در موبایل داخل منوی کشویی است */}
-            <BookingMenu label="رزرو نوبت" className="hidden lg:block" />
             <button
               onClick={() => setMenu((m) => !m)}
               aria-label="منو"
