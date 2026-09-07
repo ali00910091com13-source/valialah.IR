@@ -1,7 +1,6 @@
 name: Deploy to GitHub Pages
 
 on:
-  # با push به هر شاخه‌ای، سایت ساخته و منتشر می‌شود
   push:
     branches: ["**"]
   workflow_dispatch:
@@ -23,7 +22,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      # اگر package-lock.json وجود داشته باشد از npm ci (سریع‌تر) وگرنه npm install استفاده می‌شود
       - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then
