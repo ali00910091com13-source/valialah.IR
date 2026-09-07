@@ -6,6 +6,7 @@ import { Insurance, Team } from "./Sections2";
 import Doctors from "./Doctors";
 import { ArticlesList, ArticleView } from "./Articles";
 import { ContactSection, Footer } from "./Contact";
+import Admin from "./Admin";
 import { TABS, type TabId } from "./data";
 
 export default function App() {
