@@ -162,11 +162,10 @@ function Gate({ onOk }: { onOk: () => void }) {
 
 /* ─────────────── داشبورد ─────────────── */
 function Dashboard({ onLogout }: { onLogout: () => void }) {
-  const [panel, setPanel] = useState<"doctors" | "articles" | "insurers">("doctors");
+  const [panel, setPanel] = useState<"doctors" | "articles">("doctors");
   const [toast, setToast] = useState<Toast | null>(null);
   const doctors = useDoctors();
   const articles = useArticles();
-  const insurersCount = useInsurers().length;
 
   const notify = (msg: string, kind: "ok" | "err" = "ok") => {
     setToast({ msg, kind });
