@@ -1,4 +1,4 @@
-import type { Article, Doctor, Insurer } from "./data";
+import type { Article, Doctor } from "./data";
 
 const CFG_KEY = "aavm-cloud-cfg";
 
@@ -106,19 +106,6 @@ export async function pushCloudArticles(list: Article[]): Promise<boolean> {
   const cfg = getCloudCfg();
   if (!cfg) return false;
   return pushRow(articlesEndpoint(cfg), cfg.key, list, 1);
-}
-
-export async function fetchCloudInsurers(): Promise<Insurer[] | null> {
-  const cfg = getCloudCfg();
-  if (!cfg) return null;
-  const rows = await fetchRow(endpoint(cfg), cfg.key, 2);
-  return rows as Insurer[] | null;
-}
-
-export async function pushCloudInsurers(list: Insurer[]): Promise<boolean> {
-  const cfg = getCloudCfg();
-  if (!cfg) return false;
-  return pushRow(endpoint(cfg), cfg.key, list, 2);
 }
 
 export type TestResult =
