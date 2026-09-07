@@ -97,7 +97,7 @@ export default function Nav({
             <button
               onClick={() => setMenu((m) => !m)}
               aria-label="منو"
-              className="grid h-11 w-11 place-items-center rounded-[12px] border border-sea/25 text-seadeep transition-colors hover:bg-sea/10 lg:hidden"
+              className="flex items-center gap-2 rounded-[12px] border border-sea/25 px-3 py-2.5 text-seadeep transition-colors hover:bg-sea/10 lg:hidden"
             >
               {menu ? (
                 <IconClose className="h-5 w-5" />
@@ -106,6 +106,7 @@ export default function Nav({
                   <path d="M4 7h16M4 12h10M4 17h16" />
                 </svg>
               )}
+              <span className="text-sm font-bold">منو</span>
             </button>
           </div>
         </div>
