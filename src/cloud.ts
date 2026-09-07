@@ -4,12 +4,13 @@ const CFG_KEY = "aavm-cloud-cfg";
 
 export type CloudCfg = { url: string; key: string };
 
-const DEFAULT_CFG: CloudCfg = {
+// تنظیمات پیش‌فرض Supabase
+export const DEFAULT_CFG: CloudCfg = {
   url: "https://nrcezlwxksqmfzfsjsyw.supabase.co",
   key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yY2V6bHd4a3NxbWZ6ZnNqc3l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyMDUwNjAsImV4cCI6MjEwMzc4MTA2MH0.cr3NNjFGb4zXINrVL0cA18FKdCbatVorWIxHGrkEztE",
 };
 
-export function getCloudCfg(): CloudCfg {
+export function getCloudCfg(): CloudCfg | null {
   try {
     const raw = localStorage.getItem(CFG_KEY);
     if (raw) {
