@@ -47,12 +47,51 @@ export const BOOKING_LINKS = [
 export type Stat = { value: number; label: string; note?: string; icon: string; approx?: boolean };
 
 export const STATS: Stat[] = [
+  { value: 27, label: "سال سابقه", note: "خدمت بی‌وقفه", icon: "clock" },
   { value: 4, label: "طبقه مجزا", note: "به‌همراه زیرزمین", icon: "building" },
-  { value: 35, label: "اتاق مراجعه", note: "در تمام بخش‌ها", icon: "door" },
-  { value: 50, label: "پرسنل اداری و اجرایی", note: "در خدمت شما", icon: "users" },
-  { value: 27, label: "پزشک متخصص و عمومی", note: "در رشته‌های مختلف", icon: "stetho" },
-  { value: 15, label: "دندانپزشک مجرب", note: "در تمام شاخه‌ها", icon: "tooth" },
-  { value: 500, label: "مراجعه‌کننده در روز", note: "به‌طور میانگین", icon: "pulse", approx: true },
+  { value: 35, label: "اتاق مراجعه", note: "مجهز و مدرن", icon: "door" },
+  { value: 50, label: "پرسنل مجرب", note: "اداری و اجرایی", icon: "users" },
+  { value: 42, label: "پزشک و دندانپزشک", note: "متخصص و عمومی", icon: "stetho" },
+  { value: 500, label: "بیمار در روز", note: "به‌طور میانگین", icon: "pulse", approx: true },
+];
+
+export const FACILITIES = [
+  {
+    title: "ساختمان مدرن",
+    desc: "ساختمان ۴ طبقه به‌همراه زیرزمین با طراحی مدرن و دسترسی آسان برای همه مراجعین",
+    icon: "building",
+    features: ["آسانسور", "پارکینگ", "دسترسی معلولین", "تهویه مطبوع"],
+  },
+  {
+    title: "تجهیزات پیشرفته",
+    desc: "استفاده از جدیدترین تجهیزات پزشکی و دندانپزشکی برای تشخیص و درمان دقیق",
+    icon: "spark",
+    features: ["دستگاه پانورکس دیجیتال", "سونوگرافی رنگی", "یونیت‌های دندانپزشکی مدرن", "تجهیزات فیزیوتراپی"],
+  },
+  {
+    title: "کادر مجرب",
+    desc: "تیمی از پزشکان متخصص، دندانپزشکان و پرسنل با تجربه در خدمت شما",
+    icon: "users",
+    features: ["۲۷ پزشک متخصص", "۱۵ دندانپزشک", "۵۰ پرسنل اداری", "مشاوران حرفه‌ای"],
+  },
+  {
+    title: "خدمات ۲۴ ساعته",
+    desc: "ارائه خدمات درمانی از ساعت ۷ صبح تا ۲۳ شب، همه روزه حتی تعطیلات",
+    icon: "clock",
+    features: ["صبح تا شب", "همه روزه", "نوبت‌دهی آنلاین", "مشاوره تلفنی"],
+  },
+  {
+    title: "تعرفه خیریه",
+    desc: "ارائه خدمات با تعرفه مناسب و خیریه برای همه اقشار جامعه",
+    icon: "heart",
+    features: ["قیمت مناسب", "تخفیف ویژه", "خدمات رایگان", "پذیرش بیمه"],
+  },
+  {
+    title: "موقعیت مناسب",
+    desc: "دسترسی آسان از تمام نقاط تهران با حمل‌ونقل عمومی و خودروی شخصی",
+    icon: "pin",
+    features: ["نزدیک مترو", "پارکینگ اختصاصی", "دسترسی از بزرگراه", "محله امن"],
+  },
 ];
 
 export type Department = { id: string; title: string; short: string; icon: string; image: string; desc: string; badges: string[]; services: string[] };
