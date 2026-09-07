@@ -32,16 +32,7 @@ import {
   isDefaultArticles,
   newArticleId,
 } from "./articleStore";
-import {
-  useInsurers,
-  useInsurerSync,
-  addInsurer,
-  updateInsurer,
-  removeInsurer,
-  resetInsurers,
-  publishInsurersNow,
-  isDefaultInsurers,
-} from "./insurerStore";
+
 import { isEmbeddedCfg, SETUP_SQL, ARTICLES_SQL } from "./cloud";
 import ImagePicker from "./ImagePicker";
 import {
