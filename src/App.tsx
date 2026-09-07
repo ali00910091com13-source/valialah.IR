@@ -12,13 +12,22 @@ import { TABS, type TabId } from "./data";
 export default function App() {
   const [tab, setTab] = useState<TabId>(() => {
     const hash = window.location.hash.replace("#/", "");
+    if (hash === "admin") return "home";
     return TABS.find((t) => t.id === hash)?.id || "home";
   });
   const [articleId, setArticleId] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(() => window.location.hash === "#/admin");
 
   useEffect(() => {
     const onHash = () => {
       const hash = window.location.hash.replace("#/", "");
+      
+      if (hash === "admin") {
+        setIsAdmin(true);
+        return;
+      }
+      
+      setIsAdmin(false);
       const [tabPart, articlePart] = hash.split("/");
       const newTab = TABS.find((t) => t.id === tabPart)?.id || "home";
       setTab(newTab);
@@ -32,8 +41,13 @@ export default function App() {
     window.location.hash = articleId ? `#/${id}/${articleId}` : `#/${id}`;
     setTab(id);
     setArticleId(articleId || null);
+    setIsAdmin(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  if (isAdmin) {
+    return <Admin />;
+  }
 
   return (
     <div className="min-h-screen bg-paper">
