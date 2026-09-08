@@ -1,5 +1,6 @@
 import {
   BASE_INSURERS,
+  INSURERS,
   TEAM_SPECIALTIES,
   CONTACT,
   IMG,
@@ -8,7 +9,6 @@ import {
   type TabId,
 } from "./data";
 import { Reveal, Stamp, CountUp } from "./fx";
-import { useInsurers } from "./insurerStore";
 import {
   IconShield,
   IconStar8,
@@ -51,8 +51,6 @@ function InsurerTile({ ins, i }: { ins: Insurer; i: number }) {
 }
 
 export function Insurance() {
-  const insurers = useInsurers();
-
   return (
     <div className="relative overflow-hidden bg-paper py-14 sm:py-24">
       <div className="girih absolute inset-0 opacity-50" aria-hidden="true" />
