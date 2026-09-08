@@ -33,7 +33,6 @@ export const TABS = [
   { id: "doctors", label: "پزشکان", icon: "doctor" },
   { id: "articles", label: "مقالات", icon: "news" },
   { id: "facilities", label: "امکانات", icon: "building" },
-  { id: "insurance", label: "بیمه‌ها", icon: "shield" },
   { id: "contact", label: "تماس با ما", icon: "phone" },
 ] as const;
 
