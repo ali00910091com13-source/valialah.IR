@@ -1,0 +1,178 @@
+.admin-container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--color-card, #fefcf6);
+  border-radius: 16px;
+  border: 1px solid rgba(14, 124, 116, 0.18);
+  box-shadow: 0 10px 30px rgba(11, 59, 56, 0.08);
+  direction: rtl;
+}
+
+.admin-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(14, 124, 116, 0.15);
+}
+
+.admin-container h2 {
+  font-family: var(--font-display, inherit);
+  font-size: 1.8rem;
+  color: var(--color-pine, #0b3b38);
+  margin: 0;
+}
+
+.back-to-site-btn {
+  background: var(--color-foam, #e9f5f1);
+  color: var(--color-seadeep, #0a5a54);
+  border: 1px solid rgba(14, 124, 116, 0.3);
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.back-to-site-btn:hover {
+  background: var(--color-tea, #1ba396);
+  color: white;
+}
+
+.admin-loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.1rem;
+  color: var(--color-seadeep, #0a5a54);
+  direction: rtl;
+}
+
+.error-message {
+  background: #fef2f2;
+  color: #b91c1c;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  border: 1px solid #fecaca;
+}
+
+.form-section {
+  background: #fbf7ec;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(14, 124, 116, 0.12);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.form-section h3 {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--color-pine, #0b3b38);
+  font-weight: 800;
+}
+
+.form-section select,
+.form-section input {
+  flex: 1 1 180px;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(14, 124, 116, 0.25);
+  border-radius: 8px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--color-ink, #16302c);
+  outline: none;
+}
+
+.form-section select:focus,
+.form-section input:focus {
+  border-color: var(--color-sea, #0e7c74);
+  box-shadow: 0 0 0 3px rgba(14, 124, 116, 0.15);
+}
+
+.form-section button {
+  background: var(--color-sea, #0e7c74);
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.4rem;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.form-section button:hover {
+  background: var(--color-seadeep, #0a5a54);
+}
+
+.users-list-section {
+  overflow-x: auto;
+}
+
+.users-list-section h3 {
+  font-size: 1.1rem;
+  color: var(--color-pine, #0b3b38);
+  margin-bottom: 1rem;
+  font-weight: 800;
+}
+
+.users-list-section table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+.users-list-section th {
+  background: #f0f7f4;
+  color: var(--color-seadeep, #0a5a54);
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  border-bottom: 2px solid rgba(14, 124, 116, 0.2);
+}
+
+.users-list-section td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(14, 124, 116, 0.1);
+  color: var(--color-ink, #16302c);
+}
+
+.user-role-badge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: #e9f5f1;
+  color: #0e7c74;
+  border: 1px solid rgba(14, 124, 116, 0.25);
+}
+
+.delete-btn {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  padding: 0.35rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+  color: #fff;
+}

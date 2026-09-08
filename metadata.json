@@ -1,0 +1,6 @@
+{
+  "name": "درمانگاه خیریه آوای مهر ولی‌الله",
+  "description": "سامانه اطلاع‌رسانی و خدمات درمانگاه خیریه آوای مهر ولی‌الله شامل نوبت‌دهی اینترنتی، پزشکان، بخش‌های تخصصی و مقالات سلامتی",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
