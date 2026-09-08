@@ -116,25 +116,25 @@
   background: var(--color-seadeep, #0a5a54);
 }
 
-.insurance-list {
+.users-list-section {
   overflow-x: auto;
 }
 
-.insurance-list h3 {
+.users-list-section h3 {
   font-size: 1.1rem;
   color: var(--color-pine, #0b3b38);
   margin-bottom: 1rem;
   font-weight: 800;
 }
 
-.insurance-list table {
+.users-list-section table {
   width: 100%;
   border-collapse: collapse;
   text-align: right;
   font-size: 0.9rem;
 }
 
-.insurance-list th {
+.users-list-section th {
   background: #f0f7f4;
   color: var(--color-seadeep, #0a5a54);
   padding: 0.75rem 1rem;
@@ -142,10 +142,21 @@
   border-bottom: 2px solid rgba(14, 124, 116, 0.2);
 }
 
-.insurance-list td {
+.users-list-section td {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid rgba(14, 124, 116, 0.1);
   color: var(--color-ink, #16302c);
+}
+
+.user-role-badge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: #e9f5f1;
+  color: #0e7c74;
+  border: 1px solid rgba(14, 124, 116, 0.25);
 }
 
 .delete-btn {
