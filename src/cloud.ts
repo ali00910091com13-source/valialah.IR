@@ -1,6 +1,5 @@
 import type { Article, Doctor } from "./data";
 
-// آدرس API - این را با آدرس هاست خود تغییر دهید
 const API_BASE = "/api";
 
 export type CloudCfg = { url: string };
