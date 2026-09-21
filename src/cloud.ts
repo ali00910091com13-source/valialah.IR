@@ -16,7 +16,7 @@ export function normalizeProjectUrl(raw: string): string | null {
   return raw.trim();
 }
 
-export const saveCloudCfg = (url: string) => {};
+export const saveCloudCfg = () => {};
 export const clearCloudCfg = () => {};
 
 async function fetchData(endpoint: string): Promise<any[] | null> {
