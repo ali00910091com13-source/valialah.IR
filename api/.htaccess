@@ -1,0 +1,21 @@
+RewriteEngine On
+RewriteBase /api/
+
+# اجازه دسترسی به همه
+<IfModule mod_rewrite.c>
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?path=$1 [QSA,L]
+</IfModule>
+
+# تنظیمات کش
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType application/json "access plus 0 seconds"
+</IfModule>
+
+# امنیت
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>
