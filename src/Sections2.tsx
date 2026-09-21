@@ -1,5 +1,6 @@
 import {
   BASE_INSURERS,
+  INSURERS,
   TEAM_SPECIALTIES,
   CONTACT,
   IMG,
@@ -8,7 +9,6 @@ import {
   type TabId,
 } from "./data";
 import { Reveal, Stamp, CountUp } from "./fx";
-import { useInsurers } from "./insurerStore";
 import {
   IconShield,
   IconStar8,
@@ -51,8 +51,6 @@ function InsurerTile({ ins, i }: { ins: Insurer; i: number }) {
 }
 
 export function Insurance() {
-  const insurers = useInsurers();
-
   return (
     <div className="relative overflow-hidden bg-paper py-14 sm:py-24">
       <div className="girih absolute inset-0 opacity-50" aria-hidden="true" />
@@ -92,7 +90,7 @@ export function Insurance() {
           </h3>
         </Reveal>
         <div className="mt-8 grid grid-cols-2 gap-3.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-          {insurers.map((ins, i) => (
+          {INSURERS.map((ins, i) => (
             <InsurerTile key={`${ins.name}-${i}`} ins={ins} i={i} />
           ))}
           <Reveal delay={380}>
