@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Nav from "./Nav";
 import Hero from "./Hero";
 import { StatsBand, Departments, OtherUnits } from "./Sections";
-import { Insurance, Team } from "./Sections2";
+import { Team } from "./Sections2";
 import Doctors from "./Doctors";
 import { ArticlesList, ArticleView } from "./Articles";
 import { ContactSection, Footer } from "./Contact";
@@ -79,8 +79,6 @@ export default function App() {
         )}
         
         {tab === "facilities" && <StatsBand />}
-        
-        {tab === "insurance" && <Insurance />}
         
         {tab === "contact" && <ContactSection />}
       </main>
