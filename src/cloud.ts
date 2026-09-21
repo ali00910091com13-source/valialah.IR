@@ -1,11 +1,11 @@
 import type { Article, Doctor } from "./data";
 
-// آدرس API روی هاست - این را با آدرس واقعی هاست خود تغییر دهید
+// آدرس API - این را با آدرس هاست خود تغییر دهید
 const API_BASE = "/api";
 
 export type CloudCfg = { url: string };
 
-export function getCloudCfg(): CloudCfg {
+export function getCloudCfg(): CloudCfg | null {
   return { url: API_BASE };
 }
 
@@ -22,10 +22,7 @@ export const clearCloudCfg = () => {};
 
 async function fetchData(endpoint: string): Promise<any[] | null> {
   try {
-    const res = await fetch(`${API_BASE}/index.php?path=${endpoint}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
+    const res = await fetch(`${API_BASE}/index.php?path=${endpoint}`);
     if (!res.ok) return null;
     const data = await res.json();
     return Array.isArray(data) ? data : [];
