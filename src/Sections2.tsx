@@ -90,7 +90,7 @@ export function Insurance() {
           </h3>
         </Reveal>
         <div className="mt-8 grid grid-cols-2 gap-3.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-          {insurers.map((ins, i) => (
+          {INSURERS.map((ins, i) => (
             <InsurerTile key={`${ins.name}-${i}`} ins={ins} i={i} />
           ))}
           <Reveal delay={380}>
